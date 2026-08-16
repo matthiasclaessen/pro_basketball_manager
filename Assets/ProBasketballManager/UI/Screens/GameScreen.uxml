@@ -1,0 +1,425 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="../Styles/GameScreen.uss" />
+
+    <ui:VisualElement name="root" class="app">
+        <ui:VisualElement class="sidebar">
+            <ui:VisualElement class="brand">
+                <ui:Label text="PRO" class="brand-kicker" />
+                <ui:Label text="BASKETBALL" class="brand-title" />
+                <ui:Label text="MANAGER" class="brand-title" />
+            </ui:VisualElement>
+
+           <ui:VisualElement class="navigation">
+                <ui:Button name="nav-dashboard-button" text="Dashboard" class="nav-item nav-item-active" />
+                <ui:Button name="nav-squad-button" text="Squad" class="nav-item" />
+                <ui:Button name="nav-tactics-button" text="Tactics" class="nav-item" />
+                <ui:Button name="nav-schedule-button" text="Schedule" class="nav-item" />
+                <ui:Button name="nav-league-button" text="League" class="nav-item" />
+            </ui:VisualElement>
+
+            <ui:VisualElement class="sidebar-footer">
+                <ui:Label text="PROTOTYPE" class="sidebar-footer-label" />
+                <ui:Label text="Version 0.1" class="sidebar-footer-version" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement class="main">
+            <ui:VisualElement class="topbar">
+                <ui:VisualElement>
+                    <ui:Label name="club-name" text="Club" class="topbar-club-name" />
+                    <ui:Label name="league-name" text="League" class="topbar-league-name" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="topbar-season">
+                    <ui:Label name="season-name" text="2026 / 27" class="season-value" />
+                    <ui:Label text="DEMO SEASON" class="season-label" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement class="content">
+                <ui:VisualElement name="dashboard-screen" class="screen">
+                    <ui:Label text="Dashboard" class="page-title" />
+                    <ui:Label text="Your club overview and next fixture." class="page-subtitle" />
+
+                    <ui:VisualElement class="card match-card">
+                        <ui:VisualElement class="card-header">
+                            <ui:VisualElement>
+                                <ui:Label text="NEXT MATCH" class="card-eyebrow" />
+                                <ui:Label text="Belgian Demo League" class="card-title" />
+                            </ui:VisualElement>
+
+                            <ui:Label name="match-status" text="UPCOMING" class="status-badge" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement class="scoreboard">
+                            <ui:VisualElement class="team-block">
+                                <ui:Label name="home-team-name" text="Home Team" class="team-name" />
+                                <ui:Label text="HOME" class="team-side-label" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="score-block">
+                                <ui:VisualElement class="score-row">
+                                    <ui:Label name="home-score" text="—" class="score" />
+                                    <ui:Label text=":" class="score-separator" />
+                                    <ui:Label name="away-score" text="—" class="score" />
+                                </ui:VisualElement>
+
+                                <ui:Label name="fixture-info" text="Round 1 · 20:00" class="fixture-info" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="team-block">
+                                <ui:Label name="away-team-name" text="Away Team" class="team-name" />
+                                <ui:Label text="AWAY" class="team-side-label" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+
+                        <ui:VisualElement name="period-scores" class="period-scores" />
+
+                        <ui:Button name="simulate-match-button" text="Open Match Centre" class="primary-button" />
+                    </ui:VisualElement>
+
+                    <ui:VisualElement class="bottom-grid">
+                        <ui:VisualElement class="card league-card">
+                            <ui:Label text="LEAGUE" class="card-eyebrow" />
+                            <ui:Label text="Belgian Demo League" class="panel-title" />
+
+                            <ui:VisualElement class="league-table-header">
+                                <ui:Label text="#" class="league-position" />
+                                <ui:Label text="Team" class="league-team-name" />
+                                <ui:Label text="Record" class="league-record" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement name="league-list" class="league-list" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement class="card club-card">
+                            <ui:Label text="YOUR CLUB" class="card-eyebrow" />
+                            <ui:Label name="club-panel-name" text="Club" class="panel-title" />
+
+                            <ui:VisualElement class="metric-row">
+                                <ui:Label text="Roster" class="metric-label" />
+                                <ui:Label name="roster-count" text="-" class="metric-value" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="metric-row">
+                                <ui:Label text="Avg. 3PT" class="metric-label" />
+                                <ui:Label name="three-point-rating" text="-" class="metric-value" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="metric-row">
+                                <ui:Label text="Avg. defense" class="metric-label" />
+                                <ui:Label name="defense-rating" text="-" class="metric-value" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+
+                <ui:VisualElement name="squad-screen" class="screen screen-hidden">
+                    <ui:VisualElement class="squad-screen-header">
+                        <ui:VisualElement>
+                            <ui:Label text="Squad" class="page-title" />
+                            <ui:Label name="squad-subtitle" text="Antwerp Admirals · 2026 / 27" class="page-subtitle" />
+                        </ui:VisualElement>
+
+                        <ui:Label name="squad-games-badge" text="0 GAMES PLAYED" class="squad-games-badge" />
+                    </ui:VisualElement>
+
+                    <ui:VisualElement class="squad-summary-row">
+                        <ui:VisualElement class="card squad-summary-card">
+                            <ui:Label text="ROSTER" class="card-eyebrow" />
+                            <ui:Label name="squad-roster-value" text="12" class="squad-summary-value" />
+                            <ui:Label text="Players" class="squad-summary-label" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement class="card squad-summary-card squad-summary-card-middle">
+                            <ui:Label text="RECORD" class="card-eyebrow" />
+                            <ui:Label name="squad-record-value" text="0 - 0" class="squad-summary-value" />
+                            <ui:Label text="Wins - Losses" class="squad-summary-label" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement class="card squad-summary-card">
+                            <ui:Label text="LEADING SCORER" class="card-eyebrow" />
+                            <ui:Label name="squad-leading-scorer-value" text="No games yet" class="squad-summary-value squad-leading-scorer-value" />
+                            <ui:Label name="squad-leading-scorer-detail" text="— PPG" class="squad-summary-label" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <ui:VisualElement class="card squad-table-card">
+                        <ui:VisualElement class="squad-table-header">
+                            <ui:Label text="Player" class="squad-player-column" />
+                            <ui:Label text="Role" class="squad-role-column" />
+                            <ui:Label text="Pos" class="squad-position-column" />
+                            <ui:Label text="GP" class="squad-small-column" />
+                            <ui:Label text="GS" class="squad-small-column" />
+                            <ui:Label text="MIN" class="squad-stat-column" />
+                            <ui:Label text="PTS" class="squad-stat-column" />
+                            <ui:Label text="REB" class="squad-stat-column" />
+                            <ui:Label text="AST" class="squad-stat-column" />
+                            <ui:Label text="STL" class="squad-stat-column" />
+                            <ui:Label text="FG%" class="squad-percent-column" />
+                            <ui:Label text="3P%" class="squad-percent-column" />
+                            <ui:Label text="FT%" class="squad-percent-column" />
+                        </ui:VisualElement>
+
+                        <ui:ScrollView class="squad-table-scroll">
+                            <ui:VisualElement name="squad-list" class="squad-list" />
+                        </ui:ScrollView>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <ui:ScrollView name="tactics-screen" class="screen tactics-screen-scroll screen-hidden">
+                    <ui:VisualElement class="tactics-screen-content">
+                        <ui:VisualElement class="tactics-header">
+                            <ui:VisualElement>
+                                <ui:Label text="Tactics" class="page-title" />
+                                <ui:Label text="Control how your team approaches each game." class="page-subtitle" />
+                            </ui:VisualElement>
+
+                            <ui:Label name="tactics-save-state" text="Current tactics" class="tactics-save-state" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement class="tactics-grid">
+                            <ui:VisualElement class="card tactics-card tactics-card-left">
+                                <ui:Label text="OFFENSE" class="card-eyebrow" />
+                                <ui:Label text="Offensive Approach" class="panel-title" />
+
+                                <ui:Label text="TEMPO" class="tactics-section-label" />
+
+                                <ui:SliderInt name="pace-slider" label="Pace" low-value="0" high-value="100" value="50" page-size="1" show-input-field="true" class="tactics-slider" />
+
+                                <ui:VisualElement class="tactics-divider" />
+
+                                <ui:Label text="SHOT PROFILE" class="tactics-section-label" />
+                                <ui:Label text="These values are normalized into a shot distribution." class="tactics-help" />
+
+                                <ui:SliderInt name="rim-slider" label="Rim / Paint" low-value="0" high-value="100" value="45" page-size="1" show-input-field="true" class="tactics-slider" />
+                                <ui:SliderInt name="mid-range-slider" label="Mid-range" low-value="0" high-value="100" value="20" page-size="1" show-input-field="true" class="tactics-slider" />
+                                <ui:SliderInt name="three-point-slider" label="Three-point" low-value="0" high-value="100" value="35" page-size="1" show-input-field="true" class="tactics-slider" />
+
+                                <ui:VisualElement class="tactics-divider" />
+
+                                <ui:Label text="CREATION" class="tactics-section-label" />
+                                <ui:SliderInt name="ball-movement-slider" label="Ball movement" low-value="0" high-value="100" value="50" page-size="1" show-input-field="true" class="tactics-slider" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="card tactics-card tactics-card-right">
+                                <ui:Label text="DEFENSE" class="card-eyebrow" />
+                                <ui:Label text="Defensive Approach" class="panel-title" />
+
+                                <ui:Label text="PERIMETER" class="tactics-section-label" />
+                                <ui:SliderInt name="perimeter-pressure-slider" label="Perimeter pressure" low-value="0" high-value="100" value="50" page-size="1" show-input-field="true" class="tactics-slider" />
+                                <ui:Label text="Higher pressure can create more turnovers, but aggressive defense also increases foul risk." class="tactics-help tactics-help-spaced" />
+
+                                <ui:VisualElement class="tactics-divider" />
+
+                                <ui:Label text="INTERIOR" class="tactics-section-label" />
+                                <ui:SliderInt name="protect-paint-slider" label="Protect paint" low-value="0" high-value="100" value="50" page-size="1" show-input-field="true" class="tactics-slider" />
+                                <ui:Label text="Stronger paint protection makes interior shots harder, but can leave more space on the perimeter." class="tactics-help tactics-help-spaced" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+
+                        <ui:VisualElement class="card rotation-card">
+                            <ui:VisualElement class="rotation-card-header">
+                                <ui:VisualElement>
+                                    <ui:Label text="ROTATION" class="card-eyebrow" />
+                                    <ui:Label text="Lineup &amp; Player Roles" class="panel-title" />
+                                </ui:VisualElement>
+
+                                <ui:Label name="rotation-minutes-total" text="200 / 200 MIN" class="rotation-total rotation-total-valid" />
+                            </ui:VisualElement>
+
+                            <ui:Label text="STARTING FIVE" class="tactics-section-label" />
+
+                            <ui:VisualElement class="starting-five-row">
+                                <ui:DropdownField name="starter-pg-dropdown" label="PG" class="starter-dropdown" />
+                                <ui:DropdownField name="starter-sg-dropdown" label="SG" class="starter-dropdown" />
+                                <ui:DropdownField name="starter-sf-dropdown" label="SF" class="starter-dropdown" />
+                                <ui:DropdownField name="starter-pf-dropdown" label="PF" class="starter-dropdown" />
+                                <ui:DropdownField name="starter-c-dropdown" label="C" class="starter-dropdown starter-dropdown-last" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="tactics-divider" />
+
+                            <ui:Label text="OFFENSIVE ROLES" class="tactics-section-label" />
+
+                            <ui:VisualElement class="role-row">
+                                <ui:DropdownField name="primary-ball-handler-dropdown" label="Primary ball handler" class="role-dropdown role-dropdown-left" />
+                                <ui:DropdownField name="primary-scorer-dropdown" label="Primary scorer" class="role-dropdown" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="tactics-divider" />
+
+                            <ui:Label text="MINUTES &amp; ROTATION ORDER" class="tactics-section-label" />
+
+                            <ui:VisualElement class="rotation-table-header">
+                                <ui:Label text="#" class="rotation-order-column" />
+                                <ui:Label text="Player" class="rotation-player-column" />
+                                <ui:Label text="Pos" class="rotation-position-column" />
+                                <ui:Label text="Target MIN" class="rotation-minutes-column" />
+                            </ui:VisualElement>
+
+                            <ui:ScrollView class="rotation-scroll">
+                                <ui:VisualElement name="rotation-list" />
+                            </ui:ScrollView>
+                        </ui:VisualElement>
+
+                        <ui:VisualElement class="card tactics-summary-card">
+                            <ui:VisualElement class="tactics-summary-content">
+                                <ui:Label text="CURRENT PLAN" class="card-eyebrow" />
+                                <ui:Label name="tactics-summary" text="Balanced" class="tactics-summary" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="tactics-actions">
+                                <ui:Button name="reset-tactics-button" text="Reset to Default" class="secondary-button tactics-action-button" />
+                                <ui:Button name="apply-tactics-button" text="Apply Tactics" class="primary-button tactics-action-button" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:ScrollView>
+
+
+                <ui:VisualElement name="schedule-screen" class="screen screen-hidden">
+                    <ui:VisualElement class="season-screen-header">
+                        <ui:VisualElement>
+                            <ui:Label text="Schedule" class="page-title" />
+                            <ui:Label text="Fixtures and results for the current season." class="page-subtitle" />
+                        </ui:VisualElement>
+
+                        <ui:Label name="schedule-round-badge" text="ROUND 1 / 6" class="season-round-badge" />
+                    </ui:VisualElement>
+
+                    <ui:VisualElement class="card season-list-card">
+                        <ui:ScrollView class="season-list-scroll">
+                            <ui:VisualElement name="schedule-list" class="schedule-list" />
+                        </ui:ScrollView>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <ui:VisualElement name="league-screen" class="screen screen-hidden">
+                    <ui:VisualElement class="season-screen-header">
+                        <ui:VisualElement>
+                            <ui:Label text="League" class="page-title" />
+                            <ui:Label name="league-screen-subtitle" text="Belgian Demo League · 2026 / 27" class="page-subtitle" />
+                        </ui:VisualElement>
+
+                        <ui:Label name="league-progress-badge" text="ROUND 1 / 6" class="season-round-badge" />
+                    </ui:VisualElement>
+
+                    <ui:VisualElement class="card standings-card">
+                        <ui:VisualElement class="standings-header">
+                            <ui:Label text="#" class="standings-position" />
+                            <ui:Label text="Team" class="standings-team" />
+                            <ui:Label text="P" class="standings-small" />
+                            <ui:Label text="W" class="standings-small" />
+                            <ui:Label text="L" class="standings-small" />
+                            <ui:Label text="PF" class="standings-medium" />
+                            <ui:Label text="PA" class="standings-medium" />
+                            <ui:Label text="+/-" class="standings-medium" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement name="league-standings-list" class="standings-list" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <ui:VisualElement name="match-centre-screen" class="screen screen-hidden">
+                    <ui:VisualElement class="match-centre-header">
+                        <ui:VisualElement>
+                            <ui:Label text="MATCH CENTRE" class="card-eyebrow" />
+                            <ui:Label name="match-centre-status" text="LIVE" class="page-title" />
+                        </ui:VisualElement>
+
+                        <ui:Button name="back-to-dashboard-button" text="Back to Dashboard" class="secondary-button" />
+                    </ui:VisualElement>
+
+                    <ui:VisualElement class="card match-centre-score-card">
+                        <ui:VisualElement class="match-centre-scoreboard">
+                            <ui:VisualElement class="match-centre-team">
+                                <ui:Label name="match-centre-home-team" text="Home Team" class="match-centre-team-name" />
+                                <ui:Label text="HOME" class="team-side-label" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="match-centre-middle">
+                                <ui:VisualElement class="score-row">
+                                    <ui:Label name="match-centre-home-score" text="0" class="match-centre-score" />
+                                    <ui:Label text=":" class="score-separator" />
+                                    <ui:Label name="match-centre-away-score" text="0" class="match-centre-score" />
+                                </ui:VisualElement>
+
+                                <ui:VisualElement class="match-clock-row">
+                                    <ui:Label name="match-centre-period" text="Q1" class="match-period" />
+                                    <ui:Label name="match-centre-clock" text="10:00" class="match-clock" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="match-centre-team">
+                                <ui:Label name="match-centre-away-team" text="Away Team" class="match-centre-team-name" />
+                                <ui:Label text="AWAY" class="team-side-label" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+
+                        <ui:VisualElement class="match-centre-controls">
+                            <ui:Label text="Speed" class="controls-label" />
+
+                            <ui:Button name="speed-1x-button" text="1×" class="speed-button speed-button-active" />
+                            <ui:Button name="speed-2x-button" text="2×" class="speed-button" />
+                            <ui:Button name="speed-4x-button" text="4×" class="speed-button" />
+
+                            <ui:VisualElement class="control-spacer" />
+
+                            <ui:Button name="instant-result-button" text="Instant Result" class="instant-result-button" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <ui:VisualElement class="match-centre-bottom">
+                        <ui:VisualElement class="card play-by-play-card">
+                            <ui:Label text="PLAY-BY-PLAY" class="card-eyebrow" />
+                            <ui:Label text="Match Commentary" class="panel-title" />
+
+                            <ui:ScrollView name="play-by-play-scroll" class="play-by-play-scroll">
+                                <ui:VisualElement name="play-by-play-list" class="play-by-play-list" />
+                            </ui:ScrollView>
+                        </ui:VisualElement>
+
+                        <ui:VisualElement class="card box-score-card">
+                        <ui:VisualElement class="box-score-title-row">
+                            <ui:VisualElement>
+                                <ui:Label text="BOX SCORE" class="card-eyebrow" />
+                                <ui:Label text="Player Statistics" class="panel-title box-score-panel-title" />
+                            </ui:VisualElement>
+
+                            <ui:Label name="box-score-state" text="Available after final buzzer" class="box-score-state" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement class="box-score-meta">
+                            <ui:Label text="Seed" class="box-score-meta-label" />
+                            <ui:Label name="match-seed" text="-" class="box-score-meta-value" />
+
+                            <ui:Label text="Events" class="box-score-meta-label box-score-meta-spaced" />
+                            <ui:Label name="match-event-count" text="-" class="box-score-meta-value" />
+                        </ui:VisualElement>
+
+                       <ui:VisualElement class="box-score-header">
+                            <ui:Label text="Player" class="box-score-player" />
+                            <ui:Label text="MIN" class="box-score-minutes" />
+                            <ui:Label text="PTS" class="box-score-number" />
+                            <ui:Label text="FG" class="box-score-shooting" />
+                            <ui:Label text="3PT" class="box-score-shooting" />
+                            <ui:Label text="FT" class="box-score-shooting" />
+                            <ui:Label text="REB" class="box-score-number" />
+                            <ui:Label text="AST" class="box-score-number" />
+                            <ui:Label text="STL" class="box-score-number" />
+                            <ui:Label text="PF" class="box-score-number" />
+                            <ui:Label text="TO" class="box-score-number" />
+                        </ui:VisualElement>
+
+                        <ui:ScrollView name="box-score-scroll" class="box-score-scroll">
+                            <ui:VisualElement name="box-score-list" class="box-score-list" />
+                        </ui:ScrollView>
+                    </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
