@@ -168,6 +168,138 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
 
+
+                <ui:ScrollView name="player-profile-screen" class="screen player-profile-scroll screen-hidden">
+                    <ui:VisualElement class="player-profile-content">
+                        <ui:VisualElement class="player-profile-header">
+                            <ui:VisualElement class="player-profile-heading">
+                                <ui:Button name="player-profile-back-button" text="← Back to Squad" class="secondary-button player-profile-back-button" />
+
+                                <ui:VisualElement class="player-profile-title-row">
+                                    <ui:VisualElement>
+                                        <ui:Label name="player-profile-name" text="Player Name" class="page-title" />
+                                        <ui:Label name="player-profile-meta" text="PG · Antwerp Admirals" class="page-subtitle" />
+                                    </ui:VisualElement>
+
+                                    <ui:Label name="player-profile-role" text="STARTER" class="squad-role-badge squad-role-starter player-profile-role-badge" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+
+                            <ui:Label name="player-profile-season" text="2026 / 27" class="player-profile-season-badge" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement class="player-profile-stat-row">
+                            <ui:VisualElement class="card player-profile-stat-card">
+                                <ui:Label text="GP" class="player-profile-stat-label" />
+                                <ui:Label name="player-profile-gp" text="0" class="player-profile-stat-value" />
+                            </ui:VisualElement>
+                            <ui:VisualElement class="card player-profile-stat-card player-profile-stat-card-spaced">
+                                <ui:Label text="GS" class="player-profile-stat-label" />
+                                <ui:Label name="player-profile-gs" text="0" class="player-profile-stat-value" />
+                            </ui:VisualElement>
+                            <ui:VisualElement class="card player-profile-stat-card player-profile-stat-card-spaced">
+                                <ui:Label text="MIN" class="player-profile-stat-label" />
+                                <ui:Label name="player-profile-min" text="—" class="player-profile-stat-value" />
+                            </ui:VisualElement>
+                            <ui:VisualElement class="card player-profile-stat-card player-profile-stat-card-spaced">
+                                <ui:Label text="PTS" class="player-profile-stat-label" />
+                                <ui:Label name="player-profile-pts" text="—" class="player-profile-stat-value" />
+                            </ui:VisualElement>
+                            <ui:VisualElement class="card player-profile-stat-card player-profile-stat-card-spaced">
+                                <ui:Label text="REB" class="player-profile-stat-label" />
+                                <ui:Label name="player-profile-reb" text="—" class="player-profile-stat-value" />
+                            </ui:VisualElement>
+                            <ui:VisualElement class="card player-profile-stat-card player-profile-stat-card-spaced">
+                                <ui:Label text="AST" class="player-profile-stat-label" />
+                                <ui:Label name="player-profile-ast" text="—" class="player-profile-stat-value" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+
+                        <ui:VisualElement class="player-profile-stat-row player-profile-stat-row-secondary">
+                            <ui:VisualElement class="card player-profile-stat-card">
+                                <ui:Label text="STL" class="player-profile-stat-label" />
+                                <ui:Label name="player-profile-stl" text="—" class="player-profile-stat-value" />
+                            </ui:VisualElement>
+                            <ui:VisualElement class="card player-profile-stat-card player-profile-stat-card-spaced">
+                                <ui:Label text="FG%" class="player-profile-stat-label" />
+                                <ui:Label name="player-profile-fg" text="—" class="player-profile-stat-value" />
+                            </ui:VisualElement>
+                            <ui:VisualElement class="card player-profile-stat-card player-profile-stat-card-spaced">
+                                <ui:Label text="3P%" class="player-profile-stat-label" />
+                                <ui:Label name="player-profile-3pt" text="—" class="player-profile-stat-value" />
+                            </ui:VisualElement>
+                            <ui:VisualElement class="card player-profile-stat-card player-profile-stat-card-spaced">
+                                <ui:Label text="FT%" class="player-profile-stat-label" />
+                                <ui:Label name="player-profile-ft" text="—" class="player-profile-stat-value" />
+                            </ui:VisualElement>
+                            <ui:VisualElement class="card player-profile-stat-card player-profile-stat-card-spaced">
+                                <ui:Label text="TO" class="player-profile-stat-label" />
+                                <ui:Label name="player-profile-to" text="—" class="player-profile-stat-value" />
+                            </ui:VisualElement>
+                            <ui:VisualElement class="card player-profile-stat-card player-profile-stat-card-spaced">
+                                <ui:Label text="PF" class="player-profile-stat-label" />
+                                <ui:Label name="player-profile-pf" text="—" class="player-profile-stat-value" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+
+                        <ui:VisualElement class="player-profile-section-heading">
+                            <ui:Label text="ATTRIBUTES" class="card-eyebrow" />
+                            <ui:Label text="Player Attributes" class="panel-title" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement class="player-profile-attribute-row">
+                            <ui:VisualElement class="card player-profile-attribute-card player-profile-attribute-card-left">
+                                <ui:Label text="SCORING" class="tactics-section-label" />
+                                <ui:VisualElement name="player-profile-scoring-attributes" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="card player-profile-attribute-card">
+                                <ui:Label text="PLAYMAKING" class="tactics-section-label" />
+                                <ui:VisualElement name="player-profile-playmaking-attributes" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+
+                        <ui:VisualElement class="player-profile-attribute-row player-profile-attribute-row-secondary">
+                            <ui:VisualElement class="card player-profile-attribute-card player-profile-attribute-card-left">
+                                <ui:Label text="DEFENSE &amp; REBOUNDING" class="tactics-section-label" />
+                                <ui:VisualElement name="player-profile-defense-attributes" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="card player-profile-attribute-card">
+                                <ui:Label text="PHYSICAL" class="tactics-section-label" />
+                                <ui:VisualElement name="player-profile-physical-attributes" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+
+                        <ui:VisualElement class="card player-profile-game-log-card">
+                            <ui:VisualElement class="player-profile-section-heading player-profile-game-log-heading">
+                                <ui:VisualElement>
+                                    <ui:Label text="SEASON" class="card-eyebrow" />
+                                    <ui:Label text="Game Log" class="panel-title" />
+                                </ui:VisualElement>
+
+                                <ui:Label name="player-profile-game-log-count" text="0 FIXTURES" class="player-profile-game-log-count" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement class="player-game-log-header">
+                                <ui:Label text="Rnd" class="player-game-log-round" />
+                                <ui:Label text="Opponent" class="player-game-log-opponent" />
+                                <ui:Label text="H/A" class="player-game-log-side" />
+                                <ui:Label text="Result" class="player-game-log-result" />
+                                <ui:Label text="MIN" class="player-game-log-stat" />
+                                <ui:Label text="PTS" class="player-game-log-stat" />
+                                <ui:Label text="REB" class="player-game-log-stat" />
+                                <ui:Label text="AST" class="player-game-log-stat" />
+                                <ui:Label text="STL" class="player-game-log-stat" />
+                                <ui:Label text="FG" class="player-game-log-shooting" />
+                                <ui:Label text="3PT" class="player-game-log-shooting" />
+                            </ui:VisualElement>
+
+                            <ui:VisualElement name="player-profile-game-log-list" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:ScrollView>
+
                 <ui:ScrollView name="tactics-screen" class="screen tactics-screen-scroll screen-hidden">
                     <ui:VisualElement class="tactics-screen-content">
                         <ui:VisualElement class="tactics-header">

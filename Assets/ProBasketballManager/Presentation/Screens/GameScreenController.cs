@@ -20,6 +20,7 @@ namespace ProBasketballManager.Presentation.Screens
         private Season _season;
         private Team _userTeam;
         private Fixture _currentFixture;
+        private Player _selectedPlayer;
         private Team _homeTeam;
         private Team _awayTeam;
         private MatchResult _currentMatchResult;
@@ -29,6 +30,7 @@ namespace ProBasketballManager.Presentation.Screens
 
         private VisualElement _dashboardScreen;
         private VisualElement _squadScreen;
+        private VisualElement _playerProfileScreen;
         private VisualElement _tacticsScreen;
         private VisualElement _scheduleScreen;
         private VisualElement _leagueScreen;
@@ -40,6 +42,11 @@ namespace ProBasketballManager.Presentation.Screens
         private VisualElement _boxScoreList;
         private VisualElement _rotationList;
         private VisualElement _squadList;
+        private VisualElement _playerProfileScoringAttributes;
+        private VisualElement _playerProfilePlaymakingAttributes;
+        private VisualElement _playerProfileDefenseAttributes;
+        private VisualElement _playerProfilePhysicalAttributes;
+        private VisualElement _playerProfileGameLogList;
         private VisualElement _scheduleList;
         private VisualElement _leagueStandingsList;
 
@@ -81,6 +88,24 @@ namespace ProBasketballManager.Presentation.Screens
         private Label _squadLeadingScorerValueLabel;
         private Label _squadLeadingScorerDetailLabel;
 
+        private Label _playerProfileNameLabel;
+        private Label _playerProfileMetaLabel;
+        private Label _playerProfileRoleLabel;
+        private Label _playerProfileSeasonLabel;
+        private Label _playerProfileGamesPlayedLabel;
+        private Label _playerProfileGamesStartedLabel;
+        private Label _playerProfileMinutesLabel;
+        private Label _playerProfilePointsLabel;
+        private Label _playerProfileReboundsLabel;
+        private Label _playerProfileAssistsLabel;
+        private Label _playerProfileStealsLabel;
+        private Label _playerProfileFieldGoalLabel;
+        private Label _playerProfileThreePointLabel;
+        private Label _playerProfileFreeThrowLabel;
+        private Label _playerProfileTurnoversLabel;
+        private Label _playerProfileFoulsLabel;
+        private Label _playerProfileGameLogCountLabel;
+
         private Label _scheduleRoundBadgeLabel;
         private Label _leagueScreenSubtitleLabel;
         private Label _leagueProgressBadgeLabel;
@@ -100,6 +125,7 @@ namespace ProBasketballManager.Presentation.Screens
 
         private Button _applyTacticsButton;
         private Button _resetTacticsButton;
+        private Button _playerProfileBackButton;
 
         private SliderInt _paceSlider;
         private SliderInt _rimSlider;
@@ -136,6 +162,7 @@ namespace ProBasketballManager.Presentation.Screens
             FindNavigation(root);
             FindDashboardControls(root);
             FindSquadControls(root);
+            FindPlayerProfileControls(root);
             FindTacticsControls(root);
             FindSeasonControls(root);
             FindMatchCentreControls(root);
@@ -157,6 +184,7 @@ namespace ProBasketballManager.Presentation.Screens
         {
             _dashboardScreen = root.Q<VisualElement>("dashboard-screen");
             _squadScreen = root.Q<VisualElement>("squad-screen");
+            _playerProfileScreen = root.Q<VisualElement>("player-profile-screen");
             _tacticsScreen = root.Q<VisualElement>("tactics-screen");
             _scheduleScreen = root.Q<VisualElement>("schedule-screen");
             _leagueScreen = root.Q<VisualElement>("league-screen");
@@ -206,6 +234,37 @@ namespace ProBasketballManager.Presentation.Screens
             _squadRecordValueLabel = root.Q<Label>("squad-record-value");
             _squadLeadingScorerValueLabel = root.Q<Label>("squad-leading-scorer-value");
             _squadLeadingScorerDetailLabel = root.Q<Label>("squad-leading-scorer-detail");
+        }
+
+        private void FindPlayerProfileControls(VisualElement root)
+        {
+            _playerProfileBackButton = root.Q<Button>("player-profile-back-button");
+
+            _playerProfileNameLabel = root.Q<Label>("player-profile-name");
+            _playerProfileMetaLabel = root.Q<Label>("player-profile-meta");
+            _playerProfileRoleLabel = root.Q<Label>("player-profile-role");
+            _playerProfileSeasonLabel = root.Q<Label>("player-profile-season");
+
+            _playerProfileGamesPlayedLabel = root.Q<Label>("player-profile-gp");
+            _playerProfileGamesStartedLabel = root.Q<Label>("player-profile-gs");
+            _playerProfileMinutesLabel = root.Q<Label>("player-profile-min");
+            _playerProfilePointsLabel = root.Q<Label>("player-profile-pts");
+            _playerProfileReboundsLabel = root.Q<Label>("player-profile-reb");
+            _playerProfileAssistsLabel = root.Q<Label>("player-profile-ast");
+            _playerProfileStealsLabel = root.Q<Label>("player-profile-stl");
+            _playerProfileFieldGoalLabel = root.Q<Label>("player-profile-fg");
+            _playerProfileThreePointLabel = root.Q<Label>("player-profile-3pt");
+            _playerProfileFreeThrowLabel = root.Q<Label>("player-profile-ft");
+            _playerProfileTurnoversLabel = root.Q<Label>("player-profile-to");
+            _playerProfileFoulsLabel = root.Q<Label>("player-profile-pf");
+
+            _playerProfileScoringAttributes = root.Q<VisualElement>("player-profile-scoring-attributes");
+            _playerProfilePlaymakingAttributes = root.Q<VisualElement>("player-profile-playmaking-attributes");
+            _playerProfileDefenseAttributes = root.Q<VisualElement>("player-profile-defense-attributes");
+            _playerProfilePhysicalAttributes = root.Q<VisualElement>("player-profile-physical-attributes");
+
+            _playerProfileGameLogList = root.Q<VisualElement>("player-profile-game-log-list");
+            _playerProfileGameLogCountLabel = root.Q<Label>("player-profile-game-log-count");
         }
 
         private void FindTacticsControls(VisualElement root)
@@ -291,6 +350,7 @@ namespace ProBasketballManager.Presentation.Screens
 
             _applyTacticsButton.clicked += ApplyTactics;
             _resetTacticsButton.clicked += ResetTactics;
+            _playerProfileBackButton.clicked += ShowSquad;
         }
 
         private void UnregisterCallbacks()
@@ -316,6 +376,7 @@ namespace ProBasketballManager.Presentation.Screens
 
             _applyTacticsButton.clicked -= ApplyTactics;
             _resetTacticsButton.clicked -= ResetTactics;
+            _playerProfileBackButton.clicked -= ShowSquad;
         }
 
         private void CreateGameData()
@@ -536,6 +597,8 @@ namespace ProBasketballManager.Presentation.Screens
             row.Add(threePointPercentage);
             row.Add(freeThrowPercentage);
 
+            row.RegisterCallback<ClickEvent>(_ => ShowPlayerProfile(statistics.Player));
+
             _squadList.Add(row);
         }
 
@@ -565,6 +628,207 @@ namespace ProBasketballManager.Presentation.Screens
         private static string FormatPercentage(int attempts, double percentage)
         {
             return attempts == 0 ? "—" : $"{percentage:0.0}%";
+        }
+
+        private void ShowPlayerProfile(Player player)
+        {
+            _selectedPlayer = player;
+
+            RenderPlayerProfile(player);
+            HideAllScreens();
+
+            _playerProfileScreen.style.display = DisplayStyle.Flex;
+            SetActiveNavigation(_navSquadButton);
+        }
+
+        private void RenderPlayerProfile(Player player)
+        {
+            var statistics = PlayerSeasonStatisticsCalculator.Calculate(_season, _userTeam).Single(playerStatistics => playerStatistics.Player.Id == player.Id);
+            var assignment = _userRotation.GetAssignment(player.Id);
+            var role = GetSquadRole(assignment);
+
+            _playerProfileNameLabel.text = player.FullName;
+            _playerProfileMetaLabel.text = $"{GetPositionAbbreviation(player.Position)} · {_userTeam.Name}";
+            _playerProfileSeasonLabel.text = _season.Name;
+
+            RenderPlayerProfileRole(role);
+            RenderPlayerProfileStatistics(statistics);
+            RenderPlayerProfileAttributes(player);
+            RenderPlayerGameLog(player);
+        }
+
+        private void RenderPlayerProfileRole(string role)
+        {
+            _playerProfileRoleLabel.text = role;
+
+            _playerProfileRoleLabel.RemoveFromClassList("squad-role-starter");
+            _playerProfileRoleLabel.RemoveFromClassList("squad-role-rotation");
+            _playerProfileRoleLabel.RemoveFromClassList("squad-role-reserve");
+
+            if (role == "STARTER")
+            {
+                _playerProfileRoleLabel.AddToClassList("squad-role-starter");
+            }
+            else if (role == "ROTATION")
+            {
+                _playerProfileRoleLabel.AddToClassList("squad-role-rotation");
+            }
+            else
+            {
+                _playerProfileRoleLabel.AddToClassList("squad-role-reserve");
+            }
+        }
+
+        private void RenderPlayerProfileStatistics(PlayerSeasonStatistics statistics)
+        {
+            _playerProfileGamesPlayedLabel.text = statistics.GamesPlayed.ToString();
+            _playerProfileGamesStartedLabel.text = statistics.GamesStarted.ToString();
+            _playerProfileMinutesLabel.text = FormatPerGame(statistics.GamesPlayed, statistics.MinutesPerGame);
+            _playerProfilePointsLabel.text = FormatPerGame(statistics.GamesPlayed, statistics.PointsPerGame);
+            _playerProfileReboundsLabel.text = FormatPerGame(statistics.GamesPlayed, statistics.ReboundsPerGame);
+            _playerProfileAssistsLabel.text = FormatPerGame(statistics.GamesPlayed, statistics.AssistsPerGame);
+            _playerProfileStealsLabel.text = FormatPerGame(statistics.GamesPlayed, statistics.StealsPerGame);
+            _playerProfileFieldGoalLabel.text = FormatPercentage(statistics.FieldGoalsAttempted, statistics.FieldGoalPercentage);
+            _playerProfileThreePointLabel.text = FormatPercentage(statistics.ThreePointsAttempted, statistics.ThreePointPercentage);
+            _playerProfileFreeThrowLabel.text = FormatPercentage(statistics.FreeThrowsAttempted, statistics.FreeThrowPercentage);
+            _playerProfileTurnoversLabel.text = FormatPerGame(statistics.GamesPlayed, statistics.TurnoversPerGame);
+            _playerProfileFoulsLabel.text = FormatPerGame(statistics.GamesPlayed, statistics.PersonalFoulsPerGame);
+        }
+
+        private void RenderPlayerProfileAttributes(Player player)
+        {
+            _playerProfileScoringAttributes.Clear();
+            _playerProfilePlaymakingAttributes.Clear();
+            _playerProfileDefenseAttributes.Clear();
+            _playerProfilePhysicalAttributes.Clear();
+
+            AddAttributeRow(_playerProfileScoringAttributes, "Finishing", player.Attributes.Finishing);
+            AddAttributeRow(_playerProfileScoringAttributes, "Mid Range", player.Attributes.MidRange);
+            AddAttributeRow(_playerProfileScoringAttributes, "Three Point", player.Attributes.ThreePoint);
+            AddAttributeRow(_playerProfileScoringAttributes, "Free Throw", player.Attributes.FreeThrow);
+
+            AddAttributeRow(_playerProfilePlaymakingAttributes, "Passing", player.Attributes.Passing);
+            AddAttributeRow(_playerProfilePlaymakingAttributes, "Ball Handling", player.Attributes.BallHandling);
+            AddAttributeRow(_playerProfilePlaymakingAttributes, "Basketball IQ", player.Attributes.BasketballIq);
+
+            AddAttributeRow(_playerProfileDefenseAttributes, "Perimeter Defense", player.Attributes.PerimeterDefense);
+            AddAttributeRow(_playerProfileDefenseAttributes, "Interior Defense", player.Attributes.InteriorDefense);
+            AddAttributeRow(_playerProfileDefenseAttributes, "Offensive Rebounding", player.Attributes.OffensiveRebounding);
+            AddAttributeRow(_playerProfileDefenseAttributes, "Defensive Rebounding", player.Attributes.DefensiveRebounding);
+
+            AddAttributeRow(_playerProfilePhysicalAttributes, "Speed", player.Attributes.Speed);
+            AddAttributeRow(_playerProfilePhysicalAttributes, "Strength", player.Attributes.Strength);
+            AddAttributeRow(_playerProfilePhysicalAttributes, "Stamina", player.Attributes.Stamina);
+        }
+
+        private static void AddAttributeRow(VisualElement container, string attributeName, int value)
+        {
+            var row = new VisualElement();
+            row.AddToClassList("player-attribute-row");
+
+            var label = new Label(attributeName);
+            label.AddToClassList("player-attribute-label");
+
+            var valueLabel = new Label(value.ToString());
+            valueLabel.AddToClassList("player-attribute-value");
+
+            if (value >= 16)
+            {
+                valueLabel.AddToClassList("player-attribute-value-elite");
+            }
+            else if (value >= 13)
+            {
+                valueLabel.AddToClassList("player-attribute-value-strong");
+            }
+            else if (value <= 7)
+            {
+                valueLabel.AddToClassList("player-attribute-value-weak");
+            }
+
+            row.Add(label);
+            row.Add(valueLabel);
+
+            container.Add(row);
+        }
+
+        private void RenderPlayerGameLog(Player player)
+        {
+            _playerProfileGameLogList.Clear();
+
+            var entries = PlayerGameLogCalculator.Calculate(_season, _userTeam, player);
+            _playerProfileGameLogCountLabel.text = entries.Count == 1 ? "1 FIXTURE" : $"{entries.Count} FIXTURES";
+
+            if (entries.Count == 0)
+            {
+                var emptyState = new Label("No games have been played yet.");
+                emptyState.AddToClassList("box-score-placeholder");
+                _playerProfileGameLogList.Add(emptyState);
+                return;
+            }
+
+            foreach (var entry in entries)
+            {
+                AddPlayerGameLogRow(entry);
+            }
+        }
+
+        private void AddPlayerGameLogRow(PlayerGameLogEntry entry)
+        {
+            var row = new VisualElement();
+            row.AddToClassList("player-game-log-row");
+
+            var round = CreatePlayerGameLogLabel(entry.RoundNumber.ToString(), "player-game-log-round");
+            var opponent = CreatePlayerGameLogLabel(entry.Opponent.Name, "player-game-log-opponent");
+            var side = CreatePlayerGameLogLabel(entry.IsHome ? "H" : "A", "player-game-log-side");
+
+            var resultText = $"{(entry.Won ? "W" : "L")} {entry.TeamScore}-{entry.OpponentScore}";
+            var result = CreatePlayerGameLogLabel(resultText, "player-game-log-result");
+            result.AddToClassList(entry.Won ? "player-game-log-win" : "player-game-log-loss");
+
+            if (!entry.DidPlay)
+            {
+                var dnp = CreatePlayerGameLogLabel("DNP", "player-game-log-stat");
+                dnp.AddToClassList("player-game-log-dnp");
+
+                row.Add(round);
+                row.Add(opponent);
+                row.Add(side);
+                row.Add(result);
+                row.Add(dnp);
+                row.Add(CreatePlayerGameLogLabel("—", "player-game-log-stat"));
+                row.Add(CreatePlayerGameLogLabel("—", "player-game-log-stat"));
+                row.Add(CreatePlayerGameLogLabel("—", "player-game-log-stat"));
+                row.Add(CreatePlayerGameLogLabel("—", "player-game-log-stat"));
+                row.Add(CreatePlayerGameLogLabel("—", "player-game-log-shooting"));
+                row.Add(CreatePlayerGameLogLabel("—", "player-game-log-shooting"));
+
+                _playerProfileGameLogList.Add(row);
+                return;
+            }
+
+            var boxScore = entry.BoxScore;
+
+            row.Add(round);
+            row.Add(opponent);
+            row.Add(side);
+            row.Add(result);
+            row.Add(CreatePlayerGameLogLabel(boxScore.MinutesPlayed.ToString("0.0"), "player-game-log-stat"));
+            row.Add(CreatePlayerGameLogLabel(boxScore.Points.ToString(), "player-game-log-stat"));
+            row.Add(CreatePlayerGameLogLabel(boxScore.Rebounds.ToString(), "player-game-log-stat"));
+            row.Add(CreatePlayerGameLogLabel(boxScore.Assists.ToString(), "player-game-log-stat"));
+            row.Add(CreatePlayerGameLogLabel(boxScore.Steals.ToString(), "player-game-log-stat"));
+            row.Add(CreatePlayerGameLogLabel($"{boxScore.FieldGoalsMade}/{boxScore.FieldGoalsAttempted}", "player-game-log-shooting"));
+            row.Add(CreatePlayerGameLogLabel($"{boxScore.ThreePointsMade}/{boxScore.ThreePointsAttempted}", "player-game-log-shooting"));
+
+            _playerProfileGameLogList.Add(row);
+        }
+
+        private static Label CreatePlayerGameLogLabel(string text, string className)
+        {
+            var label = new Label(text);
+            label.AddToClassList(className);
+
+            return label;
         }
 
         private void RenderSchedule()
@@ -1236,6 +1500,7 @@ namespace ProBasketballManager.Presentation.Screens
 
         private void ShowSquad()
         {
+            _selectedPlayer = null;
             RenderSquad();
             HideAllScreens();
             _squadScreen.style.display = DisplayStyle.Flex;
@@ -1276,6 +1541,7 @@ namespace ProBasketballManager.Presentation.Screens
         {
             _dashboardScreen.style.display = DisplayStyle.None;
             _squadScreen.style.display = DisplayStyle.None;
+            _playerProfileScreen.style.display = DisplayStyle.None;
             _tacticsScreen.style.display = DisplayStyle.None;
             _scheduleScreen.style.display = DisplayStyle.None;
             _leagueScreen.style.display = DisplayStyle.None;
