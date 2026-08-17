@@ -6,7 +6,9 @@ namespace ProBasketballManager.Persistence
 {
     public sealed class GameSessionSnapshot
     {
-        public Season Season;
+        public Career Career;
+
+        public Season Season => Career?.CurrentSeason;
 
         public Team UserTeam;
 

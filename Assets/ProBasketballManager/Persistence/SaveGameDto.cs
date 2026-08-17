@@ -13,7 +13,10 @@ namespace ProBasketballManager.Persistence
         public string Description;
 
         public LeagueDto League;
+
         public SeasonDto Season;
+
+        public List<CompletedSeasonDto> CompletedSeasons = new List<CompletedSeasonDto>();
 
         public int UserTeamId;
 
@@ -66,6 +69,46 @@ namespace ProBasketballManager.Persistence
         public int Strength;
         public int Stamina;
         public int BasketballIq;
+    }
+
+    public sealed class CompletedSeasonDto
+    {
+        public int Id;
+        public string Name;
+        public List<ArchivedStandingDto> FinalStandings = new List<ArchivedStandingDto>();
+        public List<ArchivedPlayerSeasonDto> PlayerStatistics = new List<ArchivedPlayerSeasonDto>();
+    }
+
+    public sealed class ArchivedStandingDto
+    {
+        public int Position;
+        public int TeamId;
+        public int Played;
+        public int Wins;
+        public int Losses;
+        public int PointsFor;
+        public int PointsAgainst;
+    }
+
+    public sealed class ArchivedPlayerSeasonDto
+    {
+        public int PlayerId;
+        public int GamesPlayed;
+        public int GamesStarted;
+        public double TotalMinutes;
+        public int Points;
+        public int FieldGoalsMade;
+        public int FieldGoalsAttempted;
+        public int ThreePointsMade;
+        public int ThreePointsAttempted;
+        public int FreeThrowsMade;
+        public int FreeThrowsAttempted;
+        public int OffensiveRebounds;
+        public int DefensiveRebounds;
+        public int Assists;
+        public int Steals;
+        public int PersonalFouls;
+        public int Turnovers;
     }
 
     public sealed class SeasonDto

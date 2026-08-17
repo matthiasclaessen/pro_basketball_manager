@@ -32,6 +32,32 @@
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement class="content">
+                <ui:VisualElement name="end-of-season-screen" class="screen screen-hidden">
+                    <ui:Label text="Season Complete" class="page-title" />
+                    <ui:Label name="end-of-season-name" text="" class="page-subtitle" />
+                    <ui:VisualElement class="panel">
+                        <ui:Label text="CHAMPIONS" class="panel-title" />
+                        <ui:Label name="end-of-season-champion" text="" class="card-title" />
+                        <ui:Label name="end-of-season-champion-record" text="" class="card-eyebrow" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="panel">
+                        <ui:Label text="YOUR SEASON" class="panel-title" />
+                        <ui:Label name="end-of-season-user-finish" text="" class="card-title" />
+                        <ui:Label name="end-of-season-user-record" text="" class="card-eyebrow" />
+                        <ui:Label name="end-of-season-career-summary" text="" class="card-eyebrow" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="panel">
+                        <ui:Label text="LEADING SCORER" class="panel-title" />
+                        <ui:Label name="end-of-season-leading-scorer" text="" class="card-title" />
+                        <ui:Label name="end-of-season-leading-scorer-detail" text="" class="card-eyebrow" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="panel">
+                        <ui:Label text="FINAL TABLE" class="panel-title" />
+                        <ui:VisualElement name="end-of-season-standings" />
+                    </ui:VisualElement>
+                    <ui:Button name="start-next-season-button" text="Start Next Season"
+                        class="instant-result-button" />
+                </ui:VisualElement>
                 <ui:VisualElement name="main-menu-screen" class="screen screen-hidden">
                     <ui:VisualElement class="screen-header">
                         <ui:Label text="Pro Basketball Manager" class="page-title" />

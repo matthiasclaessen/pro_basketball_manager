@@ -4,6 +4,7 @@ using System.Linq;
 using ProBasketballManager.Domain.Competitions;
 using ProBasketballManager.Domain.Matches;
 using ProBasketballManager.Domain.Players;
+using ProBasketballManager.Domain.Statistics;
 using ProBasketballManager.Domain.Tactics;
 using ProBasketballManager.Domain.Teams;
 
@@ -11,7 +12,9 @@ namespace ProBasketballManager.Persistence
 {
     public static class SaveGameMapper
     {
-        public const int CurrentSchemaVersion = 1;
+        public const int CurrentSchemaVersion = 2;
+
+        public const int MinimumReadableSchemaVersion = 1;
 
         public static SaveGameDto ToDto(GameSessionSnapshot snapshot, string saveName)
         {
@@ -20,7 +23,7 @@ namespace ProBasketballManager.Persistence
                 throw new ArgumentNullException(nameof(snapshot));
             }
 
-            var season = snapshot.Season;
+            var season = snapshot.Career.CurrentSeason;
 
             return new SaveGameDto
             {
@@ -30,6 +33,7 @@ namespace ProBasketballManager.Persistence
                 Description = BuildDescription(snapshot),
                 League = ToDto(season.League),
                 Season = ToSeasonDto(season),
+                CompletedSeasons = snapshot.Career.CompletedSeasons.Select(ToDto).ToList(),
                 UserTeamId = snapshot.UserTeam.Id,
                 UserTactics = ToDto(snapshot.UserTactics),
                 UserRotation = ToDto(snapshot.UserRotation),
@@ -40,14 +44,59 @@ namespace ProBasketballManager.Persistence
 
         private static string BuildDescription(GameSessionSnapshot snapshot)
         {
-            var season = snapshot.Season;
+            var season = snapshot.Career.CurrentSeason;
 
             var standing = season.GetStandings()
                 .FirstOrDefault(entry => entry.Team.Id == snapshot.UserTeam.Id);
 
             var record = standing == null ? string.Empty : $" ({standing.Wins}-{standing.Losses})";
 
-            return season.IsComplete ? $"{snapshot.UserTeam.Name}{record} - season complete" : $"{snapshot.UserTeam.Name}{record} - round {season.CurrentRoundNumber} of {season.TotalRounds}";
+            var careerPrefix = snapshot.Career.SeasonsCompleted == 0 ? string.Empty : $"season {snapshot.Career.SeasonsCompleted + 1}, ";
+
+            return season.IsComplete ? $"{snapshot.UserTeam.Name}{record} - {careerPrefix}season complete" : $"{snapshot.UserTeam.Name}{record} - {careerPrefix}round {season.CurrentRoundNumber} of {season.TotalRounds}";
+        }
+
+        private static CompletedSeasonDto ToDto(CompletedSeason season)
+        {
+            return new CompletedSeasonDto
+            {
+                Id = season.Id,
+                Name = season.Name,
+                FinalStandings = season.FinalStandings
+                    .Select(standing => new ArchivedStandingDto
+                    {
+                        Position = standing.Position,
+                        TeamId = standing.Team.Id,
+                        Played = standing.Played,
+                        Wins = standing.Wins,
+                        Losses = standing.Losses,
+                        PointsFor = standing.PointsFor,
+                        PointsAgainst = standing.PointsAgainst
+                    })
+                    .ToList(),
+                PlayerStatistics = season.PlayerStatistics
+                    .Select(statistics => new ArchivedPlayerSeasonDto
+                    {
+                        PlayerId = statistics.Player.Id,
+                        GamesPlayed = statistics.GamesPlayed,
+                        GamesStarted = statistics.GamesStarted,
+                        TotalMinutes = statistics.TotalMinutes,
+                        Points = statistics.Points,
+                        FieldGoalsMade = statistics.FieldGoalsMade,
+                        FieldGoalsAttempted = statistics.FieldGoalsAttempted,
+                        ThreePointsMade = statistics.ThreePointsMade,
+                        ThreePointsAttempted = statistics.ThreePointsAttempted,
+                        FreeThrowsMade = statistics.FreeThrowsMade,
+                        FreeThrowsAttempted = statistics.FreeThrowsAttempted,
+                        OffensiveRebounds = statistics.OffensiveRebounds,
+                        DefensiveRebounds = statistics.DefensiveRebounds,
+                        Assists = statistics.Assists,
+                        Steals = statistics.Steals,
+                        PersonalFouls = statistics.PersonalFouls,
+                        Turnovers = statistics.Turnovers
+                    })
+                    .ToList()
+            };
         }
 
         private static LeagueDto ToDto(League league)
@@ -229,11 +278,11 @@ namespace ProBasketballManager.Persistence
                 throw new SaveGameException("The save file was empty.");
             }
 
-            if (dto.SchemaVersion != CurrentSchemaVersion)
+            if (dto.SchemaVersion > CurrentSchemaVersion || dto.SchemaVersion < MinimumReadableSchemaVersion)
             {
                 throw new SaveGameException(
                     $"This save was written by a different version of the game (schema {dto.SchemaVersion}, " +
-                    $"this build reads schema {CurrentSchemaVersion}).");
+                    $"this build reads schema {MinimumReadableSchemaVersion} to {CurrentSchemaVersion}).");
             }
 
             if (dto.League == null || dto.Season == null)
@@ -251,17 +300,58 @@ namespace ProBasketballManager.Persistence
 
             var season = FromDto(dto.Season, league, teams, players);
 
+            var completed = (dto.CompletedSeasons ?? new List<CompletedSeasonDto>())
+                .Select(completedSeason => FromDto(completedSeason, teams, players))
+                .ToList();
+
             var userTeam = Resolve(teams, dto.UserTeamId, "user team");
 
             return new GameSessionSnapshot
             {
-                Season = season,
+                Career = new Career(league, season, completed),
                 UserTeam = userTeam,
                 UserTactics = FromDto(dto.UserTactics),
                 UserRotation = FromDto(dto.UserRotation, teams, players),
                 NextSeed = dto.NextSeed,
                 CurrentFixtureRecorded = dto.CurrentFixtureRecorded
             };
+        }
+
+        private static CompletedSeason FromDto(CompletedSeasonDto dto, Dictionary<int, Team> teams, Dictionary<int, Player> players)
+        {
+            var standings = dto.FinalStandings
+                .Select(standing => new LeagueStanding(
+                    standing.Position,
+                    Resolve(teams, standing.TeamId, "archived standing team"),
+                    standing.Played,
+                    standing.Wins,
+                    standing.Losses,
+                    standing.PointsFor,
+                    standing.PointsAgainst))
+                .ToList();
+
+            var statistics = dto.PlayerStatistics
+                .Select(entry => new PlayerSeasonStatistics(
+                    Resolve(players, entry.PlayerId, "archived player"),
+                    entry.GamesPlayed,
+                    entry.GamesStarted,
+                    entry.TotalMinutes,
+                    entry.Points,
+                    entry.FieldGoalsMade,
+                    entry.FieldGoalsAttempted,
+                    entry.ThreePointsMade,
+                    entry.ThreePointsAttempted,
+                    entry.FreeThrowsMade,
+                    entry.FreeThrowsAttempted,
+                    entry.OffensiveRebounds,
+                    entry.DefensiveRebounds,
+                    entry.Assists,
+                    entry.Steals,
+                    entry.PersonalFouls,
+                    entry.Turnovers))
+                .ToList();
+
+            return new CompletedSeason(dto.Id, dto.Name, standings, statistics);
         }
 
         private static League FromDto(LeagueDto dto)
@@ -412,17 +502,11 @@ namespace ProBasketballManager.Persistence
 
         private static MatchEvent FromDto(MatchEventDto dto, Dictionary<int, Team> teams, Dictionary<int, Player> players)
         {
-            var secondaryPlayer = dto.SecondaryPlayerId == MatchEventDto.NoPlayer
-                ? null
-                : Resolve(players, dto.SecondaryPlayerId, "secondary player");
+            var secondaryPlayer = dto.SecondaryPlayerId == MatchEventDto.NoPlayer ? null : Resolve(players, dto.SecondaryPlayerId, "secondary player");
 
-            OffensiveActionType? offensiveAction = string.IsNullOrEmpty(dto.OffensiveAction)
-                ? (OffensiveActionType?)null
-                : ParseEnum<OffensiveActionType>(dto.OffensiveAction, "offensive action");
+            OffensiveActionType? offensiveAction = string.IsNullOrEmpty(dto.OffensiveAction) ? (OffensiveActionType?)null : ParseEnum<OffensiveActionType>(dto.OffensiveAction, "offensive action");
 
-            ShotZone? shotZone = string.IsNullOrEmpty(dto.ShotZone)
-                ? (ShotZone?)null
-                : ParseEnum<ShotZone>(dto.ShotZone, "shot zone");
+            ShotZone? shotZone = string.IsNullOrEmpty(dto.ShotZone) ? (ShotZone?)null : ParseEnum<ShotZone>(dto.ShotZone, "shot zone");
 
             return new MatchEvent(
                 dto.PeriodNumber,

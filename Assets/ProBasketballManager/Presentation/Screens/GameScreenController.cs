@@ -46,6 +46,10 @@ namespace ProBasketballManager.Presentation.Screens
         [Tooltip("Live match replay, play by play and box score.")]
         private MatchCentreScreenController _matchCentreScreen;
 
+        [SerializeField]
+        [Tooltip("Season summary shown once the last fixture is played.")]
+        private EndOfSeasonScreenController _endOfSeasonScreen;
+
         private GameSession _session;
 
         private Button _navDashboardButton;
@@ -110,6 +114,13 @@ namespace ProBasketballManager.Presentation.Screens
             SetNavigationVisible(true);
             SetNavigationEnabled(true);
 
+            if (_session.CanAdvanceSeason)
+            {
+                ShowEndOfSeason();
+
+                return;
+            }
+
             ShowDashboard();
         }
 
@@ -151,6 +162,7 @@ namespace ProBasketballManager.Presentation.Screens
             BindScreen(_scheduleScreen, nameof(ScheduleScreenController), root);
             BindScreen(_leagueScreen, nameof(LeagueScreenController), root);
             BindScreen(_matchCentreScreen, nameof(MatchCentreScreenController), root);
+            BindScreen(_endOfSeasonScreen, nameof(EndOfSeasonScreenController), root);
         }
 
         private void BindScreen(ScreenController screen, string screenName, VisualElement root)
@@ -162,7 +174,9 @@ namespace ProBasketballManager.Presentation.Screens
         {
             if (screen == null)
             {
-                Debug.LogError($"GameScreenController has no {screenName} assigned. " + "Add the component and drag it into the matching field in the Inspector.");
+                Debug.LogError(
+                    $"GameScreenController has no {screenName} assigned. " +
+                    "Add the component and drag it into the matching field in the Inspector.");
 
                 return;
             }
@@ -204,6 +218,12 @@ namespace ProBasketballManager.Presentation.Screens
             {
                 _tacticsScreen.RegisterCallbacks();
                 _tacticsScreen.RotationChanged += OnRotationChanged;
+            }
+
+            if (_endOfSeasonScreen != null)
+            {
+                _endOfSeasonScreen.RegisterCallbacks();
+                _endOfSeasonScreen.NextSeasonRequested += StartNextSeason;
             }
 
             if (_matchCentreScreen != null)
@@ -252,6 +272,12 @@ namespace ProBasketballManager.Presentation.Screens
                 _tacticsScreen.RotationChanged -= OnRotationChanged;
             }
 
+            if (_endOfSeasonScreen != null)
+            {
+                _endOfSeasonScreen.UnregisterCallbacks();
+                _endOfSeasonScreen.NextSeasonRequested -= StartNextSeason;
+            }
+
             if (_matchCentreScreen != null)
             {
                 _matchCentreScreen.UnregisterCallbacks();
@@ -269,6 +295,7 @@ namespace ProBasketballManager.Presentation.Screens
             _tacticsScreen?.Render();
             _scheduleScreen?.Render();
             _leagueScreen?.Render();
+            _endOfSeasonScreen?.Render();
         }
 
         private void OnRotationChanged()
@@ -301,6 +328,27 @@ namespace ProBasketballManager.Presentation.Screens
             RenderAllScreens();
 
             SetNavigationEnabled(true);
+
+            if (_session.CanAdvanceSeason)
+            {
+                ShowEndOfSeason();
+            }
+        }
+
+        private void ShowEndOfSeason()
+        {
+            HideAllScreens();
+            _endOfSeasonScreen?.Show();
+            SetActiveNavigation(null);
+        }
+
+        private void StartNextSeason()
+        {
+            _session.AdvanceToNextSeason();
+
+            RenderAllScreens();
+
+            ShowDashboard();
         }
 
         private void ShowDashboard()
@@ -386,6 +434,7 @@ namespace ProBasketballManager.Presentation.Screens
             _scheduleScreen?.Hide();
             _leagueScreen?.Hide();
             _matchCentreScreen?.Hide();
+            _endOfSeasonScreen?.Hide();
             _saveLoadScreen?.Hide();
             _mainMenuScreen?.Hide();
         }

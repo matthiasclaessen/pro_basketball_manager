@@ -12,7 +12,9 @@ namespace ProBasketballManager.Presentation.State
 {
     public sealed class GameSession
     {
-        public Season Season { get; private set; }
+        public Career Career { get; private set; }
+
+        public Season Season => Career.CurrentSeason;
 
         public Team UserTeam { get; private set; }
 
@@ -36,9 +38,9 @@ namespace ProBasketballManager.Presentation.State
 
         public event Action Changed;
 
-        private GameSession(Season season, Team userTeam)
+        private GameSession(Career career, Team userTeam)
         {
-            Season = season ?? throw new ArgumentNullException(nameof(season));
+            Career = career ?? throw new ArgumentNullException(nameof(career));
             UserTeam = userTeam ?? throw new ArgumentNullException(nameof(userTeam));
 
             UserTactics = TeamTactics.Default;
@@ -51,7 +53,7 @@ namespace ProBasketballManager.Presentation.State
         {
             return new GameSessionSnapshot
             {
-                Season = Season,
+                Career = Career,
                 UserTeam = UserTeam,
                 UserTactics = UserTactics,
                 UserRotation = UserRotation,
@@ -67,7 +69,7 @@ namespace ProBasketballManager.Presentation.State
                 throw new ArgumentNullException(nameof(snapshot));
             }
 
-            return new GameSession(snapshot.Season, snapshot.UserTeam)
+            return new GameSession(snapshot.Career, snapshot.UserTeam)
             {
                 UserTactics = snapshot.UserTactics,
                 UserRotation = snapshot.UserRotation,
@@ -80,7 +82,9 @@ namespace ProBasketballManager.Presentation.State
         {
             var season = DemoSeasonFactory.Create();
 
-            return new GameSession(season, season.League.Teams[0]);
+            var career = new Career(season.League, season);
+
+            return new GameSession(career, career.League.Teams[0]);
         }
 
         public void RefreshCurrentFixture()
@@ -164,6 +168,22 @@ namespace ProBasketballManager.Presentation.State
 
             Season.RecordResult(fixture.Id, result);
         }
+
+        public CompletedSeason AdvanceToNextSeason()
+        {
+            var archived = Career.AdvanceToNextSeason();
+
+            UserRotation = TeamRotation.CreateDefault(UserTeam);
+
+            CurrentMatchResult = null;
+            CurrentFixtureRecorded = false;
+
+            RefreshCurrentFixture();
+
+            return archived;
+        }
+
+        public bool CanAdvanceSeason => Career.CanAdvance;
 
         public void NotifyChanged()
         {
