@@ -1,4 +1,5 @@
 using ProBasketballManager.Domain.Players;
+using ProBasketballManager.Persistence;
 using ProBasketballManager.Presentation.State;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -8,6 +9,14 @@ namespace ProBasketballManager.Presentation.Screens
     [RequireComponent(typeof(UIDocument))]
     public sealed class GameScreenController : MonoBehaviour
     {
+        [SerializeField]
+        [Tooltip("Pre-game menu: new game, or continue a saved one.")]
+        private MainMenuScreenController _mainMenuScreen;
+
+        [SerializeField]
+        [Tooltip("Save to a slot, or load an existing save mid-game.")]
+        private SaveLoadScreenController _saveLoadScreen;
+
         [SerializeField]
         [Tooltip("Home screen: club summary, next fixture and mini league table.")]
         private DashboardScreenController _dashboardScreen;
@@ -43,21 +52,60 @@ namespace ProBasketballManager.Presentation.Screens
         private Button _navTacticsButton;
         private Button _navScheduleButton;
         private Button _navLeagueButton;
+        private Button _navSaveLoadButton;
 
         private Button _playerProfileBackButton;
 
+        private VisualElement _navigationBar;
+
+        private VisualElement _root;
+
         private void OnEnable()
         {
-            var root = GetComponent<UIDocument>().rootVisualElement;
+            _root = GetComponent<UIDocument>().rootVisualElement;
 
-            FindNavigation(root);
+            FindNavigation(_root);
 
-            _session = GameSession.CreateDemo();
+            BindScreen(_mainMenuScreen, nameof(MainMenuScreenController), _root, null);
 
-            BindScreens(root);
+            if (_mainMenuScreen != null)
+            {
+                _mainMenuScreen.RegisterCallbacks();
+                _mainMenuScreen.NewGameRequested += StartNewGame;
+                _mainMenuScreen.LoadRequested += AdoptLoadedGame;
+            }
+
+            ShowMainMenu();
+        }
+
+        private void StartNewGame()
+        {
+            AdoptSession(GameSession.CreateDemo());
+        }
+
+        private void AdoptLoadedGame(GameSessionSnapshot snapshot)
+        {
+            if (snapshot == null)
+            {
+                return;
+            }
+
+            AdoptSession(GameSession.Restore(snapshot));
+        }
+
+        private void AdoptSession(GameSession session)
+        {
+            _matchCentreScreen?.StopReplay();
+
+            _session = session;
+
+            BindScreens(_root);
             RegisterCallbacks();
 
             RenderAllScreens();
+
+            SetNavigationVisible(true);
+            SetNavigationEnabled(true);
 
             ShowDashboard();
         }
@@ -65,6 +113,13 @@ namespace ProBasketballManager.Presentation.Screens
         private void OnDisable()
         {
             _matchCentreScreen?.StopReplay();
+
+            if (_mainMenuScreen != null)
+            {
+                _mainMenuScreen.UnregisterCallbacks();
+                _mainMenuScreen.NewGameRequested -= StartNewGame;
+                _mainMenuScreen.LoadRequested -= AdoptLoadedGame;
+            }
 
             UnregisterCallbacks();
         }
@@ -76,12 +131,16 @@ namespace ProBasketballManager.Presentation.Screens
             _navTacticsButton = root.Q<Button>("nav-tactics-button");
             _navScheduleButton = root.Q<Button>("nav-schedule-button");
             _navLeagueButton = root.Q<Button>("nav-league-button");
+            _navSaveLoadButton = root.Q<Button>("nav-save-load-button");
 
             _playerProfileBackButton = root.Q<Button>("player-profile-back-button");
+
+            _navigationBar = root.Q<VisualElement>("navigation-bar");
         }
 
         private void BindScreens(VisualElement root)
         {
+            BindScreen(_saveLoadScreen, nameof(SaveLoadScreenController), root);
             BindScreen(_dashboardScreen, nameof(DashboardScreenController), root);
             BindScreen(_squadScreen, nameof(SquadScreenController), root);
             BindScreen(_playerProfileScreen, nameof(PlayerProfileScreenController), root);
@@ -93,6 +152,11 @@ namespace ProBasketballManager.Presentation.Screens
 
         private void BindScreen(ScreenController screen, string screenName, VisualElement root)
         {
+            BindScreen(screen, screenName, root, _session);
+        }
+
+        private void BindScreen(ScreenController screen, string screenName, VisualElement root, GameSession session)
+        {
             if (screen == null)
             {
                 Debug.LogError(
@@ -102,7 +166,7 @@ namespace ProBasketballManager.Presentation.Screens
                 return;
             }
 
-            screen.Bind(_session, root);
+            screen.Bind(session, root);
         }
 
         private void RegisterCallbacks()
@@ -114,8 +178,15 @@ namespace ProBasketballManager.Presentation.Screens
             _navTacticsButton.clicked += ShowTactics;
             _navScheduleButton.clicked += ShowSchedule;
             _navLeagueButton.clicked += ShowLeague;
+            _navSaveLoadButton.clicked += ShowSaveLoad;
 
             _playerProfileBackButton.clicked += ShowSquad;
+
+            if (_saveLoadScreen != null)
+            {
+                _saveLoadScreen.RegisterCallbacks();
+                _saveLoadScreen.LoadRequested += AdoptLoadedGame;
+            }
 
             if (_dashboardScreen != null)
             {
@@ -152,8 +223,15 @@ namespace ProBasketballManager.Presentation.Screens
                 _navTacticsButton.clicked -= ShowTactics;
                 _navScheduleButton.clicked -= ShowSchedule;
                 _navLeagueButton.clicked -= ShowLeague;
+                _navSaveLoadButton.clicked -= ShowSaveLoad;
 
                 _playerProfileBackButton.clicked -= ShowSquad;
+            }
+
+            if (_saveLoadScreen != null)
+            {
+                _saveLoadScreen.UnregisterCallbacks();
+                _saveLoadScreen.LoadRequested -= AdoptLoadedGame;
             }
 
             if (_dashboardScreen != null)
@@ -181,9 +259,11 @@ namespace ProBasketballManager.Presentation.Screens
                 _matchCentreScreen.BackRequested -= ShowDashboard;
             }
         }
+
         private void RenderAllScreens()
         {
             _dashboardScreen?.Render();
+            _saveLoadScreen?.Render();
             _squadScreen?.Render();
             _tacticsScreen?.Render();
             _scheduleScreen?.Render();
@@ -259,6 +339,22 @@ namespace ProBasketballManager.Presentation.Screens
             SetActiveNavigation(_navScheduleButton);
         }
 
+        private void ShowMainMenu()
+        {
+            HideAllScreens();
+
+            SetNavigationVisible(false);
+
+            _mainMenuScreen?.Show();
+        }
+
+        private void ShowSaveLoad()
+        {
+            HideAllScreens();
+            _saveLoadScreen?.Show();
+            SetActiveNavigation(_navSaveLoadButton);
+        }
+
         private void ShowLeague()
         {
             HideAllScreens();
@@ -275,6 +371,8 @@ namespace ProBasketballManager.Presentation.Screens
             _scheduleScreen?.Hide();
             _leagueScreen?.Hide();
             _matchCentreScreen?.Hide();
+            _saveLoadScreen?.Hide();
+            _mainMenuScreen?.Hide();
         }
 
         private void SetActiveNavigation(Button activeButton)
@@ -284,6 +382,7 @@ namespace ProBasketballManager.Presentation.Screens
             _navTacticsButton.RemoveFromClassList("nav-item-active");
             _navScheduleButton.RemoveFromClassList("nav-item-active");
             _navLeagueButton.RemoveFromClassList("nav-item-active");
+            _navSaveLoadButton.RemoveFromClassList("nav-item-active");
 
             activeButton?.AddToClassList("nav-item-active");
         }
@@ -295,6 +394,18 @@ namespace ProBasketballManager.Presentation.Screens
             _navTacticsButton.SetEnabled(enabled);
             _navScheduleButton.SetEnabled(enabled);
             _navLeagueButton.SetEnabled(enabled);
+
+            _navSaveLoadButton.SetEnabled(enabled);
+        }
+
+        private void SetNavigationVisible(bool visible)
+        {
+            if (_navigationBar == null)
+            {
+                return;
+            }
+
+            _navigationBar.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
         }
     }
 }
