@@ -786,6 +786,10 @@
     -unity-text-align: middle-center;
 }
 
+.box-score-condition-high { color: rgb(126, 217, 87); }
+.box-score-condition-medium { color: rgb(240, 190, 80); }
+.box-score-condition-low { color: rgb(232, 106, 106); }
+
 .tactics-screen-scroll {
     flex-grow: 1;
     flex-shrink: 1;

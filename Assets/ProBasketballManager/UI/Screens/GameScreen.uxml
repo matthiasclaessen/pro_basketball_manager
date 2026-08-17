@@ -499,6 +499,8 @@
 
                             <ui:VisualElement class="control-spacer" />
 
+                            <ui:Button name="start-match-button" text="Start Match" class="instant-result-button" />
+
                             <ui:Button name="instant-result-button" text="Instant Result" class="instant-result-button" />
                         </ui:VisualElement>
                     </ui:VisualElement>
@@ -543,6 +545,7 @@
                             <ui:Label text="STL" class="box-score-number" />
                             <ui:Label text="PF" class="box-score-number" />
                             <ui:Label text="TO" class="box-score-number" />
+                            <ui:Label text="COND" class="box-score-number" />
                         </ui:VisualElement>
 
                         <ui:ScrollView name="box-score-scroll" class="box-score-scroll">

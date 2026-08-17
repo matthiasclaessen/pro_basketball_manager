@@ -9,18 +9,11 @@ namespace ProBasketballManager.Domain.Matches
 {
     public sealed class MatchSimulator
     {
-        // ---- Pace -------------------------------------------------------
-        // Possessions generated per period, counting BOTH teams. FIBA rules give
-        // 40 minutes of regulation, and roughly 75 possessions per team, so a
-        // regulation period should produce about 38 combined possessions.
         private const int MinimumPeriodPossessions = 34;
         private const int MaximumPeriodPossessions = 42;
         private const int MinimumOvertimePossessions = 17;
         private const int MaximumOvertimePossessions = 21;
 
-        // ---- Shot efficiency --------------------------------------------
-        // Baseline conversion rate per zone for an average player guarded by an
-        // average defender under neutral tactics.
         private const double AtRimBaseChance = 0.560;
         private const double PaintBaseChance = 0.430;
         private const double MidRangeBaseChance = 0.383;
@@ -30,10 +23,6 @@ namespace ProBasketballManager.Domain.Matches
         private const double MinimumShotChance = 0.25;
         private const double MaximumShotChance = 0.68;
 
-        // ---- Talent sensitivity -----------------------------------------
-        // How much one point of attribute rating moves a single shot. These are
-        // deliberately small: the effect compounds over ~75 possessions, so large
-        // values make roster quality overwhelm every other factor in the game.
         private const double AtRimOffenseWeight = 0.0017;
         private const double AtRimDefenseWeight = 0.0014;
         private const double PaintOffenseWeight = 0.0016;
@@ -126,16 +115,14 @@ namespace ProBasketballManager.Domain.Matches
                 homePeriodScores,
                 awayPeriodScores,
                 events,
-                BuildBoxScores(homeTeam, homeStats),
-                BuildBoxScores(awayTeam, awayStats)
+                BuildBoxScores(homeTeam, homeStats, homeRotationRuntime),
+                BuildBoxScores(awayTeam, awayStats, awayRotationRuntime)
             );
         }
 
         private void SimulatePeriod(Team homeTeam, Team awayTeam, TeamRotation homeRotation, TeamRotation awayRotation, RotationRuntime homeRotationRuntime, RotationRuntime awayRotationRuntime, TeamTactics homeTactics, TeamTactics awayTactics, int periodNumber, int periodLengthSeconds, List<MatchEvent> events, Dictionary<int, PlayerBoxScoreBuilder> homeStats, Dictionary<int, PlayerBoxScoreBuilder> awayStats, ref int homeScore, ref int awayScore)
         {
-            var basePossessions = periodNumber <= 4
-                ? _random.NextInt(MinimumPeriodPossessions, MaximumPeriodPossessions)
-                : _random.NextInt(MinimumOvertimePossessions, MaximumOvertimePossessions);
+            var basePossessions = periodNumber <= 4 ? _random.NextInt(MinimumPeriodPossessions, MaximumPeriodPossessions) : _random.NextInt(MinimumOvertimePossessions, MaximumOvertimePossessions);
 
             var averagePace = (homeTactics.Pace + awayTactics.Pace) / 2.0;
             var paceMultiplier = 0.85 + ((averagePace / 100.0) * 0.30);
@@ -205,9 +192,6 @@ namespace ProBasketballManager.Domain.Matches
                 return;
             }
 
-            // A defensive foul away from the shot. In the bonus it sends the attacker
-            // to the line and ends the possession; otherwise play restarts and the
-            // possession continues.
             var averageDefensiveFatigue = Average(defendingPlayers, player => defendingRuntime.GetFatigue(player.Id));
             var averagePerimeterDefense = Average(defendingPlayers, player => player.Attributes.PerimeterDefense);
 
@@ -237,9 +221,7 @@ namespace ProBasketballManager.Domain.Matches
 
             for (var shotSequence = 0; shotSequence < maximumShotSequences; shotSequence++)
             {
-                var shot = shotSequence == 0
-     ? SelectShot(attackingPlayers, ballHandler, attackingRotation, attackingTactics)
-     : SelectShotAfterOffensiveRebound(attackingPlayers, attackingRotation, attackingTactics);
+                var shot = shotSequence == 0 ? SelectShot(attackingPlayers, ballHandler, attackingRotation, attackingTactics) : SelectShotAfterOffensiveRebound(attackingPlayers, attackingRotation, attackingTactics);
 
                 var defender = SelectShotDefender(shot.Shooter, defendingPlayers, shot.Zone);
 
@@ -540,7 +522,6 @@ namespace ProBasketballManager.Domain.Matches
         {
             var chance = CalculateShotChance(shot, defender, defenderFatigue, defendingTactics);
 
-            // Legs go first. A tired shooter loses range and lift.
             chance -= FatigueModel.GetShootingPenalty(shooterFatigue);
 
             if (homePossession)
@@ -715,10 +696,6 @@ namespace ProBasketballManager.Domain.Matches
             return true;
         }
 
-        /// <summary>
-        /// Shoots a set of free throws. Shared by shooting fouls and by any foul
-        /// committed once the defending team is in the bonus.
-        /// </summary>
         private void ShootFreeThrows(Player shooter, int attempts, Team attackingTeam, bool homePossession, Dictionary<int, PlayerBoxScoreBuilder> attackingStats, int periodNumber, ref int actionTime, List<MatchEvent> events, ref int homeScore, ref int awayScore)
         {
             for (var attempt = 0; attempt < attempts; attempt++)
@@ -739,11 +716,6 @@ namespace ProBasketballManager.Domain.Matches
             }
         }
 
-        /// <summary>
-        /// Charges a personal foul, and raises a FoulOut event if it disqualifies the
-        /// player. Team fouls only accumulate for defensive fouls; an offensive foul
-        /// is charged to the player but never puts the opponent in the bonus.
-        /// </summary>
         private void ChargeFoul(Player offender, Team offendingTeam, RotationRuntime offendingRuntime, Dictionary<int, PlayerBoxScoreBuilder> offendingStats, bool countsAsTeamFoul, MatchEventType eventType, Player victim, int periodNumber, ref int actionTime, List<MatchEvent> events, int homeScore, int awayScore)
         {
             offendingStats[offender.Id].RecordPersonalFoul();
@@ -769,8 +741,6 @@ namespace ProBasketballManager.Domain.Matches
             var offensiveReboundChance = 0.25 + ((offensiveRebounding - defensiveRebounding) * 0.006);
             offensiveReboundChance = Clamp(offensiveReboundChance, 0.15, 0.40);
 
-            // Contact on the glass. Charged to the team that lost the battle for the
-            // ball, and worth free throws if they are in the bonus.
             var reboundFatigue = (Average(attackingPlayers, player => attackingRuntime.GetFatigue(player.Id))
                 + Average(defendingPlayers, player => defendingRuntime.GetFatigue(player.Id))) / 2.0;
 
@@ -882,12 +852,6 @@ namespace ProBasketballManager.Domain.Matches
             stats.RecordTwoPointAttempt(made);
         }
 
-        /// <summary>
-        /// Picks the player who commits a foul, skipping anyone already disqualified.
-        /// Several fouls can occur inside a single possession while the on court list
-        /// is still the one captured at the start, so without this filter a player on
-        /// four fouls could be charged a sixth.
-        /// </summary>
         private Player SelectFoulingPlayer(IReadOnlyList<Player> players, RotationRuntime runtime, Func<Player, double> weightSelector)
         {
             var eligible = new List<Player>(players.Count);
@@ -978,8 +942,14 @@ namespace ProBasketballManager.Domain.Matches
             return builders;
         }
 
-        private static IReadOnlyList<PlayerBoxScore> BuildBoxScores(Team team, Dictionary<int, PlayerBoxScoreBuilder> stats)
+        private static IReadOnlyList<PlayerBoxScore> BuildBoxScores(Team team, Dictionary<int, PlayerBoxScoreBuilder> stats, RotationRuntime runtime)
         {
+            foreach (var player in team.Players)
+            {
+                stats[player.Id].EndOfMatchFatigue = runtime.GetFatigue(player.Id);
+                stats[player.Id].PeakFatigue = runtime.GetPeakFatigue(player.Id);
+            }
+
             return team.Players.Select(player => stats[player.Id].Build()).ToList();
         }
 
@@ -1001,6 +971,7 @@ namespace ProBasketballManager.Domain.Matches
             private readonly Dictionary<int, double> _fatigue;
             private readonly Dictionary<int, double> _conditionFactor;
             private readonly Dictionary<int, int> _personalFouls;
+            private readonly Dictionary<int, double> _peakFatigue;
 
             private int _teamFoulsThisPeriod;
 
@@ -1016,32 +987,28 @@ namespace ProBasketballManager.Domain.Matches
                     player => player.Id,
                     player => FatigueModel.RollConditionFactor(player, random.NextDouble()));
                 _personalFouls = rotation.Team.Players.ToDictionary(player => player.Id, _ => 0);
+                _peakFatigue = rotation.Team.Players.ToDictionary(player => player.Id, _ => FatigueModel.Fresh);
             }
 
-            /// <summary>
-            /// Current fatigue for a player, from 0.0 (fresh) to 1.0 (exhausted).
-            /// </summary>
             public double GetFatigue(int playerId)
             {
                 return _fatigue[playerId];
             }
 
-            /// <summary>Personal fouls charged to a player so far.</summary>
+            public double GetPeakFatigue(int playerId)
+            {
+                return _peakFatigue[playerId];
+            }
+
             public int GetPersonalFouls(int playerId)
             {
                 return _personalFouls[playerId];
             }
 
-            /// <summary>Team fouls committed in the current period.</summary>
             public int TeamFoulsThisPeriod => _teamFoulsThisPeriod;
 
-            /// <summary>Whether the next defensive foul sends the attacker to the line.</summary>
             public bool IsInBonus => FoulModel.IsInBonus(_teamFoulsThisPeriod);
 
-            /// <summary>
-            /// Charges a personal foul. Returns true if this foul disqualifies the
-            /// player, so the caller can raise a FoulOut event.
-            /// </summary>
             public bool RecordPersonalFoul(int playerId, bool countsAsTeamFoul)
             {
                 _personalFouls[playerId]++;
@@ -1051,14 +1018,11 @@ namespace ProBasketballManager.Domain.Matches
                     _teamFoulsThisPeriod++;
                 }
 
-                // Force a fresh lineup decision: a disqualification or a fourth foul
-                // should not wait for the next two minute segment to take effect.
                 _currentSegment = -1;
 
                 return _personalFouls[playerId] == FoulModel.DisqualificationLimit;
             }
 
-            /// <summary>Team fouls reset at the start of every period.</summary>
             public void BeginPeriod()
             {
                 _teamFoulsThisPeriod = 0;
@@ -1074,9 +1038,6 @@ namespace ProBasketballManager.Domain.Matches
             {
                 if (periodNumber > 4)
                 {
-                    // Overtime is not part of the planned rotation, so minute targets
-                    // are already met. Selection falls back to whoever has the most
-                    // left in the tank among the rotation players.
                     return SelectFreshestLineup();
                 }
 
@@ -1100,9 +1061,6 @@ namespace ProBasketballManager.Domain.Matches
                     _secondsPlayed[player.Id] += seconds;
                 }
 
-                // Everyone on court tires; everyone else recovers. Both happen every
-                // possession, so a player who sits for two minutes comes back
-                // measurably fresher than one who never leaves the floor.
                 foreach (var player in _rotation.Team.Players)
                 {
                     var isOnCourt = false;
@@ -1119,6 +1077,11 @@ namespace ProBasketballManager.Domain.Matches
                     _fatigue[player.Id] = isOnCourt
                         ? FatigueModel.ApplyExertion(_fatigue[player.Id], player, seconds, paceMultiplier, _conditionFactor[player.Id])
                         : FatigueModel.ApplyRecovery(_fatigue[player.Id], player, seconds);
+
+                    if (_fatigue[player.Id] > _peakFatigue[player.Id])
+                    {
+                        _peakFatigue[player.Id] = _fatigue[player.Id];
+                    }
                 }
             }
 
@@ -1136,10 +1099,6 @@ namespace ProBasketballManager.Domain.Matches
 
                 var progressAfterSegment = (segmentIndex + 1) / 20.0;
 
-                // A player's claim on the next spell combines three things: how far
-                // behind their minutes target they are, how tired they are, and how
-                // much foul trouble they are in. The last two are expressed in
-                // seconds so all three are directly comparable.
                 var available = _rotation.Assignments
                     .Where(assignment => assignment.TargetMinutes > 0)
                     .Where(assignment => !IsDisqualified(assignment.Player.Id))
@@ -1176,12 +1135,6 @@ namespace ProBasketballManager.Domain.Matches
                 return FillFromRosterIfShort(available);
             }
 
-            /// <summary>
-            /// If enough of the rotation has fouled out that five players cannot be
-            /// fielded, the remaining spots go to whoever is left on the roster,
-            /// including players the manager assigned no minutes. A team must always
-            /// put five on the floor.
-            /// </summary>
             private IReadOnlyList<Player> FillFromRosterIfShort(List<Player> selected)
             {
                 if (selected.Count >= 5)
@@ -1370,6 +1323,10 @@ namespace ProBasketballManager.Domain.Matches
                 Points += 3;
             }
 
+            public double EndOfMatchFatigue { get; set; }
+
+            public double PeakFatigue { get; set; }
+
             public PlayerBoxScore Build()
             {
                 return new PlayerBoxScore(
@@ -1388,7 +1345,9 @@ namespace ProBasketballManager.Domain.Matches
                     Assists,
                     Steals,
                     PersonalFouls,
-                    Turnovers
+                    Turnovers,
+                    EndOfMatchFatigue,
+                    PeakFatigue
                 );
             }
         }

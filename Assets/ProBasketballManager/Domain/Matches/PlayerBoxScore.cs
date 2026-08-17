@@ -38,9 +38,13 @@ namespace ProBasketballManager.Domain.Matches
 
         public int PersonalFouls { get; }
 
+        public double EndOfMatchFatigue { get; }
+
+        public double PeakFatigue { get; }
+
         public int Turnovers { get; }
 
-        public PlayerBoxScore(Player player, bool isStarter, double secondsPlayed, int points, int fieldGoalsMade, int fieldGoalsAttempted, int threePointsMade, int threePointsAttempted, int freeThrowsMade, int freeThrowsAttempted, int offensiveRebounds, int defensiveRebounds, int assists, int steals, int personalFouls, int turnovers)
+        public PlayerBoxScore(Player player, bool isStarter, double secondsPlayed, int points, int fieldGoalsMade, int fieldGoalsAttempted, int threePointsMade, int threePointsAttempted, int freeThrowsMade, int freeThrowsAttempted, int offensiveRebounds, int defensiveRebounds, int assists, int steals, int personalFouls, int turnovers, double endOfMatchFatigue, double peakFatigue)
         {
             Player = player;
             IsStarter = isStarter;
@@ -57,6 +61,8 @@ namespace ProBasketballManager.Domain.Matches
             Assists = assists;
             Steals = steals;
             PersonalFouls = personalFouls;
+            EndOfMatchFatigue = endOfMatchFatigue;
+            PeakFatigue = peakFatigue;
             Turnovers = turnovers;
         }
     }
