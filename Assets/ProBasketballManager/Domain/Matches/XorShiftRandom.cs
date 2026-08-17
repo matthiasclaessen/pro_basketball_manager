@@ -2,13 +2,22 @@ namespace ProBasketballManager.Domain.Matches
 {
     public sealed class XorShiftRandom : IRandomSource
     {
+        private const int WarmUpIterations = 16;
+
         private uint _state;
 
         public XorShiftRandom(uint seed)
         {
-            _state = seed == 0
-                ? 1u
-                : seed;
+            // A raw xorshift32 state produces heavily biased output for its first
+            // draws when seeded with a small number, and seeds are typically small
+            // sequential values (fixture IDs, match numbers). Advancing the
+            // generator before handing out any value removes that bias.
+            _state = seed == 0 ? 2463534242u : seed;
+
+            for (var iteration = 0; iteration < WarmUpIterations; iteration++)
+            {
+                NextUInt();
+            }
         }
 
         private uint NextUInt()

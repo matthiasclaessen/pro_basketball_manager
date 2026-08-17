@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using ProBasketballManager.Domain.Teams;
-using static Codice.Client.Common.Connection.AskCredentialsToUser;
 
 namespace ProBasketballManager.Domain.Competitions
 {

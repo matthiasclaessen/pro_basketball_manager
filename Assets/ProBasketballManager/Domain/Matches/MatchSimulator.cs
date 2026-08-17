@@ -9,6 +9,40 @@ namespace ProBasketballManager.Domain.Matches
 {
     public sealed class MatchSimulator
     {
+        // ---- Pace -------------------------------------------------------
+        // Possessions generated per period, counting BOTH teams. FIBA rules give
+        // 40 minutes of regulation, and roughly 75 possessions per team, so a
+        // regulation period should produce about 38 combined possessions.
+        private const int MinimumPeriodPossessions = 34;
+        private const int MaximumPeriodPossessions = 42;
+        private const int MinimumOvertimePossessions = 17;
+        private const int MaximumOvertimePossessions = 21;
+
+        // ---- Shot efficiency --------------------------------------------
+        // Baseline conversion rate per zone for an average player guarded by an average defender under neutral tactics.
+        private const double AtRimBaseChance = 0.560;
+        private const double PaintBaseChance = 0.430;
+        private const double MidRangeBaseChance = 0.383;
+        private const double CornerThreeBaseChance = 0.352;
+        private const double AboveBreakThreeBaseChance = 0.328;
+
+        private const double MinimumShotChance = 0.25;
+        private const double MaximumShotChance = 0.68;
+
+        // ---- Talent sensitivity -----------------------------------------
+        // How much one point of attribute rating moves a single shot. These are deliberately small: the effect compounds over ~75 possessions, so large
+        // values make roster quality overwhelm every other factor in the game.
+        private const double AtRimOffenseWeight = 0.0017;
+        private const double AtRimDefenseWeight = 0.0014;
+        private const double PaintOffenseWeight = 0.0016;
+        private const double PaintDefenseWeight = 0.0011;
+        private const double MidRangeOffenseWeight = 0.0015;
+        private const double MidRangeDefenseWeight = 0.0010;
+        private const double ThreePointOffenseWeight = 0.0014;
+        private const double ThreePointDefenseWeight = 0.0009;
+
+        private const double AverageAttributeRating = 10.5;
+
         private readonly IRandomSource _random;
 
         public MatchSimulator(IRandomSource random)
@@ -97,7 +131,9 @@ namespace ProBasketballManager.Domain.Matches
 
         private void SimulatePeriod(Team homeTeam, Team awayTeam, TeamRotation homeRotation, TeamRotation awayRotation, RotationRuntime homeRotationRuntime, RotationRuntime awayRotationRuntime, TeamTactics homeTactics, TeamTactics awayTactics, int periodNumber, int periodLengthSeconds, List<MatchEvent> events, Dictionary<int, PlayerBoxScoreBuilder> homeStats, Dictionary<int, PlayerBoxScoreBuilder> awayStats, ref int homeScore, ref int awayScore)
         {
-            var basePossessions = periodNumber <= 4 ? _random.NextInt(46, 55) : _random.NextInt(20, 27);
+            var basePossessions = periodNumber <= 4
+                ? _random.NextInt(MinimumPeriodPossessions, MaximumPeriodPossessions)
+                : _random.NextInt(MinimumOvertimePossessions, MaximumOvertimePossessions);
 
             var averagePace = (homeTactics.Pace + awayTactics.Pace) / 2.0;
             var paceMultiplier = 0.85 + ((averagePace / 100.0) * 0.30);
@@ -464,7 +500,7 @@ namespace ProBasketballManager.Domain.Matches
                 chance += 0.01;
             }
 
-            chance = Clamp(chance, 0.18, 0.78);
+            chance = Clamp(chance, MinimumShotChance, MaximumShotChance);
 
             return _random.NextDouble() < chance;
         }
@@ -481,7 +517,9 @@ namespace ProBasketballManager.Domain.Matches
                         var offense = shot.Shooter.Attributes.Finishing * 0.70 + shot.Shooter.Attributes.Strength * 0.15 + shot.Shooter.Attributes.Speed * 0.15;
                         var defense = defender.Attributes.InteriorDefense * 0.75 + defender.Attributes.Strength * 0.25 + interiorModifier;
 
-                        return 0.61 + ((offense - 10.5) * 0.015) - ((defense - 10.5) * 0.012);
+                        return AtRimBaseChance
+                            + ((offense - AverageAttributeRating) * AtRimOffenseWeight)
+                            - ((defense - AverageAttributeRating) * AtRimDefenseWeight);
                     }
 
                 case ShotZone.Paint:
@@ -489,7 +527,9 @@ namespace ProBasketballManager.Domain.Matches
                         var offense = shot.Shooter.Attributes.Finishing * 0.55 + shot.Shooter.Attributes.MidRange * 0.30 + shot.Shooter.Attributes.Strength * 0.15;
                         var defense = defender.Attributes.InteriorDefense * 0.70 + defender.Attributes.PerimeterDefense * 0.30 + interiorModifier;
 
-                        return 0.48 + ((offense - 10.5) * 0.014) - ((defense - 10.5) * 0.010);
+                        return PaintBaseChance
+                            + ((offense - AverageAttributeRating) * PaintOffenseWeight)
+                            - ((defense - AverageAttributeRating) * PaintDefenseWeight);
                     }
 
                 case ShotZone.MidRange:
@@ -497,7 +537,9 @@ namespace ProBasketballManager.Domain.Matches
                         var offense = shot.Shooter.Attributes.MidRange * 0.80 + shot.Shooter.Attributes.BasketballIq * 0.20;
                         var defense = defender.Attributes.PerimeterDefense * 0.70 + defender.Attributes.InteriorDefense * 0.30 + (perimeterModifier * 0.65) + (interiorModifier * 0.35);
 
-                        return 0.41 + ((offense - 10.5) * 0.013) - ((defense - 10.5) * 0.009);
+                        return MidRangeBaseChance
+                            + ((offense - AverageAttributeRating) * MidRangeOffenseWeight)
+                            - ((defense - AverageAttributeRating) * MidRangeDefenseWeight);
                     }
 
                 case ShotZone.CornerThree:
@@ -505,7 +547,9 @@ namespace ProBasketballManager.Domain.Matches
                         var offense = shot.Shooter.Attributes.ThreePoint * 0.85 + shot.Shooter.Attributes.BasketballIq * 0.15;
                         var defense = defender.Attributes.PerimeterDefense + perimeterModifier;
 
-                        return 0.38 + ((offense - 10.5) * 0.012) - ((defense - 10.5) * 0.008);
+                        return CornerThreeBaseChance
+                            + ((offense - AverageAttributeRating) * ThreePointOffenseWeight)
+                            - ((defense - AverageAttributeRating) * ThreePointDefenseWeight);
                     }
 
                 case ShotZone.AboveBreakThree:
@@ -513,7 +557,9 @@ namespace ProBasketballManager.Domain.Matches
                         var offense = shot.Shooter.Attributes.ThreePoint * 0.85 + shot.Shooter.Attributes.BallHandling * 0.15;
                         var defense = defender.Attributes.PerimeterDefense + perimeterModifier;
 
-                        return 0.35 + ((offense - 10.5) * 0.012) - ((defense - 10.5) * 0.008);
+                        return AboveBreakThreeBaseChance
+                            + ((offense - AverageAttributeRating) * ThreePointOffenseWeight)
+                            - ((defense - AverageAttributeRating) * ThreePointDefenseWeight);
                     }
 
                 default:
@@ -541,7 +587,7 @@ namespace ProBasketballManager.Domain.Matches
             var defensivePressure = Average(defendingPlayers, player => player.Attributes.PerimeterDefense);
             defensivePressure += GetPerimeterDefenseModifier(defendingTactics);
 
-            var turnoverChance = 0.13 + ((defensivePressure - ballSecurity) * 0.006);
+            var turnoverChance = 0.145 + ((defensivePressure - ballSecurity) * 0.003);
             turnoverChance = Clamp(turnoverChance, 0.07, 0.22);
 
             if (_random.NextDouble() >= turnoverChance)
@@ -574,12 +620,12 @@ namespace ProBasketballManager.Domain.Matches
         {
             var foulChance = shot.Zone switch
             {
-                ShotZone.AtRim => 0.18,
-                ShotZone.Paint => 0.13,
-                ShotZone.MidRange => 0.08,
-                ShotZone.CornerThree => 0.05,
-                ShotZone.AboveBreakThree => 0.06,
-                _ => 0.08
+                ShotZone.AtRim => 0.162,
+                ShotZone.Paint => 0.117,
+                ShotZone.MidRange => 0.072,
+                ShotZone.CornerThree => 0.045,
+                ShotZone.AboveBreakThree => 0.054,
+                _ => 0.072
             };
 
             var perimeterAggression = Math.Max(0, (defendingTactics.PerimeterPressure - 50) / 50.0);
@@ -608,7 +654,7 @@ namespace ProBasketballManager.Domain.Matches
 
             for (var attempt = 0; attempt < freeThrows; attempt++)
             {
-                var makeChance = 0.72 + ((shot.Shooter.Attributes.FreeThrow - 10.5) * 0.02);
+                var makeChance = 0.755 + ((shot.Shooter.Attributes.FreeThrow - AverageAttributeRating) * 0.012);
                 makeChance = Clamp(makeChance, 0.45, 0.95);
 
                 var made = _random.NextDouble() < makeChance;
@@ -631,7 +677,7 @@ namespace ProBasketballManager.Domain.Matches
             var offensiveRebounding = Average(attackingPlayers, player => player.Attributes.OffensiveRebounding);
             var defensiveRebounding = Average(defendingPlayers, player => player.Attributes.DefensiveRebounding);
 
-            var offensiveReboundChance = 0.25 + ((offensiveRebounding - defensiveRebounding) * 0.012);
+            var offensiveReboundChance = 0.25 + ((offensiveRebounding - defensiveRebounding) * 0.006);
             offensiveReboundChance = Clamp(offensiveReboundChance, 0.15, 0.40);
 
             var offensiveRebound = allowOffensiveRebound && _random.NextDouble() < offensiveReboundChance;
@@ -660,11 +706,11 @@ namespace ProBasketballManager.Domain.Matches
         {
             var baseChance = shot.Action switch
             {
-                OffensiveActionType.SpotUp => 0.80,
-                OffensiveActionType.Drive => 0.42,
-                OffensiveActionType.PullUp => 0.28,
-                OffensiveActionType.PostUp => 0.22,
-                _ => 0.50
+                OffensiveActionType.SpotUp => 0.92,
+                OffensiveActionType.Drive => 0.58,
+                OffensiveActionType.PullUp => 0.42,
+                OffensiveActionType.PostUp => 0.38,
+                _ => 0.60
             };
 
             var averagePassing = Average(attackingPlayers, player => player.Attributes.Passing);
