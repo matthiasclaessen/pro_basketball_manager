@@ -32,11 +32,11 @@
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement class="content">
-                <ui:VisualElement name="main-menu-screen" class="screen">
+                <ui:VisualElement name="main-menu-screen" class="screen screen-hidden">
                     <ui:VisualElement class="screen-header">
-                        <ui:Label text="Pro Basketball Manager" class="screen-title" />
+                        <ui:Label text="Pro Basketball Manager" class="page-title" />
                         <ui:Label text="Start a new career or continue a saved one"
-                                class="screen-subtitle" />
+                                class="page-subtitle" />
                     </ui:VisualElement>
                     <ui:VisualElement class="panel">
                         <ui:Button name="new-game-button" text="New Game"
@@ -50,11 +50,11 @@
                         </ui:ScrollView>
                     </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:VisualElement name="save-load-screen" class="screen">
+                <ui:VisualElement name="save-load-screen" class="screen screen-hidden">
                     <ui:VisualElement class="screen-header">
-                        <ui:Label text="Save / Load" class="screen-title" />
+                        <ui:Label text="Save / Load" class="page-title" />
                         <ui:Label text="Saving is available between rounds"
-                                class="screen-subtitle" />
+                                class="page-subtitle" />
                     </ui:VisualElement>
                     <ui:VisualElement class="panel">
                         <ui:Label text="SAVE CURRENT GAME" class="panel-title" />
@@ -72,7 +72,7 @@
                         </ui:ScrollView>
                     </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:VisualElement name="dashboard-screen" class="screen">
+                <ui:VisualElement name="dashboard-screen" class="screen screen-hidden">
                     <ui:Label text="Dashboard" class="page-title" />
                     <ui:Label text="Your club overview and next fixture." class="page-subtitle" />
                     <ui:VisualElement class="card match-card">

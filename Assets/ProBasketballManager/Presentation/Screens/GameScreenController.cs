@@ -1,3 +1,4 @@
+using System.Linq;
 using ProBasketballManager.Domain.Players;
 using ProBasketballManager.Persistence;
 using ProBasketballManager.Presentation.State;
@@ -65,6 +66,8 @@ namespace ProBasketballManager.Presentation.Screens
             _root = GetComponent<UIDocument>().rootVisualElement;
 
             FindNavigation(_root);
+
+            HideEveryScreenElement();
 
             BindScreen(_mainMenuScreen, nameof(MainMenuScreenController), _root, null);
 
@@ -159,9 +162,7 @@ namespace ProBasketballManager.Presentation.Screens
         {
             if (screen == null)
             {
-                Debug.LogError(
-                    $"GameScreenController has no {screenName} assigned. " +
-                    "Add the component and drag it into the matching field in the Inspector.");
+                Debug.LogError($"GameScreenController has no {screenName} assigned. " + "Add the component and drag it into the matching field in the Inspector.");
 
                 return;
             }
@@ -339,8 +340,22 @@ namespace ProBasketballManager.Presentation.Screens
             SetActiveNavigation(_navScheduleButton);
         }
 
+        private void HideEveryScreenElement()
+        {
+            if (_root == null)
+            {
+                return;
+            }
+
+            foreach (var screen in _root.Query<VisualElement>(className: "screen").ToList())
+            {
+                screen.style.display = DisplayStyle.None;
+            }
+        }
+
         private void ShowMainMenu()
         {
+            HideEveryScreenElement();
             HideAllScreens();
 
             SetNavigationVisible(false);
