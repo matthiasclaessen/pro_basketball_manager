@@ -15,6 +15,10 @@ namespace ProBasketballManager.Domain.Matches
         DefensiveRebound,
 
         ShootingFoul,
+        PersonalFoul,
+        OffensiveFoul,
+        LooseBallFoul,
+        FoulOut,
 
         MadeFreeThrow,
         MissedFreeThrow

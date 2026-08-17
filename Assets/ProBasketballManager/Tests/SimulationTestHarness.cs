@@ -137,6 +137,38 @@ namespace ProBasketballManager.Domain.Tests
         }
 
         /// <summary>
+        /// Builds a roster where every attribute is identical except Stamina, so a
+        /// match between two of these isolates the effect of conditioning alone.
+        /// </summary>
+        public static Team CreateTeamWithStamina(int teamId, string name, int rating, int stamina)
+        {
+            var positions = (PlayerPosition[])Enum.GetValues(typeof(PlayerPosition));
+            var players = new List<Player>();
+
+            for (var index = 0; index < 10; index++)
+            {
+                var attributes = new PlayerAttributes(
+                    rating, rating, rating, rating,
+                    rating, rating,
+                    rating, rating,
+                    rating, rating,
+                    rating, rating, stamina,
+                    rating
+                );
+
+                players.Add(new Player(
+                    (teamId * 1000) + index,
+                    "Player" + index,
+                    "Team" + teamId,
+                    positions[index % positions.Length],
+                    attributes
+                ));
+            }
+
+            return new Team(teamId, name, players);
+        }
+
+        /// <summary>
         /// Plays two uniformly rated teams against each other and reports how often
         /// the stronger side wins, plus the average points margin.
         /// </summary>
