@@ -1,0 +1,17 @@
+{
+    "name": "ProBasketballManager.Presentation",
+    "rootNamespace": "ProBasketballManager.Presentation",
+    "references": [
+        "GUID:ad061b6c03b5e9446ac3aaea37426e9c",
+        "GUID:ec75b3d69eff61f49a5afb38407d0f54"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

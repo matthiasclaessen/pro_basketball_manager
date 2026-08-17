@@ -1,0 +1,16 @@
+{
+    "name": "ProBasketballManager.Persistence",
+    "rootNamespace": "ProBasketballManager.Persistence",
+    "references": [
+        "GUID:ad061b6c03b5e9446ac3aaea37426e9c"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

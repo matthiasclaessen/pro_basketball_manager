@@ -6,6 +6,7 @@ using ProBasketballManager.Domain.Matches;
 using ProBasketballManager.Domain.Players;
 using ProBasketballManager.Domain.Tactics;
 using ProBasketballManager.Domain.Teams;
+using ProBasketballManager.Persistence;
 
 namespace ProBasketballManager.Presentation.State
 {
@@ -44,6 +45,35 @@ namespace ProBasketballManager.Presentation.State
             UserRotation = TeamRotation.CreateDefault(userTeam);
 
             RefreshCurrentFixture();
+        }
+
+        public GameSessionSnapshot CreateSnapshot()
+        {
+            return new GameSessionSnapshot
+            {
+                Season = Season,
+                UserTeam = UserTeam,
+                UserTactics = UserTactics,
+                UserRotation = UserRotation,
+                NextSeed = NextSeed,
+                CurrentFixtureRecorded = CurrentFixtureRecorded
+            };
+        }
+
+        public static GameSession Restore(GameSessionSnapshot snapshot)
+        {
+            if (snapshot == null)
+            {
+                throw new ArgumentNullException(nameof(snapshot));
+            }
+
+            return new GameSession(snapshot.Season, snapshot.UserTeam)
+            {
+                UserTactics = snapshot.UserTactics,
+                UserRotation = snapshot.UserRotation,
+                NextSeed = snapshot.NextSeed,
+                CurrentFixtureRecorded = snapshot.CurrentFixtureRecorded
+            };
         }
 
         public static GameSession CreateDemo()

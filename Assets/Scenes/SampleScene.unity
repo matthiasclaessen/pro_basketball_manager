@@ -130,6 +130,13 @@ GameObject:
   - component: {fileID: 22130508}
   - component: {fileID: 22130507}
   - component: {fileID: 22130506}
+  - component: {fileID: 22130509}
+  - component: {fileID: 22130512}
+  - component: {fileID: 22130511}
+  - component: {fileID: 22130510}
+  - component: {fileID: 22130515}
+  - component: {fileID: 22130514}
+  - component: {fileID: 22130513}
   m_Layer: 5
   m_Name: GameUI
   m_TagString: Untagged
@@ -149,6 +156,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e97668cc2c4b27244abaf4c8049e73b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProBasketballManager.Presentation.Screens.GameScreenController
+  _dashboardScreen: {fileID: 22130514}
+  _squadScreen: {fileID: 22130511}
+  _playerProfileScreen: {fileID: 22130510}
+  _tacticsScreen: {fileID: 22130515}
+  _scheduleScreen: {fileID: 22130512}
+  _leagueScreen: {fileID: 22130509}
+  _matchCentreScreen: {fileID: 22130513}
 --- !u!114 &22130507
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -187,6 +201,90 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &22130509
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 22130505}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97ab7f4d29b3ce84497804cafa2afaa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProBasketballManager.Presentation.Screens.LeagueScreenController
+--- !u!114 &22130510
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 22130505}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0be390e340e6fc468a4f071f06a9286, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProBasketballManager.Presentation.Screens.PlayerProfileScreenController
+--- !u!114 &22130511
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 22130505}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0e33beb7c8f5e34dae1990a2436bdfd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProBasketballManager.Presentation.Screens.SquadScreenController
+--- !u!114 &22130512
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 22130505}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9fde64b88147164c8563fa7eee09219, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProBasketballManager.Presentation.Screens.ScheduleScreenController
+--- !u!114 &22130513
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 22130505}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ecf9c44c43ead24448db12f275342755, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProBasketballManager.Presentation.Screens.MatchCentreScreenController
+--- !u!114 &22130514
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 22130505}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 438ae69cdb599fc47a8ce5d62fce4d72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProBasketballManager.Presentation.Screens.DashboardScreenController
+--- !u!114 &22130515
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 22130505}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc8b58f948baaa2488c3e307127f1c32, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProBasketballManager.Presentation.Screens.TacticsScreenController
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
