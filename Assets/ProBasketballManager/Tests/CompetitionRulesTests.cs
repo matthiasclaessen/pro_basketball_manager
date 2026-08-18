@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using NUnit.Framework;
 using ProBasketballManager.Domain.Competitions;
@@ -226,7 +226,7 @@ namespace ProBasketballManager.Domain.Tests
 
             var dto = SaveGameMapper.ToDto(session.CreateSnapshot(), "rules");
 
-            Assert.That(dto.SchemaVersion, Is.EqualTo(4));
+            Assert.That(dto.SchemaVersion, Is.EqualTo(SaveGameMapper.CurrentSchemaVersion));
             Assert.That(dto.Season.Rules, Is.Not.Null);
 
             var restored = SaveGameMapper.FromDto(dto);
@@ -239,14 +239,15 @@ namespace ProBasketballManager.Domain.Tests
         [Test]
         public void ANonFibaRulesetSurvivesASaveAndLoad()
         {
-            var season = DemoSeasonFactory.Create(CompetitionRules.Nba);
+            var career = DemoCareerFactory.Create(CompetitionRules.Nba);
+            var season = career.CurrentSeason;
 
             var snapshot = new GameSessionSnapshot
             {
-                Career = new Career(season.League, season),
-                UserTeam = season.League.Teams[0],
+                Career = career,
+                UserTeam = career.Clubs[0].FirstTeam,
                 UserTactics = TeamTactics.Default,
-                UserRotation = TeamRotation.CreateDefault(season.League.Teams[0], CompetitionRules.Nba),
+                UserRotation = TeamRotation.CreateDefault(career.Clubs[0].FirstTeam, CompetitionRules.Nba),
                 NextSeed = 1u
             };
 
@@ -288,8 +289,8 @@ namespace ProBasketballManager.Domain.Tests
         [Test]
         public void RulesCarryForwardIntoTheNextSeason()
         {
-            var season = DemoSeasonFactory.Create(CompetitionRules.Nba);
-            var career = new Career(season.League, season);
+            var career = DemoCareerFactory.Create(CompetitionRules.Nba);
+            var season = career.CurrentSeason;
 
             foreach (var fixture in season.Fixtures.ToList())
             {

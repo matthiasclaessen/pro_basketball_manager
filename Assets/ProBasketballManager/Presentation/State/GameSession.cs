@@ -1,5 +1,6 @@
-using System;
+﻿using System;
 using System.Linq;
+using ProBasketballManager.Domain.Clubs;
 using ProBasketballManager.Domain.Competitions;
 using ProBasketballManager.Domain.Demo;
 using ProBasketballManager.Domain.Matches;
@@ -80,11 +81,13 @@ namespace ProBasketballManager.Presentation.State
 
         public static GameSession CreateDemo()
         {
-            var season = DemoSeasonFactory.Create();
+            var clubs = DemoClubFactory.Create();
 
-            var career = new Career(season.League, season);
+            var season = DemoSeasonFactory.Create(clubs, TeamType.First);
 
-            return new GameSession(career, career.League.Teams[0]);
+            var career = new Career(clubs, season.League, season);
+
+            return new GameSession(career, clubs[0].FirstTeam);
         }
 
         public void RefreshCurrentFixture()

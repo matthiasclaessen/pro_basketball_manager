@@ -1,6 +1,8 @@
-using System;
+﻿using System;
+using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
+using ProBasketballManager.Domain.Clubs;
 using ProBasketballManager.Domain.Competitions;
 using ProBasketballManager.Domain.Matches;
 using ProBasketballManager.Domain.Players;
@@ -12,7 +14,7 @@ namespace ProBasketballManager.Persistence
 {
     public static class SaveGameMapper
     {
-        public const int CurrentSchemaVersion = 4;
+        public const int CurrentSchemaVersion = 6;
 
         public const int MinimumReadableSchemaVersion = 1;
 
@@ -31,14 +33,17 @@ namespace ProBasketballManager.Persistence
                 SaveName = saveName,
                 SavedAtUtc = DateTime.UtcNow.ToString("o"),
                 Description = BuildDescription(snapshot),
+                Clubs = snapshot.Career.Clubs.Select(ToDto).ToList(),
                 League = ToDto(season.League),
                 Season = ToSeasonDto(season),
                 CompletedSeasons = snapshot.Career.CompletedSeasons.Select(ToDto).ToList(),
                 RetiredPlayers = snapshot.Career.RetiredPlayers.Select(ToDto).ToList(),
+                UserClubId = snapshot.UserTeam.ClubId,
                 UserTeamId = snapshot.UserTeam.Id,
                 UserTactics = ToDto(snapshot.UserTactics),
                 UserRotation = ToDto(snapshot.UserRotation),
                 NextSeed = snapshot.NextSeed,
+                CurrentDate = snapshot.Career.CurrentDate.ToString("yyyy-MM-dd"),
                 CurrentFixtureRecorded = snapshot.CurrentFixtureRecorded
             };
         }
@@ -100,14 +105,54 @@ namespace ProBasketballManager.Persistence
             };
         }
 
+        private static ClubDto ToDto(Club club)
+        {
+            return new ClubDto
+            {
+                Id = club.Id,
+                Name = club.Name,
+                Squad = club.Squad.Select(ToDto).ToList(),
+                Teams = club.Teams.Select(ToDto).ToList()
+            };
+        }
+
         private static LeagueDto ToDto(League league)
         {
             return new LeagueDto
             {
                 Id = league.Id,
                 Name = league.Name,
-                Teams = league.Teams.Select(ToDto).ToList()
+                Calendar = ToDto(league.Calendar),
+                TeamIds = league.Teams.Select(team => team.Id).ToList()
             };
+        }
+
+        private static CompetitionCalendarDto ToDto(CompetitionCalendar calendar)
+        {
+            return new CompetitionCalendarDto
+            {
+                MatchDay = calendar.MatchDay.ToString(),
+                DaysBetweenRounds = calendar.DaysBetweenRounds,
+                FirstRoundMonth = calendar.FirstRoundMonth,
+                FirstRoundDay = calendar.FirstRoundDay
+            };
+        }
+
+        private static CompetitionCalendar FromDto(CompetitionCalendarDto dto)
+        {
+            if (dto == null)
+            {
+                return CompetitionCalendar.Default;
+            }
+
+            try
+            {
+                return new CompetitionCalendar(ParseEnum<DayOfWeek>(dto.MatchDay, "match day"), dto.DaysBetweenRounds, dto.FirstRoundMonth, dto.FirstRoundDay);
+            }
+            catch (ArgumentOutOfRangeException exception)
+            {
+                throw new SaveGameException($"The save file contains an invalid competition calendar: {exception.Message}", exception);
+            }
         }
 
         private static TeamDto ToDto(Team team)
@@ -116,7 +161,8 @@ namespace ProBasketballManager.Persistence
             {
                 Id = team.Id,
                 Name = team.Name,
-                Players = team.Players.Select(ToDto).ToList()
+                Level = team.Type.ToString(),
+                PlayerIds = team.Players.Select(player => player.Id).ToList()
             };
         }
 
@@ -186,7 +232,6 @@ namespace ProBasketballManager.Persistence
 
         private static CompetitionRules FromDto(CompetitionRulesDto dto)
         {
-            // Saves written before rules were data all assumed FIBA.
             if (dto == null)
             {
                 return CompetitionRules.Fiba;
@@ -218,6 +263,7 @@ namespace ProBasketballManager.Persistence
             {
                 Id = fixture.Id,
                 RoundNumber = fixture.RoundNumber,
+                Date = fixture.Date.ToString("yyyy-MM-dd"),
                 HomeTeamId = fixture.HomeTeam.Id,
                 AwayTeamId = fixture.AwayTeam.Id,
                 Result = fixture.IsPlayed ? ToDto(fixture.Result) : null
@@ -338,18 +384,27 @@ namespace ProBasketballManager.Persistence
                 throw new SaveGameException("The save file is missing its league or season.");
             }
 
-            var league = FromDto(dto.League);
+            var hasClubs = dto.Clubs != null && dto.Clubs.Count > 0;
 
-            var teams = league.Teams.ToDictionary(team => team.Id);
+            if (!hasClubs && (dto.League.Teams == null || dto.League.Teams.Count == 0))
+            {
+                throw new SaveGameException("The save file contains no clubs.");
+            }
+
+            var clubs = hasClubs ? dto.Clubs.Select(FromDto).ToList() : dto.League.Teams.Select(UpgradeLegacyTeam).ToList();
+
+            var teams = clubs.SelectMany(club => club.Teams).ToDictionary(team => team.Id);
 
             var retiredPlayers = (dto.RetiredPlayers ?? new List<PlayerDto>())
                 .Select(FromDto)
                 .ToList();
 
-            var players = league.Teams
-                .SelectMany(team => team.Players)
+            var players = clubs
+                .SelectMany(club => club.Squad)
                 .Concat(retiredPlayers)
                 .ToDictionary(player => player.Id);
+
+            var league = FromDto(dto.League, teams, clubs);
 
             var season = FromDto(dto.Season, league, teams, players);
 
@@ -359,9 +414,24 @@ namespace ProBasketballManager.Persistence
 
             var userTeam = Resolve(teams, dto.UserTeamId, "user team");
 
+            var career = new Career(clubs, league, season, completed, retiredPlayers);
+
+            if (!string.IsNullOrWhiteSpace(dto.CurrentDate))
+            {
+                if (!DateTime.TryParse(dto.CurrentDate, CultureInfo.InvariantCulture, DateTimeStyles.None, out var currentDate))
+                {
+                    throw new SaveGameException($"The save file has an unreadable current date: '{dto.CurrentDate}'.");
+                }
+
+                if (currentDate.Date > career.CurrentDate)
+                {
+                    career.SetCurrentDate(currentDate);
+                }
+            }
+
             return new GameSessionSnapshot
             {
-                Career = new Career(league, season, completed, retiredPlayers),
+                Career = career,
                 UserTeam = userTeam,
                 UserTactics = FromDto(dto.UserTactics),
                 UserRotation = FromDto(dto.UserRotation, teams, players, season.Rules),
@@ -407,18 +477,49 @@ namespace ProBasketballManager.Persistence
             return new CompletedSeason(dto.Id, dto.Name, standings, statistics);
         }
 
-        private static League FromDto(LeagueDto dto)
+        private static Club FromDto(ClubDto dto)
         {
-            var teams = dto.Teams.Select(FromDto).ToList();
+            if (dto.Squad == null || dto.Squad.Count == 0)
+            {
+                throw new SaveGameException($"Club '{dto.Name}' has no squad in the save file.");
+            }
 
-            return new League(dto.Id, dto.Name, teams);
+            var squad = dto.Squad.Select(FromDto).ToList();
+            var squadById = squad.ToDictionary(player => player.Id);
+
+            var teams = (dto.Teams ?? new List<TeamDto>()).Select(team => FromDto(team, dto.Id, squadById)).ToList();
+
+            return new Club(dto.Id, dto.Name, squad, teams);
         }
 
-        private static Team FromDto(TeamDto dto)
+        private static Team FromDto(TeamDto dto, int clubId, Dictionary<int, Player> squad)
         {
-            var players = dto.Players.Select(FromDto).ToList();
+            var players = dto.PlayerIds.Select(id => Resolve(squad, id, $"player on team '{dto.Name}'")).ToList();
 
-            return new Team(dto.Id, dto.Name, players);
+            return new Team(dto.Id, dto.Name, players, clubId, ParseEnum<TeamType>(dto.Level, "team level"));
+        }
+
+        private static League FromDto(LeagueDto dto, Dictionary<int, Team> teams, List<Club> clubs)
+        {
+            var teamIds = dto.TeamIds != null && dto.TeamIds.Count > 0 ? dto.TeamIds : clubs.Select(club => club.FirstTeam.Id).ToList();
+
+            var leagueTeams = teamIds.Select(id => Resolve(teams, id, $"team in league '{dto.Name}'")).ToList();
+
+            return new League(dto.Id, dto.Name, leagueTeams, FromDto(dto.Calendar));
+        }
+
+        private static Club UpgradeLegacyTeam(LegacyTeamDto dto)
+        {
+            if (dto.Players == null || dto.Players.Count == 0)
+            {
+                throw new SaveGameException($"Team '{dto.Name}' has no players in the save file.");
+            }
+
+            var squad = dto.Players.Select(FromDto).ToList();
+
+            var team = new Team(dto.Id, dto.Name, squad, dto.Id, TeamType.First);
+
+            return new Club(dto.Id, dto.Name, squad, new[] { team });
         }
 
         private static Player FromDto(PlayerDto dto)
@@ -465,7 +566,8 @@ namespace ProBasketballManager.Persistence
                     fixtureDto.Id,
                     fixtureDto.RoundNumber,
                     Resolve(teams, fixtureDto.HomeTeamId, "fixture home team"),
-                    Resolve(teams, fixtureDto.AwayTeamId, "fixture away team"));
+                    Resolve(teams, fixtureDto.AwayTeamId, "fixture away team"),
+                    ParseFixtureDate(fixtureDto, league));
 
                 if (fixtureDto.Result != null)
                 {
@@ -576,6 +678,21 @@ namespace ProBasketballManager.Persistence
                 dto.AwayScore,
                 offensiveAction,
                 shotZone);
+        }
+
+        private static DateTime ParseFixtureDate(FixtureDto dto, League league)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Date))
+            {
+                return league.Calendar.GetRoundDate(CompetitionCalendar.DefaultFirstSeasonYear, dto.RoundNumber);
+            }
+
+            if (!DateTime.TryParse(dto.Date, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsed))
+            {
+                throw new SaveGameException($"Fixture {dto.Id} has an unreadable date: '{dto.Date}'.");
+            }
+
+            return parsed.Date;
         }
 
         private static TValue Resolve<TValue>(Dictionary<int, TValue> lookup, int id, string what)

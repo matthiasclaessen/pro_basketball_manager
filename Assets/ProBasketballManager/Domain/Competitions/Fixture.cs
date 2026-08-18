@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using ProBasketballManager.Domain.Matches;
 using ProBasketballManager.Domain.Teams;
 
@@ -14,11 +14,13 @@ namespace ProBasketballManager.Domain.Competitions
 
         public Team AwayTeam { get; }
 
+        public DateTime Date { get; }
+
         public MatchResult Result { get; private set; }
 
         public bool IsPlayed => Result != null;
 
-        public Fixture(int id, int roundNumber, Team homeTeam, Team awayTeam)
+        public Fixture(int id, int roundNumber, Team homeTeam, Team awayTeam, DateTime date)
         {
             if (homeTeam.Id == awayTeam.Id)
             {
@@ -30,8 +32,14 @@ namespace ProBasketballManager.Domain.Competitions
                 throw new ArgumentOutOfRangeException(nameof(roundNumber), "Round number must be at least 1.");
             }
 
+            if (date == default)
+            {
+                throw new ArgumentException("A fixture must be scheduled on a real date.", nameof(date));
+            }
+
             Id = id;
             RoundNumber = roundNumber;
+            Date = date.Date;
             HomeTeam = homeTeam;
             AwayTeam = awayTeam;
         }

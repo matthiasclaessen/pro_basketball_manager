@@ -1,4 +1,7 @@
+﻿using System.Collections.Generic;
+using ProBasketballManager.Domain.Clubs;
 using ProBasketballManager.Domain.Competitions;
+using ProBasketballManager.Domain.Teams;
 
 namespace ProBasketballManager.Domain.Demo
 {
@@ -6,17 +9,17 @@ namespace ProBasketballManager.Domain.Demo
     {
         public static Season Create(CompetitionRules rules = null)
         {
+            return Create(DemoClubFactory.Create(), TeamType.First, rules);
+        }
+
+        public static Season Create(IReadOnlyList<Club> clubs, TeamType level, CompetitionRules rules = null)
+        {
             var effectiveRules = rules ?? CompetitionRules.Fiba;
 
-            var league = DemoLeagueFactory.Create();
+            var league = DemoLeagueFactory.CreateFrom(clubs, level);
             var fixtures = RoundRobinScheduleGenerator.Generate(league, effectiveRules);
 
-            return new Season(
-                id: 1,
-                name: "2026 / 27",
-                league: league,
-                fixtures: fixtures,
-                rules: effectiveRules);
+            return new Season(level == TeamType.First ? 1 : 2, "2026 / 27", league, fixtures, effectiveRules);
         }
     }
 }

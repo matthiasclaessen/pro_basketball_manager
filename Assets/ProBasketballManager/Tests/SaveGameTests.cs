@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using NUnit.Framework;
 using ProBasketballManager.Domain.Matches;
@@ -251,7 +251,7 @@ namespace ProBasketballManager.Domain.Tests
         public void AnUnrecognisedEnumValueIsRejected()
         {
             var dto = CreateValidDto();
-            dto.League.Teams[0].Players[0].Position = "GoalKeeper";
+            dto.Clubs[0].Squad[0].Position = "GoalKeeper";
 
             Assert.Throws<SaveGameException>(() => SaveGameMapper.FromDto(dto));
         }

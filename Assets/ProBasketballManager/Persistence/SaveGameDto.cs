@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace ProBasketballManager.Persistence
@@ -12,6 +12,8 @@ namespace ProBasketballManager.Persistence
 
         public string Description;
 
+        public List<ClubDto> Clubs = new List<ClubDto>();
+
         public LeagueDto League;
 
         public SeasonDto Season;
@@ -20,28 +22,58 @@ namespace ProBasketballManager.Persistence
 
         public List<PlayerDto> RetiredPlayers = new List<PlayerDto>();
 
+        public int UserClubId;
         public int UserTeamId;
 
         public TeamTacticsDto UserTactics;
         public TeamRotationDto UserRotation;
+
+        public string CurrentDate;
 
         public uint NextSeed;
 
         public bool CurrentFixtureRecorded;
     }
 
+    public sealed class ClubDto
+    {
+        public int Id;
+        public string Name;
+        public List<PlayerDto> Squad = new List<PlayerDto>();
+        public List<TeamDto> Teams = new List<TeamDto>();
+    }
+
     public sealed class LeagueDto
     {
         public int Id;
         public string Name;
-        public List<TeamDto> Teams = new List<TeamDto>();
+        public CompetitionCalendarDto Calendar;
+        public List<int> TeamIds = new List<int>();
+
+        public List<LegacyTeamDto> Teams;
+    }
+
+    public sealed class CompetitionCalendarDto
+    {
+        public string MatchDay;
+        public int DaysBetweenRounds;
+        public int FirstRoundMonth;
+        public int FirstRoundDay;
+    }
+
+    public sealed class LegacyTeamDto
+    {
+        public int Id;
+        public string Name;
+        public List<PlayerDto> Players = new List<PlayerDto>();
     }
 
     public sealed class TeamDto
     {
         public int Id;
         public string Name;
-        public List<PlayerDto> Players = new List<PlayerDto>();
+        public string Level;
+        public List<int> PlayerIds = new List<int>();
     }
 
     public sealed class PlayerDto
@@ -146,6 +178,7 @@ namespace ProBasketballManager.Persistence
     {
         public int Id;
         public int RoundNumber;
+        public string Date;
         public int HomeTeamId;
         public int AwayTeamId;
 

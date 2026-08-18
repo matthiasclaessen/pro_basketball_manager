@@ -1,8 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using ProBasketballManager.Domain.Matches;
 using ProBasketballManager.Domain.Players;
+using ProBasketballManager.Domain.Teams;
+using ProBasketballManager.Domain.Clubs;
 using ProBasketballManager.Domain.Statistics;
 
 namespace ProBasketballManager.Domain.Competitions
@@ -11,10 +13,15 @@ namespace ProBasketballManager.Domain.Competitions
     {
         private readonly List<CompletedSeason> _completedSeasons;
         private readonly List<Player> _retiredPlayers = new List<Player>();
+        private readonly List<Club> _clubs;
+
+        public IReadOnlyList<Club> Clubs => _clubs;
 
         public League League { get; }
 
         public Season CurrentSeason { get; private set; }
+
+        public DateTime CurrentDate { get; private set; }
 
         public IReadOnlyList<CompletedSeason> CompletedSeasons => _completedSeasons;
 
@@ -22,12 +29,26 @@ namespace ProBasketballManager.Domain.Competitions
 
         public bool CanAdvance => CurrentSeason.IsComplete;
 
-        public Career(League league, Season currentSeason, IEnumerable<CompletedSeason> completedSeasons = null, IEnumerable<Player> retiredPlayers = null)
+        public Career(IEnumerable<Club> clubs, League league, Season currentSeason, IEnumerable<CompletedSeason> completedSeasons = null, IEnumerable<Player> retiredPlayers = null)
         {
+            if (clubs == null)
+            {
+                throw new ArgumentNullException(nameof(clubs));
+            }
+
+            _clubs = clubs.ToList();
+
+            if (_clubs.Count == 0)
+            {
+                throw new ArgumentException("A career must contain at least one club.", nameof(clubs));
+            }
+
             League = league ?? throw new ArgumentNullException(nameof(league));
             CurrentSeason = currentSeason ?? throw new ArgumentNullException(nameof(currentSeason));
 
             _completedSeasons = completedSeasons?.ToList() ?? new List<CompletedSeason>();
+
+            CurrentDate = currentSeason.StartDate;
 
             if (retiredPlayers != null)
             {
@@ -38,15 +59,56 @@ namespace ProBasketballManager.Domain.Competitions
             {
                 throw new ArgumentException("The current season must belong to the career's league.", nameof(currentSeason));
             }
+
+            var clubTeamIds = _clubs.SelectMany(club => club.Teams).Select(team => team.Id).ToHashSet();
+
+            var orphan = league.Teams.FirstOrDefault(team => !clubTeamIds.Contains(team.Id));
+
+            if (orphan != null)
+            {
+                throw new ArgumentException($"{orphan.Name} competes in {league.Name} but belongs to no club in this career.", nameof(clubs));
+            }
         }
 
-        public static Career Start(League league, int seasonId, string seasonName, CompetitionRules rules = null)
+        public void SetCurrentDate(DateTime date)
+        {
+            if (date.Date < CurrentDate)
+            {
+                throw new ArgumentException("The career clock cannot run backwards.", nameof(date));
+            }
+
+            CurrentDate = date.Date;
+        }
+
+        public Club GetClub(int clubId)
+        {
+            var club = _clubs.FirstOrDefault(candidate => candidate.Id == clubId);
+
+            if (club == null)
+            {
+                throw new ArgumentException($"There is no club with id {clubId} in this career.", nameof(clubId));
+            }
+
+            return club;
+        }
+
+        public Club GetClubFor(Team team)
+        {
+            if (team == null)
+            {
+                throw new ArgumentNullException(nameof(team));
+            }
+
+            return GetClub(team.ClubId);
+        }
+
+        public static Career Start(IEnumerable<Club> clubs, League league, int seasonId, string seasonName, CompetitionRules rules = null)
         {
             var effectiveRules = rules ?? CompetitionRules.Fiba;
 
             var fixtures = RoundRobinScheduleGenerator.Generate(league, effectiveRules);
 
-            return new Career(league, new Season(seasonId, seasonName, league, fixtures, effectiveRules));
+            return new Career(clubs, league, new Season(seasonId, seasonName, league, fixtures, effectiveRules));
         }
 
         public CompletedSeason AdvanceToNextSeason(IRandomSource random = null)
@@ -62,7 +124,7 @@ namespace ProBasketballManager.Domain.Competitions
 
             LastCloseSeason = RunCloseSeason(random ?? new XorShiftRandom((uint)(CurrentSeason.Id * 7919 + 13)));
 
-            var fixtures = RoundRobinScheduleGenerator.Generate(League, CurrentSeason.Rules);
+            var fixtures = RoundRobinScheduleGenerator.Generate(League, CurrentSeason.Rules, CurrentSeason.StartDate.Year + 1);
 
             CurrentSeason = new Season(
                 CurrentSeason.Id + 1,
@@ -70,6 +132,8 @@ namespace ProBasketballManager.Domain.Competitions
                 League,
                 fixtures,
                 CurrentSeason.Rules);
+
+            CurrentDate = CurrentSeason.StartDate;
 
             return archived;
         }
@@ -82,19 +146,21 @@ namespace ProBasketballManager.Domain.Competitions
         {
             var report = new CloseSeasonReport();
 
-            var nextPlayerId = League.Teams.Max(team => team.GetHighestPlayerId()) + 1;
+            var nextPlayerId = _clubs.Max(club => club.GetHighestPlayerId()) + 1;
 
-            foreach (var team in League.Teams)
+            foreach (var club in _clubs)
             {
-                foreach (var player in team.Players.ToList())
+                foreach (var player in club.Squad.ToList())
                 {
+                    var team = club.GetPrimaryTeamFor(player.Id);
+
                     player.AdvanceAge();
 
                     if (RetirementModel.ShouldRetire(player, random))
                     {
                         var replacement = ProspectGenerator.Create(nextPlayerId++, player.Position, random);
 
-                        team.ReplacePlayer(player, replacement);
+                        club.ReplacePlayer(player, replacement);
 
                         _retiredPlayers.Add(player);
 

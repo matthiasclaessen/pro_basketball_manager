@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using ProBasketballManager.Domain.Matches;
@@ -21,6 +21,10 @@ namespace ProBasketballManager.Domain.Competitions
         public IReadOnlyList<Fixture> Fixtures => _fixtures;
 
         public int TotalRounds => _fixtures.Count == 0 ? 0 : _fixtures.Max(fixture => fixture.RoundNumber);
+
+        public DateTime StartDate => _fixtures.Min(fixture => fixture.Date);
+
+        public DateTime EndDate => _fixtures.Max(fixture => fixture.Date);
 
         public bool IsComplete => _fixtures.Count > 0 && _fixtures.All(fixture => fixture.IsPlayed);
 
@@ -53,6 +57,18 @@ namespace ProBasketballManager.Domain.Competitions
             _fixtures = fixtures?.ToList() ?? throw new ArgumentNullException(nameof(fixtures));
 
             ValidateFixtures();
+        }
+
+        public IReadOnlyList<Fixture> GetFixturesOn(DateTime date)
+        {
+            return _fixtures.Where(fixture => fixture.Date == date.Date).OrderBy(fixture => fixture.Id).ToList();
+        }
+
+        public DateTime? GetNextMatchDayAfter(DateTime date)
+        {
+            var upcoming = _fixtures.Where(fixture => fixture.Date > date.Date).Select(fixture => fixture.Date).ToList();
+
+            return upcoming.Count == 0 ? (DateTime?)null : upcoming.Min();
         }
 
         public IReadOnlyList<Fixture> GetFixturesForRound(int roundNumber)
@@ -119,6 +135,28 @@ namespace ProBasketballManager.Domain.Competitions
             if (_fixtures.Select(fixture => fixture.Id).Distinct().Count() != _fixtures.Count)
             {
                 throw new ArgumentException("Every fixture must have a unique ID.");
+            }
+
+            if (_fixtures.Count == 0)
+            {
+                return;
+            }
+
+            var roundDates = _fixtures.GroupBy(fixture => fixture.RoundNumber).OrderBy(group => group.Key).Select(group => new { Round = group.Key, Dates = group.Select(fixture => fixture.Date).Distinct().ToList() }).ToList();
+
+            var straddling = roundDates.FirstOrDefault(entry => entry.Dates.Count > 1);
+
+            if (straddling != null)
+            {
+                throw new ArgumentException($"Round {straddling.Round} is scheduled across more than one date.");
+            }
+
+            for (var index = 1; index < roundDates.Count; index++)
+            {
+                if (roundDates[index].Dates[0] <= roundDates[index - 1].Dates[0])
+                {
+                    throw new ArgumentException($"Round {roundDates[index].Round} is not scheduled after round {roundDates[index - 1].Round}.");
+                }
             }
         }
     }

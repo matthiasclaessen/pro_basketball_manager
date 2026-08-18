@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using ProBasketballManager.Domain.Teams;
@@ -8,6 +8,11 @@ namespace ProBasketballManager.Domain.Competitions
     public static class RoundRobinScheduleGenerator
     {
         public static IReadOnlyList<Fixture> Generate(League league, CompetitionRules rules = null)
+        {
+            return Generate(league, rules, CompetitionCalendar.DefaultFirstSeasonYear);
+        }
+
+        public static IReadOnlyList<Fixture> Generate(League league, CompetitionRules rules, int seasonStartYear)
         {
             if (league.Teams.Count < 2)
             {
@@ -47,7 +52,7 @@ namespace ProBasketballManager.Domain.Competitions
                     var homeTeam = reverseHomeAndAway ? secondTeam : firstTeam;
                     var awayTeam = reverseHomeAndAway ? firstTeam : secondTeam;
 
-                    firstHalfFixtures.Add(new Fixture(fixtureId, roundNumber, homeTeam, awayTeam));
+                    firstHalfFixtures.Add(new Fixture(fixtureId, roundNumber, homeTeam, awayTeam, league.Calendar.GetRoundDate(seasonStartYear, roundNumber)));
 
                     fixtureId++;
                 }
@@ -65,11 +70,14 @@ namespace ProBasketballManager.Domain.Competitions
 
                 foreach (var firstHalfFixture in firstHalfFixtures)
                 {
+                    var laterRoundNumber = firstHalfFixture.RoundNumber + (roundsPerHalf * pass);
+
                     fixtures.Add(new Fixture(
                         fixtureId,
-                        firstHalfFixture.RoundNumber + (roundsPerHalf * pass),
+                        laterRoundNumber,
                         swapHomeAndAway ? firstHalfFixture.AwayTeam : firstHalfFixture.HomeTeam,
-                        swapHomeAndAway ? firstHalfFixture.HomeTeam : firstHalfFixture.AwayTeam
+                        swapHomeAndAway ? firstHalfFixture.HomeTeam : firstHalfFixture.AwayTeam,
+                        league.Calendar.GetRoundDate(seasonStartYear, laterRoundNumber)
                     ));
 
                     fixtureId++;
