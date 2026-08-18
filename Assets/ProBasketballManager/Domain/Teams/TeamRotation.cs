@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ProBasketballManager.Domain.Competitions;
 using ProBasketballManager.Domain.Players;
 
 namespace ProBasketballManager.Domain.Teams
@@ -20,9 +21,14 @@ namespace ProBasketballManager.Domain.Teams
 
         public Player PrimaryScorer { get; }
 
-        public TeamRotation(Team team, IDictionary<PlayerPosition, Player> starters, IEnumerable<PlayerRotationAssignment> assignments, Player primaryBallHandler, Player primaryScorer)
+        public CompetitionRules Rules { get; }
+
+        public int RequiredTotalMinutes => (int)Math.Round(Rules.TotalPlayerMinutesPerGame);
+
+        public TeamRotation(Team team, IDictionary<PlayerPosition, Player> starters, IEnumerable<PlayerRotationAssignment> assignments, Player primaryBallHandler, Player primaryScorer, CompetitionRules rules = null)
         {
             Team = team ?? throw new ArgumentNullException(nameof(team));
+            Rules = rules ?? CompetitionRules.Fiba;
             PrimaryBallHandler = primaryBallHandler ?? throw new ArgumentNullException(nameof(primaryBallHandler));
             PrimaryScorer = primaryScorer ?? throw new ArgumentNullException(nameof(primaryScorer));
 
@@ -47,8 +53,10 @@ namespace ProBasketballManager.Domain.Teams
             return _assignments.Single(assignment => assignment.Player.Id == playerId);
         }
 
-        public static TeamRotation CreateDefault(Team team)
+        public static TeamRotation CreateDefault(Team team, CompetitionRules rules = null)
         {
+            var effectiveRules = rules ?? CompetitionRules.Fiba;
+
             var remainingPlayers = team.Players.ToList();
             var starters = new Dictionary<PlayerPosition, Player>();
 
@@ -65,18 +73,36 @@ namespace ProBasketballManager.Domain.Teams
                 remainingPlayers.Remove(player);
             }
 
+            var totalMinutes = (int)Math.Round(effectiveRules.TotalPlayerMinutesPerGame);
+            var starterCount = effectiveRules.PlayersOnCourt;
+
+            var benchCount = Math.Min(5, remainingPlayers.Count);
+
+            var starterShare = (int)Math.Round(totalMinutes * 0.70 / starterCount);
+            var benchShare = benchCount == 0 ? 0 : (totalMinutes - (starterShare * starterCount)) / benchCount;
+
             var assignments = new List<PlayerRotationAssignment>();
             var rotationOrder = 1;
 
+            var allocated = 0;
+            var starterIndex = 0;
+
             foreach (PlayerPosition position in Enum.GetValues(typeof(PlayerPosition)))
             {
-                assignments.Add(new PlayerRotationAssignment(starters[position], 28, rotationOrder));
+                var isLastStarter = starterIndex == starterCount - 1;
+
+                var minutes = isLastStarter ? totalMinutes - allocated - (benchShare * benchCount) : starterShare;
+
+                assignments.Add(new PlayerRotationAssignment(starters[position], minutes, rotationOrder));
+
+                allocated += minutes;
                 rotationOrder++;
+                starterIndex++;
             }
 
             for (var index = 0; index < remainingPlayers.Count; index++)
             {
-                var targetMinutes = index < 5 ? 12 : 0;
+                var targetMinutes = index < benchCount ? benchShare : 0;
 
                 assignments.Add(new PlayerRotationAssignment(remainingPlayers[index], targetMinutes, rotationOrder));
                 rotationOrder++;
@@ -88,7 +114,7 @@ namespace ProBasketballManager.Domain.Teams
                 .OrderByDescending(player => player.Attributes.Finishing + player.Attributes.MidRange + player.Attributes.ThreePoint)
                 .First();
 
-            return new TeamRotation(team, starters, assignments, primaryBallHandler, primaryScorer);
+            return new TeamRotation(team, starters, assignments, primaryBallHandler, primaryScorer, rules);
         }
 
         private void Validate()
@@ -129,9 +155,9 @@ namespace ProBasketballManager.Domain.Teams
 
             var totalMinutes = _assignments.Sum(assignment => assignment.TargetMinutes);
 
-            if (totalMinutes != 200)
+            if (totalMinutes != RequiredTotalMinutes)
             {
-                throw new ArgumentException($"Rotation minutes must total 200. Current total: {totalMinutes}.");
+                throw new ArgumentException($"Rotation minutes must total {RequiredTotalMinutes} under {Rules.Name} rules. " + $"Current total: {totalMinutes}.");
             }
 
             var rotationOrders = _assignments.Select(assignment => assignment.RotationOrder).ToList();

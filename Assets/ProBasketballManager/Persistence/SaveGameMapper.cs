@@ -12,7 +12,7 @@ namespace ProBasketballManager.Persistence
 {
     public static class SaveGameMapper
     {
-        public const int CurrentSchemaVersion = 3;
+        public const int CurrentSchemaVersion = 4;
 
         public const int MinimumReadableSchemaVersion = 1;
 
@@ -162,8 +162,54 @@ namespace ProBasketballManager.Persistence
             {
                 Id = season.Id,
                 Name = season.Name,
+                Rules = ToDto(season.Rules),
                 Fixtures = season.Fixtures.Select(ToDto).ToList()
             };
+        }
+
+        private static CompetitionRulesDto ToDto(CompetitionRules rules)
+        {
+            return new CompetitionRulesDto
+            {
+                Name = rules.Name,
+                PeriodCount = rules.PeriodCount,
+                PeriodLengthSeconds = rules.PeriodLengthSeconds,
+                OvertimeLengthSeconds = rules.OvertimeLengthSeconds,
+                PlayersOnCourt = rules.PlayersOnCourt,
+                PersonalFoulsToDisqualify = rules.PersonalFoulsToDisqualify,
+                TeamFoulsBeforeBonus = rules.TeamFoulsBeforeBonus,
+                BonusFreeThrows = rules.BonusFreeThrows,
+                RosterSize = rules.RosterSize,
+                RoundRobinPasses = rules.RoundRobinPasses
+            };
+        }
+
+        private static CompetitionRules FromDto(CompetitionRulesDto dto)
+        {
+            // Saves written before rules were data all assumed FIBA.
+            if (dto == null)
+            {
+                return CompetitionRules.Fiba;
+            }
+
+            try
+            {
+                return new CompetitionRules(
+                    dto.Name,
+                    dto.PeriodCount,
+                    dto.PeriodLengthSeconds,
+                    dto.OvertimeLengthSeconds,
+                    dto.PlayersOnCourt,
+                    dto.PersonalFoulsToDisqualify,
+                    dto.TeamFoulsBeforeBonus,
+                    dto.BonusFreeThrows,
+                    dto.RosterSize,
+                    dto.RoundRobinPasses);
+            }
+            catch (ArgumentException exception)
+            {
+                throw new SaveGameException($"The save file contains an invalid ruleset: {exception.Message}", exception);
+            }
         }
 
         private static FixtureDto ToDto(Fixture fixture)
@@ -318,7 +364,7 @@ namespace ProBasketballManager.Persistence
                 Career = new Career(league, season, completed, retiredPlayers),
                 UserTeam = userTeam,
                 UserTactics = FromDto(dto.UserTactics),
-                UserRotation = FromDto(dto.UserRotation, teams, players),
+                UserRotation = FromDto(dto.UserRotation, teams, players, season.Rules),
                 NextSeed = dto.NextSeed,
                 CurrentFixtureRecorded = dto.CurrentFixtureRecorded
             };
@@ -409,6 +455,8 @@ namespace ProBasketballManager.Persistence
 
         private static Season FromDto(SeasonDto dto, League league, Dictionary<int, Team> teams, Dictionary<int, Player> players)
         {
+            var rules = FromDto(dto.Rules);
+
             var fixtures = new List<Fixture>(dto.Fixtures.Count);
 
             foreach (var fixtureDto in dto.Fixtures)
@@ -421,22 +469,22 @@ namespace ProBasketballManager.Persistence
 
                 if (fixtureDto.Result != null)
                 {
-                    fixture.Complete(FromDto(fixtureDto.Result, teams, players));
+                    fixture.Complete(FromDto(fixtureDto.Result, teams, players, rules));
                 }
 
                 fixtures.Add(fixture);
             }
 
-            return new Season(dto.Id, dto.Name, league, fixtures);
+            return new Season(dto.Id, dto.Name, league, fixtures, rules);
         }
 
-        private static MatchResult FromDto(MatchResultDto dto, Dictionary<int, Team> teams, Dictionary<int, Player> players)
+        private static MatchResult FromDto(MatchResultDto dto, Dictionary<int, Team> teams, Dictionary<int, Player> players, CompetitionRules rules)
         {
             return new MatchResult(
                 Resolve(teams, dto.HomeTeamId, "result home team"),
                 Resolve(teams, dto.AwayTeamId, "result away team"),
-                FromDto(dto.HomeRotation, teams, players),
-                FromDto(dto.AwayRotation, teams, players),
+                FromDto(dto.HomeRotation, teams, players, rules),
+                FromDto(dto.AwayRotation, teams, players, rules),
                 dto.HomePeriodScores.ToList(),
                 dto.AwayPeriodScores.ToList(),
                 dto.Events.Select(matchEvent => FromDto(matchEvent, teams, players)).ToList(),
@@ -444,7 +492,7 @@ namespace ProBasketballManager.Persistence
                 dto.AwayPlayerStats.Select(box => FromDto(box, players)).ToList());
         }
 
-        private static TeamRotation FromDto(TeamRotationDto dto, Dictionary<int, Team> teams, Dictionary<int, Player> players)
+        private static TeamRotation FromDto(TeamRotationDto dto, Dictionary<int, Team> teams, Dictionary<int, Player> players, CompetitionRules rules)
         {
             if (dto == null)
             {
@@ -465,7 +513,8 @@ namespace ProBasketballManager.Persistence
                 starters,
                 assignments,
                 Resolve(players, dto.PrimaryBallHandlerId, "primary ball handler"),
-                Resolve(players, dto.PrimaryScorerId, "primary scorer"));
+                Resolve(players, dto.PrimaryScorerId, "primary scorer"),
+                rules);
         }
 
         private static TeamTactics FromDto(TeamTacticsDto dto)

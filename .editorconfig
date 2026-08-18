@@ -1,0 +1,32 @@
+root = true
+
+# Applies to Visual Studio, Rider, VS Code and most other editors. Committing this
+# means the encoding rule travels with the repository rather than living in one
+# person's IDE settings.
+
+[*]
+charset = utf-8-bom
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+
+[*.cs]
+indent_size = 4
+
+# Unity markup and stylesheets
+[*.{uxml,uss}]
+indent_size = 4
+
+[*.{json,asmdef,asmref}]
+indent_size = 2
+
+# Unity writes these itself; leave them alone
+[*.{meta,unity,prefab,asset,mat,anim,controller}]
+charset = unset
+end_of_line = unset
+insert_final_newline = unset
+trim_trailing_whitespace = false
+
+[*.md]
+trim_trailing_whitespace = false

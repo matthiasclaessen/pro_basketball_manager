@@ -123,7 +123,23 @@ namespace ProBasketballManager.Persistence
     {
         public int Id;
         public string Name;
+
+        public CompetitionRulesDto Rules;
         public List<FixtureDto> Fixtures = new List<FixtureDto>();
+    }
+
+    public sealed class CompetitionRulesDto
+    {
+        public string Name;
+        public int PeriodCount;
+        public int PeriodLengthSeconds;
+        public int OvertimeLengthSeconds;
+        public int PlayersOnCourt;
+        public int PersonalFoulsToDisqualify;
+        public int TeamFoulsBeforeBonus;
+        public int BonusFreeThrows;
+        public int RosterSize;
+        public int RoundRobinPasses;
     }
 
     public sealed class FixtureDto

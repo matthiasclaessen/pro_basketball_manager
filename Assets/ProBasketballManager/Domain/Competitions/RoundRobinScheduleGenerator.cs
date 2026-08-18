@@ -7,7 +7,7 @@ namespace ProBasketballManager.Domain.Competitions
 {
     public static class RoundRobinScheduleGenerator
     {
-        public static IReadOnlyList<Fixture> Generate(League league)
+        public static IReadOnlyList<Fixture> Generate(League league, CompetitionRules rules = null)
         {
             if (league.Teams.Count < 2)
             {
@@ -57,16 +57,23 @@ namespace ProBasketballManager.Domain.Competitions
 
             var fixtures = new List<Fixture>(firstHalfFixtures);
 
-            foreach (var firstHalfFixture in firstHalfFixtures)
-            {
-                fixtures.Add(new Fixture(
-                    fixtureId,
-                    firstHalfFixture.RoundNumber + roundsPerHalf,
-                    firstHalfFixture.AwayTeam,
-                    firstHalfFixture.HomeTeam
-                ));
+            var passes = (rules ?? CompetitionRules.Fiba).RoundRobinPasses;
 
-                fixtureId++;
+            for (var pass = 1; pass < passes; pass++)
+            {
+                var swapHomeAndAway = pass % 2 == 1;
+
+                foreach (var firstHalfFixture in firstHalfFixtures)
+                {
+                    fixtures.Add(new Fixture(
+                        fixtureId,
+                        firstHalfFixture.RoundNumber + (roundsPerHalf * pass),
+                        swapHomeAndAway ? firstHalfFixture.AwayTeam : firstHalfFixture.HomeTeam,
+                        swapHomeAndAway ? firstHalfFixture.HomeTeam : firstHalfFixture.AwayTeam
+                    ));
+
+                    fixtureId++;
+                }
             }
 
             return fixtures;

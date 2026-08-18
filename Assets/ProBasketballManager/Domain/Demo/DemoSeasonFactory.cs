@@ -4,13 +4,19 @@ namespace ProBasketballManager.Domain.Demo
 {
     public static class DemoSeasonFactory
     {
-        public static Season Create()
+        public static Season Create(CompetitionRules rules = null)
         {
-            var league = DemoLeagueFactory.Create();
-            var fixtures = RoundRobinScheduleGenerator.Generate(league);
+            var effectiveRules = rules ?? CompetitionRules.Fiba;
 
-            return new Season(id: 1, name: "2026 / 27", league: league, fixtures: fixtures
-            );
+            var league = DemoLeagueFactory.Create();
+            var fixtures = RoundRobinScheduleGenerator.Generate(league, effectiveRules);
+
+            return new Season(
+                id: 1,
+                name: "2026 / 27",
+                league: league,
+                fixtures: fixtures,
+                rules: effectiveRules);
         }
     }
 }

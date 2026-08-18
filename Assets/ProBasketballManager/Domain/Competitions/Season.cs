@@ -12,6 +12,8 @@ namespace ProBasketballManager.Domain.Competitions
 
         public int Id { get; }
 
+        public CompetitionRules Rules { get; }
+
         public string Name { get; }
 
         public League League { get; }
@@ -36,7 +38,7 @@ namespace ProBasketballManager.Domain.Competitions
             }
         }
 
-        public Season(int id, string name, League league, IEnumerable<Fixture> fixtures)
+        public Season(int id, string name, League league, IEnumerable<Fixture> fixtures, CompetitionRules rules = null)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -44,6 +46,7 @@ namespace ProBasketballManager.Domain.Competitions
             }
 
             Id = id;
+            Rules = rules ?? CompetitionRules.Fiba;
             Name = name;
             League = league ?? throw new ArgumentNullException(nameof(league));
 

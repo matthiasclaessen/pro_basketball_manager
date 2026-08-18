@@ -44,7 +44,7 @@ namespace ProBasketballManager.Presentation.State
             UserTeam = userTeam ?? throw new ArgumentNullException(nameof(userTeam));
 
             UserTactics = TeamTactics.Default;
-            UserRotation = TeamRotation.CreateDefault(userTeam);
+            UserRotation = TeamRotation.CreateDefault(userTeam, career.CurrentSeason.Rules);
 
             RefreshCurrentFixture();
         }
@@ -104,13 +104,13 @@ namespace ProBasketballManager.Presentation.State
 
             var userIsHome = CurrentFixture.HomeTeam.Id == UserTeam.Id;
 
-            var homeRotation = userIsHome ? UserRotation : TeamRotation.CreateDefault(CurrentFixture.HomeTeam);
-            var awayRotation = userIsHome ? TeamRotation.CreateDefault(CurrentFixture.AwayTeam) : UserRotation;
+            var homeRotation = userIsHome ? UserRotation : TeamRotation.CreateDefault(CurrentFixture.HomeTeam, Season.Rules);
+            var awayRotation = userIsHome ? TeamRotation.CreateDefault(CurrentFixture.AwayTeam, Season.Rules) : UserRotation;
 
             var homeTactics = userIsHome ? UserTactics : TeamTactics.Default;
             var awayTactics = userIsHome ? TeamTactics.Default : UserTactics;
 
-            var simulator = new MatchSimulator(new XorShiftRandom(seed));
+            var simulator = new MatchSimulator(new XorShiftRandom(seed), Season.Rules);
 
             CurrentMatchResult = simulator.Simulate(
                 CurrentFixture.HomeTeam,
@@ -155,14 +155,14 @@ namespace ProBasketballManager.Presentation.State
 
         private void SimulateAiFixture(Fixture fixture)
         {
-            var simulator = new MatchSimulator(new XorShiftRandom(NextSeed));
+            var simulator = new MatchSimulator(new XorShiftRandom(NextSeed), Season.Rules);
             NextSeed++;
 
             var result = simulator.Simulate(
                 fixture.HomeTeam,
                 fixture.AwayTeam,
-                TeamRotation.CreateDefault(fixture.HomeTeam),
-                TeamRotation.CreateDefault(fixture.AwayTeam),
+                TeamRotation.CreateDefault(fixture.HomeTeam, Season.Rules),
+                TeamRotation.CreateDefault(fixture.AwayTeam, Season.Rules),
                 TeamTactics.Default,
                 TeamTactics.Default);
 
@@ -173,7 +173,7 @@ namespace ProBasketballManager.Presentation.State
         {
             var archived = Career.AdvanceToNextSeason();
 
-            UserRotation = TeamRotation.CreateDefault(UserTeam);
+            UserRotation = TeamRotation.CreateDefault(UserTeam, Season.Rules);
 
             CurrentMatchResult = null;
             CurrentFixtureRecorded = false;

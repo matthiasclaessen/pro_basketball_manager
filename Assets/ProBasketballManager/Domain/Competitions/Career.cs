@@ -40,19 +40,20 @@ namespace ProBasketballManager.Domain.Competitions
             }
         }
 
-        public static Career Start(League league, int seasonId, string seasonName)
+        public static Career Start(League league, int seasonId, string seasonName, CompetitionRules rules = null)
         {
-            var fixtures = RoundRobinScheduleGenerator.Generate(league);
+            var effectiveRules = rules ?? CompetitionRules.Fiba;
 
-            return new Career(league, new Season(seasonId, seasonName, league, fixtures));
+            var fixtures = RoundRobinScheduleGenerator.Generate(league, effectiveRules);
+
+            return new Career(league, new Season(seasonId, seasonName, league, fixtures, effectiveRules));
         }
 
         public CompletedSeason AdvanceToNextSeason(IRandomSource random = null)
         {
             if (!CurrentSeason.IsComplete)
             {
-                throw new InvalidOperationException(
-                    "The season is not finished yet, so the next one cannot start.");
+                throw new InvalidOperationException("The season is not finished yet, so the next one cannot start.");
             }
 
             var archived = Archive(CurrentSeason);
@@ -61,13 +62,14 @@ namespace ProBasketballManager.Domain.Competitions
 
             LastCloseSeason = RunCloseSeason(random ?? new XorShiftRandom((uint)(CurrentSeason.Id * 7919 + 13)));
 
-            var fixtures = RoundRobinScheduleGenerator.Generate(League);
+            var fixtures = RoundRobinScheduleGenerator.Generate(League, CurrentSeason.Rules);
 
             CurrentSeason = new Season(
                 CurrentSeason.Id + 1,
                 GetNextSeasonName(CurrentSeason.Name),
                 League,
-                fixtures);
+                fixtures,
+                CurrentSeason.Rules);
 
             return archived;
         }
@@ -146,9 +148,7 @@ namespace ProBasketballManager.Domain.Competitions
 
             var parts = currentName.Split('/');
 
-            if (parts.Length == 2
-                && int.TryParse(parts[0].Trim(), out var startYear)
-                && int.TryParse(parts[1].Trim(), out var endYear))
+            if (parts.Length == 2 && int.TryParse(parts[0].Trim(), out var startYear) && int.TryParse(parts[1].Trim(), out var endYear))
             {
                 var nextStart = startYear + 1;
                 var nextEnd = (endYear + 1) % 100;

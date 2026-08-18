@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ProBasketballManager.Domain.Competitions;
 using ProBasketballManager.Domain.Players;
 using ProBasketballManager.Domain.Tactics;
 using ProBasketballManager.Domain.Teams;
@@ -9,10 +10,8 @@ namespace ProBasketballManager.Domain.Matches
 {
     public sealed class MatchSimulator
     {
-        private const int MinimumPeriodPossessions = 34;
-        private const int MaximumPeriodPossessions = 42;
-        private const int MinimumOvertimePossessions = 17;
-        private const int MaximumOvertimePossessions = 21;
+        private const double MinimumSecondsPerPossession = 14.3;
+        private const double MaximumSecondsPerPossession = 17.6;
 
         private const double AtRimBaseChance = 0.560;
         private const double PaintBaseChance = 0.430;
@@ -35,10 +34,17 @@ namespace ProBasketballManager.Domain.Matches
         private const double AverageAttributeRating = 10.5;
 
         private readonly IRandomSource _random;
+        private readonly CompetitionRules _rules;
 
-        public MatchSimulator(IRandomSource random)
+        public MatchSimulator(IRandomSource random) : this(random, CompetitionRules.Fiba)
         {
-            _random = random;
+        }
+
+
+        public MatchSimulator(IRandomSource random, CompetitionRules rules)
+        {
+            _random = random ?? throw new ArgumentNullException(nameof(random));
+            _rules = rules ?? throw new ArgumentNullException(nameof(rules));
         }
 
         public MatchResult Simulate(Team homeTeam, Team awayTeam)
@@ -75,18 +81,18 @@ namespace ProBasketballManager.Domain.Matches
             var homeStats = CreateStatBuilders(homeTeam, homeRotation);
             var awayStats = CreateStatBuilders(awayTeam, awayRotation);
 
-            var homeRotationRuntime = new RotationRuntime(homeRotation, _random);
-            var awayRotationRuntime = new RotationRuntime(awayRotation, _random);
+            var homeRotationRuntime = new RotationRuntime(homeRotation, _random, _rules);
+            var awayRotationRuntime = new RotationRuntime(awayRotation, _random, _rules);
 
             var homeScore = 0;
             var awayScore = 0;
 
-            for (var periodNumber = 1; periodNumber <= 4; periodNumber++)
+            for (var periodNumber = 1; periodNumber <= _rules.PeriodCount; periodNumber++)
             {
                 var homeScoreBeforePeriod = homeScore;
                 var awayScoreBeforePeriod = awayScore;
 
-                SimulatePeriod(homeTeam, awayTeam, homeRotation, awayRotation, homeRotationRuntime, awayRotationRuntime, homeTactics, awayTactics, periodNumber, 600, events, homeStats, awayStats, ref homeScore, ref awayScore);
+                SimulatePeriod(homeTeam, awayTeam, homeRotation, awayRotation, homeRotationRuntime, awayRotationRuntime, homeTactics, awayTactics, periodNumber, _rules.PeriodLengthSeconds, events, homeStats, awayStats, ref homeScore, ref awayScore);
 
                 homePeriodScores.Add(homeScore - homeScoreBeforePeriod);
                 awayPeriodScores.Add(awayScore - awayScoreBeforePeriod);
@@ -99,7 +105,7 @@ namespace ProBasketballManager.Domain.Matches
                 var homeScoreBeforePeriod = homeScore;
                 var awayScoreBeforePeriod = awayScore;
 
-                SimulatePeriod(homeTeam, awayTeam, homeRotation, awayRotation, homeRotationRuntime, awayRotationRuntime, homeTactics, awayTactics, overtimePeriodNumber, 300, events, homeStats, awayStats, ref homeScore, ref awayScore);
+                SimulatePeriod(homeTeam, awayTeam, homeRotation, awayRotation, homeRotationRuntime, awayRotationRuntime, homeTactics, awayTactics, overtimePeriodNumber, _rules.OvertimeLengthSeconds, events, homeStats, awayStats, ref homeScore, ref awayScore);
 
                 homePeriodScores.Add(homeScore - homeScoreBeforePeriod);
                 awayPeriodScores.Add(awayScore - awayScoreBeforePeriod);
@@ -122,7 +128,9 @@ namespace ProBasketballManager.Domain.Matches
 
         private void SimulatePeriod(Team homeTeam, Team awayTeam, TeamRotation homeRotation, TeamRotation awayRotation, RotationRuntime homeRotationRuntime, RotationRuntime awayRotationRuntime, TeamTactics homeTactics, TeamTactics awayTactics, int periodNumber, int periodLengthSeconds, List<MatchEvent> events, Dictionary<int, PlayerBoxScoreBuilder> homeStats, Dictionary<int, PlayerBoxScoreBuilder> awayStats, ref int homeScore, ref int awayScore)
         {
-            var basePossessions = periodNumber <= 4 ? _random.NextInt(MinimumPeriodPossessions, MaximumPeriodPossessions) : _random.NextInt(MinimumOvertimePossessions, MaximumOvertimePossessions);
+            var secondsPerPossession = MinimumSecondsPerPossession + (_random.NextDouble() * (MaximumSecondsPerPossession - MinimumSecondsPerPossession));
+
+            var basePossessions = Math.Max(2, (int)Math.Round(periodLengthSeconds / secondsPerPossession));
 
             var averagePace = (homeTactics.Pace + awayTactics.Pace) / 2.0;
             var paceMultiplier = 0.85 + ((averagePace / 100.0) * 0.30);
@@ -206,7 +214,7 @@ namespace ProBasketballManager.Domain.Matches
 
                 if (inBonus)
                 {
-                    ShootFreeThrows(ballHandler, FoulModel.BonusFreeThrows, attackingTeam, homePossession, attackingStats, periodNumber, ref actionTime, events, ref homeScore, ref awayScore);
+                    ShootFreeThrows(ballHandler, _rules.BonusFreeThrows, attackingTeam, homePossession, attackingStats, periodNumber, ref actionTime, events, ref homeScore, ref awayScore);
 
                     return;
                 }
@@ -547,9 +555,7 @@ namespace ProBasketballManager.Domain.Matches
                         var defense = defender.Attributes.InteriorDefense * 0.75 + defender.Attributes.Strength * 0.25 + interiorModifier;
                         defense = AverageAttributeRating + ((defense - AverageAttributeRating) * FatigueModel.GetDefensiveMultiplier(defenderFatigue));
 
-                        return AtRimBaseChance
-                            + ((offense - AverageAttributeRating) * AtRimOffenseWeight)
-                            - ((defense - AverageAttributeRating) * AtRimDefenseWeight);
+                        return AtRimBaseChance + ((offense - AverageAttributeRating) * AtRimOffenseWeight) - ((defense - AverageAttributeRating) * AtRimDefenseWeight);
                     }
 
                 case ShotZone.Paint:
@@ -558,9 +564,7 @@ namespace ProBasketballManager.Domain.Matches
                         var defense = defender.Attributes.InteriorDefense * 0.70 + defender.Attributes.PerimeterDefense * 0.30 + interiorModifier;
                         defense = AverageAttributeRating + ((defense - AverageAttributeRating) * FatigueModel.GetDefensiveMultiplier(defenderFatigue));
 
-                        return PaintBaseChance
-                            + ((offense - AverageAttributeRating) * PaintOffenseWeight)
-                            - ((defense - AverageAttributeRating) * PaintDefenseWeight);
+                        return PaintBaseChance + ((offense - AverageAttributeRating) * PaintOffenseWeight) - ((defense - AverageAttributeRating) * PaintDefenseWeight);
                     }
 
                 case ShotZone.MidRange:
@@ -569,9 +573,7 @@ namespace ProBasketballManager.Domain.Matches
                         var defense = defender.Attributes.PerimeterDefense * 0.70 + defender.Attributes.InteriorDefense * 0.30 + (perimeterModifier * 0.65) + (interiorModifier * 0.35);
                         defense = AverageAttributeRating + ((defense - AverageAttributeRating) * FatigueModel.GetDefensiveMultiplier(defenderFatigue));
 
-                        return MidRangeBaseChance
-                            + ((offense - AverageAttributeRating) * MidRangeOffenseWeight)
-                            - ((defense - AverageAttributeRating) * MidRangeDefenseWeight);
+                        return MidRangeBaseChance + ((offense - AverageAttributeRating) * MidRangeOffenseWeight) - ((defense - AverageAttributeRating) * MidRangeDefenseWeight);
                     }
 
                 case ShotZone.CornerThree:
@@ -580,9 +582,7 @@ namespace ProBasketballManager.Domain.Matches
                         var defense = defender.Attributes.PerimeterDefense + perimeterModifier;
                         defense = AverageAttributeRating + ((defense - AverageAttributeRating) * FatigueModel.GetDefensiveMultiplier(defenderFatigue));
 
-                        return CornerThreeBaseChance
-                            + ((offense - AverageAttributeRating) * ThreePointOffenseWeight)
-                            - ((defense - AverageAttributeRating) * ThreePointDefenseWeight);
+                        return CornerThreeBaseChance + ((offense - AverageAttributeRating) * ThreePointOffenseWeight) - ((defense - AverageAttributeRating) * ThreePointDefenseWeight);
                     }
 
                 case ShotZone.AboveBreakThree:
@@ -591,9 +591,7 @@ namespace ProBasketballManager.Domain.Matches
                         var defense = defender.Attributes.PerimeterDefense + perimeterModifier;
                         defense = AverageAttributeRating + ((defense - AverageAttributeRating) * FatigueModel.GetDefensiveMultiplier(defenderFatigue));
 
-                        return AboveBreakThreeBaseChance
-                            + ((offense - AverageAttributeRating) * ThreePointOffenseWeight)
-                            - ((defense - AverageAttributeRating) * ThreePointDefenseWeight);
+                        return AboveBreakThreeBaseChance + ((offense - AverageAttributeRating) * ThreePointOffenseWeight) - ((defense - AverageAttributeRating) * ThreePointDefenseWeight);
                     }
 
                 default:
@@ -609,22 +607,18 @@ namespace ProBasketballManager.Domain.Matches
 
             var closestMatches = positionMatchedPlayers.Where(player => Math.Abs((int)player.Position - (int)shooter.Position) == closestPositionDistance).ToList();
 
-            return IsInteriorZone(zone)
-                ? closestMatches.OrderByDescending(player => player.Attributes.InteriorDefense).First()
-                : closestMatches.OrderByDescending(player => player.Attributes.PerimeterDefense).First();
+            return IsInteriorZone(zone) ? closestMatches.OrderByDescending(player => player.Attributes.InteriorDefense).First() : closestMatches.OrderByDescending(player => player.Attributes.PerimeterDefense).First();
         }
 
         private bool SimulateTurnover(Player ballHandler, Team attackingTeam, Team defendingTeam, IReadOnlyList<Player> defendingPlayers, RotationRuntime attackingRuntime, RotationRuntime defendingRuntime, TeamTactics defendingTactics, Dictionary<int, PlayerBoxScoreBuilder> attackingStats, Dictionary<int, PlayerBoxScoreBuilder> defendingStats, int periodNumber, ref int actionTime, List<MatchEvent> events, int homeScore, int awayScore)
         {
             var ballSecurity = (ballHandler.Attributes.BallHandling + ballHandler.Attributes.Passing) / 2.0;
 
-            var defensivePressure = Average(defendingPlayers, player =>
-                player.Attributes.PerimeterDefense * FatigueModel.GetDefensiveMultiplier(defendingRuntime.GetFatigue(player.Id)));
+            var defensivePressure = Average(defendingPlayers, player => player.Attributes.PerimeterDefense * FatigueModel.GetDefensiveMultiplier(defendingRuntime.GetFatigue(player.Id)));
             defensivePressure += GetPerimeterDefenseModifier(defendingTactics);
 
             var turnoverChance = 0.145 + ((defensivePressure - ballSecurity) * 0.003);
 
-            // Tired hands are loose hands.
             turnoverChance += FatigueModel.GetTurnoverPenalty(attackingRuntime.GetFatigue(ballHandler.Id));
             turnoverChance = Clamp(turnoverChance, 0.07, 0.22);
 
@@ -679,7 +673,6 @@ namespace ProBasketballManager.Domain.Matches
                 foulChance += paintAggression * 0.035;
             }
 
-            // Tired defenders reach instead of moving their feet.
             foulChance *= FatigueModel.GetFoulMultiplier(defenderFatigue);
 
             if (_random.NextDouble() >= foulChance || defendingRuntime.IsDisqualified(defender.Id))
@@ -732,17 +725,14 @@ namespace ProBasketballManager.Domain.Matches
 
         private bool SimulateRebound(Team attackingTeam, Team defendingTeam, IReadOnlyList<Player> attackingPlayers, IReadOnlyList<Player> defendingPlayers, RotationRuntime attackingRuntime, RotationRuntime defendingRuntime, Dictionary<int, PlayerBoxScoreBuilder> attackingStats, Dictionary<int, PlayerBoxScoreBuilder> defendingStats, bool allowOffensiveRebound, int periodNumber, ref int actionTime, List<MatchEvent> events, int homeScore, int awayScore)
         {
-            // A tired big man stops boxing out, so rebounding weight fades with fatigue.
-            var offensiveRebounding = Average(attackingPlayers, player =>
-                player.Attributes.OffensiveRebounding * FatigueModel.GetReboundingMultiplier(attackingRuntime.GetFatigue(player.Id)));
-            var defensiveRebounding = Average(defendingPlayers, player =>
-                player.Attributes.DefensiveRebounding * FatigueModel.GetReboundingMultiplier(defendingRuntime.GetFatigue(player.Id)));
+
+            var offensiveRebounding = Average(attackingPlayers, player => player.Attributes.OffensiveRebounding * FatigueModel.GetReboundingMultiplier(attackingRuntime.GetFatigue(player.Id)));
+            var defensiveRebounding = Average(defendingPlayers, player => player.Attributes.DefensiveRebounding * FatigueModel.GetReboundingMultiplier(defendingRuntime.GetFatigue(player.Id)));
 
             var offensiveReboundChance = 0.25 + ((offensiveRebounding - defensiveRebounding) * 0.006);
             offensiveReboundChance = Clamp(offensiveReboundChance, 0.15, 0.40);
 
-            var reboundFatigue = (Average(attackingPlayers, player => attackingRuntime.GetFatigue(player.Id))
-                + Average(defendingPlayers, player => defendingRuntime.GetFatigue(player.Id))) / 2.0;
+            var reboundFatigue = (Average(attackingPlayers, player => attackingRuntime.GetFatigue(player.Id)) + Average(defendingPlayers, player => defendingRuntime.GetFatigue(player.Id))) / 2.0;
 
             if (_random.NextDouble() < FoulModel.GetLooseBallFoulChance(reboundFatigue))
             {
@@ -864,9 +854,7 @@ namespace ProBasketballManager.Domain.Matches
                 }
             }
 
-            return eligible.Count == 0
-                ? SelectWeightedPlayer(players, weightSelector)
-                : SelectWeightedPlayer(eligible, weightSelector);
+            return eligible.Count == 0 ? SelectWeightedPlayer(players, weightSelector) : SelectWeightedPlayer(eligible, weightSelector);
         }
 
         private Player SelectWeightedPlayer(IReadOnlyList<Player> players, Func<Player, double> weightSelector)
@@ -978,8 +966,11 @@ namespace ProBasketballManager.Domain.Matches
             private int _currentSegment = -1;
             private IReadOnlyList<Player> _currentPlayers;
 
-            public RotationRuntime(TeamRotation rotation, IRandomSource random)
+            private readonly CompetitionRules _rules;
+
+            public RotationRuntime(TeamRotation rotation, IRandomSource random, CompetitionRules rules)
             {
+                _rules = rules;
                 _rotation = rotation;
                 _secondsPlayed = rotation.Team.Players.ToDictionary(player => player.Id, _ => 0.0);
                 _fatigue = rotation.Team.Players.ToDictionary(player => player.Id, _ => FatigueModel.Fresh);
@@ -1007,7 +998,7 @@ namespace ProBasketballManager.Domain.Matches
 
             public int TeamFoulsThisPeriod => _teamFoulsThisPeriod;
 
-            public bool IsInBonus => FoulModel.IsInBonus(_teamFoulsThisPeriod);
+            public bool IsInBonus => FoulModel.IsInBonus(_teamFoulsThisPeriod, _rules.TeamFoulsBeforeBonus);
 
             public bool RecordPersonalFoul(int playerId, bool countsAsTeamFoul)
             {
@@ -1020,7 +1011,7 @@ namespace ProBasketballManager.Domain.Matches
 
                 _currentSegment = -1;
 
-                return _personalFouls[playerId] == FoulModel.DisqualificationLimit;
+                return _personalFouls[playerId] == _rules.PersonalFoulsToDisqualify;
             }
 
             public void BeginPeriod()
@@ -1031,12 +1022,12 @@ namespace ProBasketballManager.Domain.Matches
 
             public bool IsDisqualified(int playerId)
             {
-                return FoulModel.IsDisqualified(_personalFouls[playerId]);
+                return FoulModel.IsDisqualified(_personalFouls[playerId], _rules.PersonalFoulsToDisqualify);
             }
 
             public IReadOnlyList<Player> GetOnCourtPlayers(int periodNumber, int periodLengthSeconds, int secondsRemaining)
             {
-                if (periodNumber > 4)
+                if (_rules.IsOvertimePeriod(periodNumber))
                 {
                     return SelectFreshestLineup();
                 }
@@ -1074,9 +1065,7 @@ namespace ProBasketballManager.Domain.Matches
                         }
                     }
 
-                    _fatigue[player.Id] = isOnCourt
-                        ? FatigueModel.ApplyExertion(_fatigue[player.Id], player, seconds, paceMultiplier, _conditionFactor[player.Id])
-                        : FatigueModel.ApplyRecovery(_fatigue[player.Id], player, seconds);
+                    _fatigue[player.Id] = isOnCourt ? FatigueModel.ApplyExertion(_fatigue[player.Id], player, seconds, paceMultiplier, _conditionFactor[player.Id]) : FatigueModel.ApplyRecovery(_fatigue[player.Id], player, seconds);
 
                     if (_fatigue[player.Id] > _peakFatigue[player.Id])
                     {
@@ -1105,9 +1094,9 @@ namespace ProBasketballManager.Domain.Matches
                     .OrderByDescending(assignment =>
                         GetMinutesDeficit(assignment, progressAfterSegment)
                         - FatigueModel.GetSubstitutionCost(_fatigue[assignment.Player.Id])
-                        - FoulModel.GetSubstitutionCost(_personalFouls[assignment.Player.Id], periodNumber))
+                        - FoulModel.GetSubstitutionCost(_personalFouls[assignment.Player.Id], periodNumber, _rules))
                     .ThenBy(assignment => assignment.RotationOrder)
-                    .Take(5)
+                    .Take(_rules.PlayersOnCourt)
                     .Select(assignment => assignment.Player)
                     .ToList();
 
@@ -1128,7 +1117,7 @@ namespace ProBasketballManager.Domain.Matches
                     .Where(assignment => !IsDisqualified(assignment.Player.Id))
                     .OrderBy(assignment => _fatigue[assignment.Player.Id])
                     .ThenBy(assignment => assignment.RotationOrder)
-                    .Take(5)
+                    .Take(_rules.PlayersOnCourt)
                     .Select(assignment => assignment.Player)
                     .ToList();
 

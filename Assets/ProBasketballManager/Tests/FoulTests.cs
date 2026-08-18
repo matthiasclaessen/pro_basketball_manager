@@ -3,32 +3,33 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using ProBasketballManager.Domain.Demo;
+using ProBasketballManager.Domain.Competitions;
 using ProBasketballManager.Domain.Matches;
 using ProBasketballManager.Domain.Players;
 using ProBasketballManager.Domain.Tactics;
 
 namespace ProBasketballManager.Domain.Tests
 {
-    /// <summary>
-    /// Tests the foul model in isolation. Pure arithmetic, no randomness.
-    /// </summary>
     [TestFixture]
     public sealed class FoulModelTests
     {
+
+        private static readonly CompetitionRules Fiba = CompetitionRules.Fiba;
+
         [Test]
         public void FiveFouls_Disqualifies()
         {
-            Assert.That(FoulModel.IsDisqualified(4), Is.False);
-            Assert.That(FoulModel.IsDisqualified(5), Is.True);
-            Assert.That(FoulModel.DisqualificationLimit, Is.EqualTo(5),
+            Assert.That(FoulModel.IsDisqualified(4, Fiba.PersonalFoulsToDisqualify), Is.False);
+            Assert.That(FoulModel.IsDisqualified(5, Fiba.PersonalFoulsToDisqualify), Is.True);
+            Assert.That(CompetitionRules.Fiba.PersonalFoulsToDisqualify, Is.EqualTo(5),
                 "FIBA disqualifies on the fifth personal foul. This is a rule, not a tuning value.");
         }
 
         [Test]
         public void TheBonus_StartsOnTheFifthTeamFoulOfAPeriod()
         {
-            Assert.That(FoulModel.IsInBonus(3), Is.False);
-            Assert.That(FoulModel.IsInBonus(4), Is.True,
+            Assert.That(FoulModel.IsInBonus(3, Fiba.TeamFoulsBeforeBonus), Is.False);
+            Assert.That(FoulModel.IsInBonus(4, Fiba.TeamFoulsBeforeBonus), Is.True,
                 "With four team fouls already committed, the next one is the fifth and sends the attacker to the line.");
         }
 
@@ -36,20 +37,20 @@ namespace ProBasketballManager.Domain.Tests
         public void FoulTrouble_TightensAsThePeriodGetsEarlier()
         {
             // Two fouls in the first period is trouble; two in the third is not.
-            Assert.That(FoulModel.GetFoulTroubleLevel(2, 1), Is.GreaterThan(0));
-            Assert.That(FoulModel.GetFoulTroubleLevel(2, 3), Is.EqualTo(0));
+            Assert.That(FoulModel.GetFoulTroubleLevel(2, 1, Fiba), Is.GreaterThan(0));
+            Assert.That(FoulModel.GetFoulTroubleLevel(2, 3, Fiba), Is.EqualTo(0));
 
-            Assert.That(FoulModel.GetFoulTroubleLevel(4, 3), Is.GreaterThan(0));
-            Assert.That(FoulModel.GetFoulTroubleLevel(4, 4), Is.EqualTo(0),
+            Assert.That(FoulModel.GetFoulTroubleLevel(4, 3, Fiba), Is.GreaterThan(0));
+            Assert.That(FoulModel.GetFoulTroubleLevel(4, 4, Fiba), Is.EqualTo(0),
                 "In the closing period there is no later game to save a player for, so the limit relaxes.");
         }
 
         [Test]
         public void FoulTrouble_DeepensWithEachExtraFoul()
         {
-            var two = FoulModel.GetSubstitutionCost(2, 1);
-            var three = FoulModel.GetSubstitutionCost(3, 1);
-            var four = FoulModel.GetSubstitutionCost(4, 1);
+            var two = FoulModel.GetSubstitutionCost(2, 1, Fiba);
+            var three = FoulModel.GetSubstitutionCost(3, 1, Fiba);
+            var four = FoulModel.GetSubstitutionCost(4, 1, Fiba);
 
             Assert.That(three, Is.GreaterThan(two));
             Assert.That(four, Is.GreaterThan(three));
@@ -58,14 +59,14 @@ namespace ProBasketballManager.Domain.Tests
         [Test]
         public void ACleanPlayer_PaysNoSubstitutionCost()
         {
-            Assert.That(FoulModel.GetSubstitutionCost(0, 1), Is.EqualTo(0.0).Within(1e-9));
-            Assert.That(FoulModel.GetSubstitutionCost(1, 2), Is.EqualTo(0.0).Within(1e-9));
+            Assert.That(FoulModel.GetSubstitutionCost(0, 1, Fiba), Is.EqualTo(0.0).Within(1e-9));
+            Assert.That(FoulModel.GetSubstitutionCost(1, 2, Fiba), Is.EqualTo(0.0).Within(1e-9));
         }
 
         [Test]
         public void Overtime_OnlyCaresAboutOutrightDisqualification()
         {
-            Assert.That(FoulModel.GetFoulTroubleLevel(4, 5), Is.EqualTo(0),
+            Assert.That(FoulModel.GetFoulTroubleLevel(4, 5, Fiba), Is.EqualTo(0),
                 "By overtime every remaining player is needed, so only fouling out removes anyone.");
         }
 
@@ -109,11 +110,6 @@ namespace ProBasketballManager.Domain.Tests
         }
     }
 
-    /// <summary>
-    /// Tests what fouls do inside a real match: whether the personal foul count is
-    /// realistic, whether the disqualification rule is actually enforced, and
-    /// whether aggressive tactics now carry a cost.
-    /// </summary>
     [TestFixture]
     [Category("Statistical")]
     public sealed class FoulBehaviourTests
@@ -148,7 +144,7 @@ namespace ProBasketballManager.Domain.Tests
         {
             var worst = AllBoxScores.Max(box => box.PersonalFouls);
 
-            Assert.That(worst, Is.LessThanOrEqualTo(FoulModel.DisqualificationLimit),
+            Assert.That(worst, Is.LessThanOrEqualTo(CompetitionRules.Fiba.PersonalFoulsToDisqualify),
                 "A disqualified player cannot commit another foul. Several fouls can occur inside one " +
                 "possession while the on court list is still the one captured at its start, so the foul " +
                 "selection has to skip players who have already fouled out.");
@@ -158,8 +154,8 @@ namespace ProBasketballManager.Domain.Tests
         public void PlayersDoFoulOut_ButNotConstantly()
         {
             var foulOutsPerGame = _results.Average(result =>
-                result.HomePlayerStats.Count(box => box.PersonalFouls >= FoulModel.DisqualificationLimit)
-                + result.AwayPlayerStats.Count(box => box.PersonalFouls >= FoulModel.DisqualificationLimit));
+                result.HomePlayerStats.Count(box => box.PersonalFouls >= CompetitionRules.Fiba.PersonalFoulsToDisqualify)
+                + result.AwayPlayerStats.Count(box => box.PersonalFouls >= CompetitionRules.Fiba.PersonalFoulsToDisqualify));
 
             Assert.That(foulOutsPerGame, Is.InRange(0.4, 1.5),
                 "Under a five foul limit disqualifications should happen most games but stay uncommon. " +
@@ -170,9 +166,8 @@ namespace ProBasketballManager.Domain.Tests
         [Test]
         public void DisqualifiedPlayers_StopAccumulatingMinutes()
         {
-            // A player who fouls out early cannot have played the whole game.
             var fouledOut = AllBoxScores
-                .Where(box => box.PersonalFouls >= FoulModel.DisqualificationLimit)
+                .Where(box => box.PersonalFouls >= CompetitionRules.Fiba.PersonalFoulsToDisqualify)
                 .ToList();
 
             Assert.That(fouledOut, Is.Not.Empty, "The sample should contain some disqualifications.");
@@ -207,10 +202,7 @@ namespace ProBasketballManager.Domain.Tests
 
             var shooting = events.Count(matchEvent => matchEvent.Type == MatchEventType.ShootingFoul);
 
-            var other = events.Count(matchEvent =>
-                matchEvent.Type == MatchEventType.PersonalFoul
-                || matchEvent.Type == MatchEventType.OffensiveFoul
-                || matchEvent.Type == MatchEventType.LooseBallFoul);
+            var other = events.Count(matchEvent => matchEvent.Type == MatchEventType.PersonalFoul || matchEvent.Type == MatchEventType.OffensiveFoul || matchEvent.Type == MatchEventType.LooseBallFoul);
 
             Assert.That(other, Is.GreaterThan(shooting),
                 "Most real fouls are not committed on a shot attempt. If shooting fouls dominate, the mix " +
@@ -297,9 +289,6 @@ namespace ProBasketballManager.Domain.Tests
         [Test]
         public void FiveTeammates_AreAlwaysAvailable()
         {
-            // Even with disqualifications, every game must field five players for the
-            // full forty minutes, falling back to players outside the rotation if the
-            // manager's chosen ten run out.
             foreach (var result in _results.Where(result => result.HomePeriodScores.Count == 4))
             {
                 var played = result.HomePlayerStats.Count(box => box.SecondsPlayed > 0.0);

@@ -1,20 +1,12 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using ProBasketballManager.Domain.Competitions;
 using ProBasketballManager.Domain.Demo;
 using ProBasketballManager.Domain.Matches;
 
 namespace ProBasketballManager.Domain.Tests
 {
-    /// <summary>
-    /// Checks facts that must hold in every single game, no matter how the
-    /// simulator is tuned.
-    ///
-    /// Unlike the calibration tests, none of these involve judgement. A box score
-    /// whose points do not add up to the final score is simply wrong. These tests
-    /// stay valid forever and are the ones to trust when a change breaks several
-    /// things at once.
-    /// </summary>
     [TestFixture]
     public sealed class MatchInvariantTests
     {
@@ -65,11 +57,11 @@ namespace ProBasketballManager.Domain.Tests
         }
 
         [Test]
-        public void RegulationGames_DistributeExactlyTwoHundredPlayerMinutes()
+        public void RegulationGames_DistributeTheRulesetsPlayerMinutes()
         {
             foreach (var result in SimulationTestHarness.SimulateLeagueBatch(GameCount))
             {
-                var wentToOvertime = result.HomePeriodScores.Count > 4;
+                var wentToOvertime = CompetitionRules.Fiba.IsOvertimePeriod(result.HomePeriodScores.Count);
 
                 if (wentToOvertime)
                 {
@@ -79,11 +71,14 @@ namespace ProBasketballManager.Domain.Tests
                 var homeMinutes = result.HomePlayerStats.Sum(player => player.SecondsPlayed) / 60.0;
                 var awayMinutes = result.AwayPlayerStats.Sum(player => player.SecondsPlayed) / 60.0;
 
-                Assert.That(homeMinutes, Is.EqualTo(200.0).Within(0.01),
-                    "Five players on court for forty minutes is exactly 200 player minutes. A different total " +
-                    "means the substitution logic is dropping or double counting time on court.");
+                var expectedMinutes = CompetitionRules.Fiba.TotalPlayerMinutesPerGame;
 
-                Assert.That(awayMinutes, Is.EqualTo(200.0).Within(0.01));
+                Assert.That(homeMinutes, Is.EqualTo(expectedMinutes).Within(0.01),
+                    "Players on court for the whole game is exactly PlayersOnCourt x RegulationMinutes of " +
+                    "player time. A different total means the substitution logic is dropping or double " +
+                    "counting time on court.");
+
+                Assert.That(awayMinutes, Is.EqualTo(expectedMinutes).Within(0.01));
             }
         }
 
@@ -91,7 +86,7 @@ namespace ProBasketballManager.Domain.Tests
         public void OvertimeGames_AwardMoreThanTwoHundredMinutes()
         {
             var overtimeGames = SimulationTestHarness.SimulateLeagueBatch(GameCount)
-                .Where(result => result.HomePeriodScores.Count > 4)
+                .Where(result => CompetitionRules.Fiba.IsOvertimePeriod(result.HomePeriodScores.Count))
                 .ToList();
 
             Assert.That(overtimeGames, Is.Not.Empty,
@@ -102,7 +97,7 @@ namespace ProBasketballManager.Domain.Tests
             {
                 var minutes = result.HomePlayerStats.Sum(player => player.SecondsPlayed) / 60.0;
 
-                Assert.That(minutes, Is.GreaterThan(200.0),
+                Assert.That(minutes, Is.GreaterThan(CompetitionRules.Fiba.TotalPlayerMinutesPerGame),
                     "An overtime game must award more than the regulation 200 player minutes.");
             }
         }
@@ -141,10 +136,10 @@ namespace ProBasketballManager.Domain.Tests
             var teams = DemoLeagueFactory.Create().Teams;
             var result = new MatchSimulator(new XorShiftRandom(909u)).Simulate(teams[0], teams[1]);
 
-            Assert.That(result.HomePlayerStats.Count(player => player.IsStarter), Is.EqualTo(5),
-                "Exactly five players start a basketball game.");
+            Assert.That(result.HomePlayerStats.Count(player => player.IsStarter), Is.EqualTo(CompetitionRules.Fiba.PlayersOnCourt),
+                "The starting lineup is however many players the rules put on court.");
 
-            Assert.That(result.AwayPlayerStats.Count(player => player.IsStarter), Is.EqualTo(5));
+            Assert.That(result.AwayPlayerStats.Count(player => player.IsStarter), Is.EqualTo(CompetitionRules.Fiba.PlayersOnCourt));
         }
 
         [Test]
