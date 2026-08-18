@@ -29,7 +29,7 @@ namespace ProBasketballManager.Presentation.Screens
 
             _standingsList.Clear();
 
-            _subtitleLabel.text = $"{season.League.Name} · {season.Name}";
+            _subtitleLabel.text = $"{season.League.Name} - {season.Name}";
 
             _progressBadgeLabel.text = season.IsComplete ? "SEASON COMPLETE" : $"ROUND {season.CurrentRoundNumber} / {season.TotalRounds}";
 
@@ -65,9 +65,7 @@ namespace ProBasketballManager.Presentation.Screens
 
         private static Label CreateDifferenceLabel(int pointDifference)
         {
-            var text = pointDifference > 0
-                ? $"+{pointDifference}"
-                : pointDifference.ToString();
+            var text = pointDifference > 0 ? $"+{pointDifference}" : pointDifference.ToString();
 
             var label = CreateLabel(text, "standings-medium");
 
