@@ -12,7 +12,7 @@ namespace ProBasketballManager.Persistence
 {
     public static class SaveGameMapper
     {
-        public const int CurrentSchemaVersion = 2;
+        public const int CurrentSchemaVersion = 3;
 
         public const int MinimumReadableSchemaVersion = 1;
 
@@ -34,6 +34,7 @@ namespace ProBasketballManager.Persistence
                 League = ToDto(season.League),
                 Season = ToSeasonDto(season),
                 CompletedSeasons = snapshot.Career.CompletedSeasons.Select(ToDto).ToList(),
+                RetiredPlayers = snapshot.Career.RetiredPlayers.Select(ToDto).ToList(),
                 UserTeamId = snapshot.UserTeam.Id,
                 UserTactics = ToDto(snapshot.UserTactics),
                 UserRotation = ToDto(snapshot.UserRotation),
@@ -127,7 +128,10 @@ namespace ProBasketballManager.Persistence
                 FirstName = player.FirstName,
                 LastName = player.LastName,
                 Position = player.Position.ToString(),
-                Attributes = ToDto(player.Attributes)
+                Attributes = ToDto(player.Attributes),
+                Age = player.Age,
+                Potential = player.Potential,
+                ScoutedPotential = player.ScoutedPotential
             };
         }
 
@@ -280,9 +284,7 @@ namespace ProBasketballManager.Persistence
 
             if (dto.SchemaVersion > CurrentSchemaVersion || dto.SchemaVersion < MinimumReadableSchemaVersion)
             {
-                throw new SaveGameException(
-                    $"This save was written by a different version of the game (schema {dto.SchemaVersion}, " +
-                    $"this build reads schema {MinimumReadableSchemaVersion} to {CurrentSchemaVersion}).");
+                throw new SaveGameException($"This save was written by a different version of the game (schema {dto.SchemaVersion}, " + $"this build reads schema {MinimumReadableSchemaVersion} to {CurrentSchemaVersion}).");
             }
 
             if (dto.League == null || dto.Season == null)
@@ -294,8 +296,13 @@ namespace ProBasketballManager.Persistence
 
             var teams = league.Teams.ToDictionary(team => team.Id);
 
+            var retiredPlayers = (dto.RetiredPlayers ?? new List<PlayerDto>())
+                .Select(FromDto)
+                .ToList();
+
             var players = league.Teams
                 .SelectMany(team => team.Players)
+                .Concat(retiredPlayers)
                 .ToDictionary(player => player.Id);
 
             var season = FromDto(dto.Season, league, teams, players);
@@ -308,7 +315,7 @@ namespace ProBasketballManager.Persistence
 
             return new GameSessionSnapshot
             {
-                Career = new Career(league, season, completed),
+                Career = new Career(league, season, completed, retiredPlayers),
                 UserTeam = userTeam,
                 UserTactics = FromDto(dto.UserTactics),
                 UserRotation = FromDto(dto.UserRotation, teams, players),
@@ -375,7 +382,10 @@ namespace ProBasketballManager.Persistence
                 dto.FirstName,
                 dto.LastName,
                 ParseEnum<PlayerPosition>(dto.Position, "player position"),
-                FromDto(dto.Attributes));
+                FromDto(dto.Attributes),
+                dto.Age <= 0 ? Player.DefaultAge : dto.Age,
+                dto.Potential,
+                dto.ScoutedPotential);
         }
 
         private static PlayerAttributes FromDto(PlayerAttributesDto dto)
@@ -441,9 +451,7 @@ namespace ProBasketballManager.Persistence
                 throw new SaveGameException("The save file is missing a rotation.");
             }
 
-            var starters = dto.Starters.ToDictionary(
-                starter => ParseEnum<PlayerPosition>(starter.Position, "starter position"),
-                starter => Resolve(players, starter.PlayerId, "starter"));
+            var starters = dto.Starters.ToDictionary(starter => ParseEnum<PlayerPosition>(starter.Position, "starter position"), starter => Resolve(players, starter.PlayerId, "starter"));
 
             var assignments = dto.Assignments
                 .Select(assignment => new PlayerRotationAssignment(

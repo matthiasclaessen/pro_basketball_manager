@@ -18,6 +18,8 @@ namespace ProBasketballManager.Persistence
 
         public List<CompletedSeasonDto> CompletedSeasons = new List<CompletedSeasonDto>();
 
+        public List<PlayerDto> RetiredPlayers = new List<PlayerDto>();
+
         public int UserTeamId;
 
         public TeamTacticsDto UserTactics;
@@ -51,6 +53,12 @@ namespace ProBasketballManager.Persistence
         public string Position;
 
         public PlayerAttributesDto Attributes;
+
+        public int Age;
+
+        public int Potential;
+
+        public int ScoutedPotential;
     }
 
     public sealed class PlayerAttributesDto

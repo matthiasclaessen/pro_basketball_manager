@@ -14,7 +14,7 @@ namespace ProBasketballManager.Domain.Demo
             {
                 new Team(
                     id: 1,
-                    name: "Antwerp Admirals",
+                    name: "Antwerp Giants",
                     players: CreateRoster(
                         startingPlayerId: 100,
                         offenseModifier: 0,
@@ -26,7 +26,7 @@ namespace ProBasketballManager.Domain.Demo
 
                 new Team(
                     id: 2,
-                    name: "Brussels Bears",
+                    name: "Okapi Aalst",
                     players: CreateRoster(
                         startingPlayerId: 200,
                         offenseModifier: 1,
@@ -38,7 +38,7 @@ namespace ProBasketballManager.Domain.Demo
 
                 new Team(
                     id: 3,
-                    name: "Ghent Falcons",
+                    name: "Leuven Bears",
                     players: CreateRoster(
                         startingPlayerId: 300,
                         offenseModifier: -1,
@@ -50,7 +50,7 @@ namespace ProBasketballManager.Domain.Demo
 
                 new Team(
                     id: 4,
-                    name: "Ostend Waves",
+                    name: "Filou Oostende",
                     players: CreateRoster(
                         startingPlayerId: 400,
                         offenseModifier: 0,
@@ -68,12 +68,7 @@ namespace ProBasketballManager.Domain.Demo
             );
         }
 
-        private static IEnumerable<Player> CreateRoster(
-            int startingPlayerId,
-            int offenseModifier,
-            int defenseModifier,
-            int shootingModifier,
-            int nameOffset)
+        private static IEnumerable<Player> CreateRoster(int startingPlayerId,int offenseModifier,int defenseModifier,int shootingModifier,int nameOffset)
         {
             var positions = new[]
             {
@@ -108,17 +103,34 @@ namespace ProBasketballManager.Domain.Demo
                         defenseModifier,
                         shootingModifier,
                         i
-                    )
+                    ),
+                    age: GetStartingAge(i),
+                    potential: GetStartingPotential(position, offenseModifier, defenseModifier, shootingModifier, i),
+                    scoutedPotential: 0
                 );
             }
         }
 
-        private static PlayerAttributes CreateAttributes(
-            PlayerPosition position,
-            int offenseModifier,
-            int defenseModifier,
-            int shootingModifier,
-            int playerIndex)
+        private static int GetStartingAge(int rosterIndex)
+        {
+            var ages = new[] { 29, 27, 24, 31, 22, 26, 33, 20, 25, 23, 19, 28 };
+
+            return ages[rosterIndex % ages.Length];
+        }
+
+        private static int GetStartingPotential(PlayerPosition position,int offenseModifier,int defenseModifier,int shootingModifier,int rosterIndex)
+        {
+            var current = Player.GetOverallRating(
+                CreateAttributes(position, offenseModifier, defenseModifier, shootingModifier, rosterIndex));
+
+            var age = GetStartingAge(rosterIndex);
+
+            var upside = age <= 21 ? 6: age <= 24 ? 4: age <= 27 ? 2: 0;
+
+            return PlayerAttributes.Clamp(current + upside);
+        }
+
+        private static PlayerAttributes CreateAttributes(PlayerPosition position,int offenseModifier,int defenseModifier,int shootingModifier,int playerIndex)
         {
             var variation = (playerIndex % 3) - 1;
 
@@ -209,11 +221,7 @@ namespace ProBasketballManager.Domain.Demo
                     basketballIq: Attribute(11)
                 ),
 
-                _ => throw new ArgumentOutOfRangeException(
-                    nameof(position),
-                    position,
-                    null
-                )
+                _ => throw new ArgumentOutOfRangeException(nameof(position), position, null)
             };
         }
 

@@ -1769,3 +1769,64 @@
     margin-top: 4px;
     white-space: normal;
 }
+
+.squad-potential-high {
+    color: rgb(126, 217, 87);
+    -unity-font-style: bold;
+}
+
+.squad-potential-modest {
+    color: rgb(200, 206, 216);
+}
+
+.squad-potential-settled {
+    color: rgb(110, 118, 132);
+}
+
+.close-season-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    background-color: rgb(32, 36, 44);
+}
+
+.close-season-details {
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.close-season-headline {
+    font-size: 13px;
+    -unity-font-style: bold;
+    color: rgb(232, 236, 244);
+}
+
+.close-season-detail {
+    font-size: 11px;
+    color: rgb(150, 158, 172);
+    margin-top: 2px;
+    white-space: normal;
+}
+
+.close-season-mover-name {
+    font-size: 13px;
+    color: rgb(232, 236, 244);
+    flex-grow: 1;
+}
+
+.close-season-mover-range {
+    font-size: 12px;
+    color: rgb(150, 158, 172);
+    width: 70px;
+    -unity-text-align: middle-right;
+}
+
+.close-season-mover-change {
+    font-size: 13px;
+    -unity-font-style: bold;
+    width: 44px;
+    -unity-text-align: middle-right;
+}

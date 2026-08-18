@@ -65,6 +65,25 @@ namespace ProBasketballManager.Presentation.Screens
             }
         }
 
+        private static Label CreatePotentialLabel(Player player)
+        {
+            if (player.ScoutedPotential <= player.Overall)
+            {
+                var settled = ScreenFormatting.CreateLabel(ScreenFormatting.NoValue, "squad-small-column");
+                settled.AddToClassList("squad-potential-settled");
+
+                return settled;
+            }
+
+            var label = ScreenFormatting.CreateLabel(player.ScoutedPotential.ToString(), "squad-small-column");
+
+            var upside = player.ScoutedPotential - player.Overall;
+
+            label.AddToClassList(upside >= 4 ? "squad-potential-high" : "squad-potential-modest");
+
+            return label;
+        }
+
         private void RenderLeadingScorer(System.Collections.Generic.IEnumerable<PlayerSeasonStatistics> statistics)
         {
             var leadingScorer = statistics
@@ -108,6 +127,8 @@ namespace ProBasketballManager.Presentation.Screens
             row.Add(ScreenFormatting.CreateLabel(statistics.Player.FullName, "squad-player-column"));
             row.Add(roleBadge);
             row.Add(ScreenFormatting.CreateLabel(ScreenFormatting.GetPositionAbbreviation(statistics.Player.Position), "squad-position-column"));
+            row.Add(ScreenFormatting.CreateLabel(statistics.Player.Age.ToString(), "squad-small-column"));
+            row.Add(CreatePotentialLabel(statistics.Player));
             row.Add(ScreenFormatting.CreateLabel(statistics.GamesPlayed.ToString(), "squad-small-column"));
             row.Add(ScreenFormatting.CreateLabel(statistics.GamesStarted.ToString(), "squad-small-column"));
             row.Add(ScreenFormatting.CreateLabel(ScreenFormatting.FormatPerGame(statistics.GamesPlayed, statistics.MinutesPerGame), "squad-stat-column"));

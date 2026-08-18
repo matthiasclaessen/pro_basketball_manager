@@ -32,6 +32,25 @@
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement class="content">
+                <ui:VisualElement name="close-season-screen" class="screen screen-hidden">
+                    <ui:Label text="Close Season" class="page-title" />
+                    <ui:Label name="close-season-name" text="" class="page-subtitle" />
+                    <ui:Label name="close-season-summary" text="" class="page-subtitle" />
+                    <ui:VisualElement class="panel">
+                        <ui:Label text="RETIREMENTS" class="panel-title" />
+                        <ui:VisualElement name="close-season-retirements" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="panel">
+                        <ui:Label text="IMPROVED" class="panel-title" />
+                        <ui:VisualElement name="close-season-improvements" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="panel">
+                        <ui:Label text="DECLINED" class="panel-title" />
+                        <ui:VisualElement name="close-season-declines" />
+                    </ui:VisualElement>
+                    <ui:Button name="close-season-continue-button" text="Continue"
+               class="instant-result-button" />
+                </ui:VisualElement>
                 <ui:VisualElement name="end-of-season-screen" class="screen screen-hidden">
                     <ui:Label text="Season Complete" class="page-title" />
                     <ui:Label name="end-of-season-name" text="" class="page-subtitle" />
@@ -189,6 +208,8 @@
                             <ui:Label text="Player" class="squad-player-column" />
                             <ui:Label text="Role" class="squad-role-column" />
                             <ui:Label text="Pos" class="squad-position-column" />
+                            <ui:Label text="Age" class="squad-small-column" />
+                            <ui:Label text="Pot" class="squad-small-column" />
                             <ui:Label text="GP" class="squad-small-column" />
                             <ui:Label text="GS" class="squad-small-column" />
                             <ui:Label text="MIN" class="squad-stat-column" />
@@ -219,6 +240,8 @@
                                 </ui:VisualElement>
                             </ui:VisualElement>
                             <ui:Label name="player-profile-season" text="2026 / 27" class="player-profile-season-badge" />
+                            <ui:Label name="player-profile-overall" text="0" class="player-profile-season-badge" />
+                            <ui:Label name="player-profile-potential" text="" class="player-profile-season-badge" />
                         </ui:VisualElement>
                         <ui:VisualElement class="player-profile-stat-row">
                             <ui:VisualElement class="card player-profile-stat-card">

@@ -4,6 +4,11 @@ namespace ProBasketballManager.Domain.Players
 {
     public sealed class PlayerAttributes
     {
+        public const int Minimum = 1;
+        public const int Maximum = 20;
+
+        public const double Average = 10.5;
+
         public int Finishing { get; }
         public int MidRange { get; }
         public int ThreePoint { get; }
@@ -26,35 +31,45 @@ namespace ProBasketballManager.Domain.Players
 
         public PlayerAttributes(int finishing, int midRange, int threePoint, int freeThrow, int passing, int ballHandling, int perimeterDefense, int interiorDefense, int offensiveRebounding, int defensiveRebounding, int speed, int strength, int stamina, int basketballIq)
         {
-            Finishing = finishing;
-            MidRange = midRange;
-            ThreePoint = threePoint;
-            FreeThrow = freeThrow;
+            Finishing = Validate(finishing, nameof(finishing));
+            MidRange = Validate(midRange, nameof(midRange));
+            ThreePoint = Validate(threePoint, nameof(threePoint));
+            FreeThrow = Validate(freeThrow, nameof(freeThrow));
 
-            Passing = passing;
-            BallHandling = ballHandling;
+            Passing = Validate(passing, nameof(passing));
+            BallHandling = Validate(ballHandling, nameof(ballHandling));
 
-            PerimeterDefense = perimeterDefense;
-            InteriorDefense = interiorDefense;
+            PerimeterDefense = Validate(perimeterDefense, nameof(perimeterDefense));
+            InteriorDefense = Validate(interiorDefense, nameof(interiorDefense));
 
-            OffensiveRebounding = offensiveRebounding;
-            DefensiveRebounding = defensiveRebounding;
+            OffensiveRebounding = Validate(offensiveRebounding, nameof(offensiveRebounding));
+            DefensiveRebounding = Validate(defensiveRebounding, nameof(defensiveRebounding));
 
-            Speed = speed;
-            Strength = strength;
-            Stamina = stamina;
+            Speed = Validate(speed, nameof(speed));
+            Strength = Validate(strength, nameof(strength));
+            Stamina = Validate(stamina, nameof(stamina));
 
-            BasketballIq = basketballIq;
+            BasketballIq = Validate(basketballIq, nameof(basketballIq));
         }
 
-        private static int Validate(int value)
+        private static int Validate(int value, string parameterName)
         {
-            if (value < 1 || value > 20)
+            if (value < Minimum || value > Maximum)
             {
-                throw new ArgumentOutOfRangeException(nameof(value), value, "Player attributes must be between 1 and 20.");
+                throw new ArgumentOutOfRangeException(parameterName, value, $"Player attributes must be between {Minimum} and {Maximum}.");
             }
 
             return value;
+        }
+
+        public static int Clamp(int value)
+        {
+            return value < Minimum ? Minimum : value > Maximum ? Maximum : value;
+        }
+
+        public static int Clamp(double value)
+        {
+            return Clamp((int)Math.Round(value, MidpointRounding.AwayFromZero));
         }
     }
 }

@@ -50,6 +50,10 @@ namespace ProBasketballManager.Presentation.Screens
         [Tooltip("Season summary shown once the last fixture is played.")]
         private EndOfSeasonScreenController _endOfSeasonScreen;
 
+        [SerializeField]
+        [Tooltip("Retirements and development, shown after starting a new season.")]
+        private CloseSeasonScreenController _closeSeasonScreen;
+
         private GameSession _session;
 
         private Button _navDashboardButton;
@@ -163,6 +167,7 @@ namespace ProBasketballManager.Presentation.Screens
             BindScreen(_leagueScreen, nameof(LeagueScreenController), root);
             BindScreen(_matchCentreScreen, nameof(MatchCentreScreenController), root);
             BindScreen(_endOfSeasonScreen, nameof(EndOfSeasonScreenController), root);
+            BindScreen(_closeSeasonScreen, nameof(CloseSeasonScreenController), root);
         }
 
         private void BindScreen(ScreenController screen, string screenName, VisualElement root)
@@ -174,9 +179,7 @@ namespace ProBasketballManager.Presentation.Screens
         {
             if (screen == null)
             {
-                Debug.LogError(
-                    $"GameScreenController has no {screenName} assigned. " +
-                    "Add the component and drag it into the matching field in the Inspector.");
+                Debug.LogError($"GameScreenController has no {screenName} assigned. " + "Add the component and drag it into the matching field in the Inspector.");
 
                 return;
             }
@@ -224,6 +227,12 @@ namespace ProBasketballManager.Presentation.Screens
             {
                 _endOfSeasonScreen.RegisterCallbacks();
                 _endOfSeasonScreen.NextSeasonRequested += StartNextSeason;
+            }
+
+            if (_closeSeasonScreen != null)
+            {
+                _closeSeasonScreen.RegisterCallbacks();
+                _closeSeasonScreen.ContinueRequested += ShowDashboard;
             }
 
             if (_matchCentreScreen != null)
@@ -278,6 +287,12 @@ namespace ProBasketballManager.Presentation.Screens
                 _endOfSeasonScreen.NextSeasonRequested -= StartNextSeason;
             }
 
+            if (_closeSeasonScreen != null)
+            {
+                _closeSeasonScreen.UnregisterCallbacks();
+                _closeSeasonScreen.ContinueRequested -= ShowDashboard;
+            }
+
             if (_matchCentreScreen != null)
             {
                 _matchCentreScreen.UnregisterCallbacks();
@@ -296,6 +311,7 @@ namespace ProBasketballManager.Presentation.Screens
             _scheduleScreen?.Render();
             _leagueScreen?.Render();
             _endOfSeasonScreen?.Render();
+            _closeSeasonScreen?.Render();
         }
 
         private void OnRotationChanged()
@@ -348,7 +364,14 @@ namespace ProBasketballManager.Presentation.Screens
 
             RenderAllScreens();
 
-            ShowDashboard();
+            ShowCloseSeason();
+        }
+
+        private void ShowCloseSeason()
+        {
+            HideAllScreens();
+            _closeSeasonScreen?.Show();
+            SetActiveNavigation(null);
         }
 
         private void ShowDashboard()
@@ -435,6 +458,7 @@ namespace ProBasketballManager.Presentation.Screens
             _leagueScreen?.Hide();
             _matchCentreScreen?.Hide();
             _endOfSeasonScreen?.Hide();
+            _closeSeasonScreen?.Hide();
             _saveLoadScreen?.Hide();
             _mainMenuScreen?.Hide();
         }

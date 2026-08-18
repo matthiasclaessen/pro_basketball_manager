@@ -13,6 +13,8 @@ namespace ProBasketballManager.Presentation.Screens
         private Label _metaLabel;
         private Label _roleLabel;
         private Label _seasonLabel;
+        private Label _overallLabel;
+        private Label _potentialLabel;
 
         private Label _gamesPlayedLabel;
         private Label _gamesStartedLabel;
@@ -41,6 +43,8 @@ namespace ProBasketballManager.Presentation.Screens
             _metaLabel = documentRoot.Q<Label>("player-profile-meta");
             _roleLabel = documentRoot.Q<Label>("player-profile-role");
             _seasonLabel = documentRoot.Q<Label>("player-profile-season");
+            _overallLabel = documentRoot.Q<Label>("player-profile-overall");
+            _potentialLabel = documentRoot.Q<Label>("player-profile-potential");
 
             _gamesPlayedLabel = documentRoot.Q<Label>("player-profile-gp");
             _gamesStartedLabel = documentRoot.Q<Label>("player-profile-gs");
@@ -64,6 +68,7 @@ namespace ProBasketballManager.Presentation.Screens
             _gameLogCountLabel = documentRoot.Q<Label>("player-profile-game-log-count");
         }
 
+        /// <summary>Selects a player and reveals the screen.</summary>
         public void ShowForPlayer(Player player)
         {
             Session.SelectedPlayer = player;
@@ -88,7 +93,9 @@ namespace ProBasketballManager.Presentation.Screens
             var role = ScreenFormatting.GetSquadRole(Session.UserRotation, assignment);
 
             _nameLabel.text = player.FullName;
-            _metaLabel.text = $"{ScreenFormatting.GetPositionAbbreviation(player.Position)} {ScreenFormatting.Separator} {Session.UserTeam.Name}";
+            _metaLabel.text = $"{ScreenFormatting.GetPositionAbbreviation(player.Position)} {ScreenFormatting.Separator} " + $"{player.Age} years {ScreenFormatting.Separator} {Session.UserTeam.Name}";
+
+            RenderDevelopment(player);
             _seasonLabel.text = Session.Season.Name;
 
             _roleLabel.text = role;
@@ -97,6 +104,21 @@ namespace ProBasketballManager.Presentation.Screens
             RenderStatistics(statistics);
             RenderAttributes(player);
             RenderGameLog(player);
+        }
+
+        private void RenderDevelopment(Player player)
+        {
+            if (_overallLabel != null)
+            {
+                _overallLabel.text = player.Overall.ToString();
+            }
+
+            if (_potentialLabel == null)
+            {
+                return;
+            }
+
+            _potentialLabel.text = player.ScoutedPotential <= player.Overall ? "Fully developed" : $"{player.ScoutedPotential} (scouted)";
         }
 
         private void RenderStatistics(PlayerSeasonStatistics statistics)

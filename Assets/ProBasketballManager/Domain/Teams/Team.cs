@@ -32,11 +32,36 @@ namespace ProBasketballManager.Domain.Teams
 
             if (_players.Count < 5)
             {
-                throw new ArgumentException(
-                    "A basketball team must contain at least five players.",
-                    nameof(players)
+                throw new ArgumentException("A basketball team must contain at least five players.", nameof(players)
                 );
             }
+        }
+
+        public void ReplacePlayer(Player leaving, Player arriving)
+        {
+            if (leaving == null)
+            {
+                throw new ArgumentNullException(nameof(leaving));
+            }
+
+            if (arriving == null)
+            {
+                throw new ArgumentNullException(nameof(arriving));
+            }
+
+            var index = _players.FindIndex(player => player.Id == leaving.Id);
+
+            if (index < 0)
+            {
+                throw new ArgumentException($"{leaving.FullName} is not on {Name}.", nameof(leaving));
+            }
+
+            _players[index] = arriving;
+        }
+
+        public int GetHighestPlayerId()
+        {
+            return _players.Max(player => player.Id);
         }
     }
 }
