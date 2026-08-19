@@ -16,22 +16,24 @@ namespace ProBasketballManager.Persistence
             public string City;
             public string PrimaryColor;
             public string SecondaryColor;
+            public string TertiaryColor;
+            public string BadgeTemplate;
             public double Strength;
         }
 
         private static readonly ClubSeed[] Clubs =
         {
-            new ClubSeed { Id = 1, PrimaryColor = "#FFD500", SecondaryColor = "#E30613", Name = "Oostende", ShortName = "OOS", City = "Oostende", Strength = 2.6 },
-            new ClubSeed { Id = 2, PrimaryColor = "#0B5FA5", SecondaryColor = "#FFFFFF", Name = "Antwerp Giants", ShortName = "ANT", City = "Antwerp", Strength = 2.3 },
-            new ClubSeed { Id = 3, PrimaryColor = "#E4022A", SecondaryColor = "#111827", Name = "Kangoeroes Mechelen", ShortName = "MEC", City = "Mechelen", Strength = 1.5 },
-            new ClubSeed { Id = 4, PrimaryColor = "#0F7B4A", SecondaryColor = "#FFFFFF", Name = "Limburg United", ShortName = "LIM", City = "Hasselt", Strength = 0.8 },
-            new ClubSeed { Id = 5, PrimaryColor = "#7B2D8E", SecondaryColor = "#F5B301", Name = "Leuven Bears", ShortName = "LEU", City = "Leuven", Strength = 0.3 },
-            new ClubSeed { Id = 6, PrimaryColor = "#0A0A0A", SecondaryColor = "#FFC300", Name = "Spirou Charleroi", ShortName = "CHA", City = "Charleroi", Strength = 0.0 },
-            new ClubSeed { Id = 7, PrimaryColor = "#C8102E", SecondaryColor = "#FFFFFF", Name = "Okapi Aalst", ShortName = "AAL", City = "Aalst", Strength = -0.4 },
-            new ClubSeed { Id = 8, PrimaryColor = "#1D4ED8", SecondaryColor = "#F97316", Name = "Kortrijk Spurs", ShortName = "KOR", City = "Kortrijk", Strength = -0.8 },
-            new ClubSeed { Id = 9, PrimaryColor = "#B01B2E", SecondaryColor = "#FFFFFF", Name = "Mons-Hainaut", ShortName = "MON", City = "Mons", Strength = -1.2 },
-            new ClubSeed { Id = 10, PrimaryColor = "#E4032E", SecondaryColor = "#111827", Name = "Liege Basket", ShortName = "LIE", City = "Liege", Strength = -1.7 },
-            new ClubSeed { Id = 11, PrimaryColor = "#0E7490", SecondaryColor = "#FDE047", Name = "Brussels Basketball", ShortName = "BRU", City = "Brussels", Strength = -2.2 }
+            new ClubSeed { Id = 1, TertiaryColor = "#0A0A0A", BadgeTemplate = "roundel-ball", PrimaryColor = "#FFD500", SecondaryColor = "#E30613", Name = "Oostende", ShortName = "OOS", City = "Oostende", Strength = 2.6 },
+            new ClubSeed { Id = 2, TertiaryColor = "#0A0A0A", BadgeTemplate = "shield-sword", PrimaryColor = "#0B5FA5", SecondaryColor = "#FFFFFF", Name = "Antwerp Giants", ShortName = "ANT", City = "Antwerp", Strength = 2.3 },
+            new ClubSeed { Id = 3, TertiaryColor = "#FFFFFF", BadgeTemplate = "roundel-crown-stripes", PrimaryColor = "#E4022A", SecondaryColor = "#111827", Name = "Kangoeroes Mechelen", ShortName = "MEC", City = "Mechelen", Strength = 1.5 },
+            new ClubSeed { Id = 4, TertiaryColor = "#0A0A0A", BadgeTemplate = "shield-castle-ball", PrimaryColor = "#0F7B4A", SecondaryColor = "#FFFFFF", Name = "Limburg United", ShortName = "LIM", City = "Hasselt", Strength = 0.8 },
+            new ClubSeed { Id = 5, TertiaryColor = "#FFFFFF", BadgeTemplate = "shield-crown-quarters", PrimaryColor = "#7B2D8E", SecondaryColor = "#F5B301", Name = "Leuven Bears", ShortName = "LEU", City = "Leuven", Strength = 0.3 },
+            new ClubSeed { Id = 6, TertiaryColor = "#FFFFFF", BadgeTemplate = "shield-stripes", PrimaryColor = "#0A0A0A", SecondaryColor = "#FFC300", Name = "Spirou Charleroi", ShortName = "CHA", City = "Charleroi", Strength = 0.0 },
+            new ClubSeed { Id = 7, TertiaryColor = "#0A0A0A", BadgeTemplate = "shield-stars-ball", PrimaryColor = "#C8102E", SecondaryColor = "#FFFFFF", Name = "Okapi Aalst", ShortName = "AAL", City = "Aalst", Strength = -0.4 },
+            new ClubSeed { Id = 8, TertiaryColor = "#FFFFFF", BadgeTemplate = "shield-crossed-swords", PrimaryColor = "#1D4ED8", SecondaryColor = "#F97316", Name = "Kortrijk Spurs", ShortName = "KOR", City = "Kortrijk", Strength = -0.8 },
+            new ClubSeed { Id = 9, TertiaryColor = "#0A0A0A", BadgeTemplate = "shield-rose-scroll", PrimaryColor = "#B01B2E", SecondaryColor = "#FFFFFF", Name = "Mons-Hainaut", ShortName = "MON", City = "Mons", Strength = -1.2 },
+            new ClubSeed { Id = 10, TertiaryColor = "#FFFFFF", BadgeTemplate = "oval-star-banner", PrimaryColor = "#E4032E", SecondaryColor = "#111827", Name = "Liege Basket", ShortName = "LIE", City = "Liege", Strength = -1.7 },
+            new ClubSeed { Id = 11, TertiaryColor = "#0A0A0A", BadgeTemplate = "shield-ship", PrimaryColor = "#0E7490", SecondaryColor = "#FDE047", Name = "Brussels Basketball", ShortName = "BRU", City = "Brussels", Strength = -2.2 }
         };
 
         private static readonly double[] RoleModifiers = { 4.2, 2.8, 2.0, 1.4, 0.8, 0.1, -0.5, -1.2, -1.9, -2.6, -3.4, -4.2 };
@@ -74,7 +76,7 @@ namespace ProBasketballManager.Persistence
 
             foreach (var club in Clubs)
             {
-                database.Clubs.Add(new DatabaseClubDto { Id = club.Id, Name = club.Name, ShortName = club.ShortName, City = club.City, PrimaryColor = club.PrimaryColor, SecondaryColor = club.SecondaryColor });
+                database.Clubs.Add(new DatabaseClubDto { Id = club.Id, Name = club.Name, ShortName = club.ShortName, City = club.City, PrimaryColor = club.PrimaryColor, SecondaryColor = club.SecondaryColor, TertiaryColor = club.TertiaryColor, BadgeTemplate = club.BadgeTemplate });
 
                 var squad = new List<DatabasePlayerDto>();
 

@@ -23,13 +23,17 @@ namespace ProBasketballManager.Domain.Clubs
 
         public string SecondaryColor { get; }
 
+        public string TertiaryColor { get; }
+
+        public string BadgeTemplate { get; }
+
         public IReadOnlyList<Player> Squad => _squad;
 
         public IReadOnlyList<Team> Teams => _teams;
 
         public Team FirstTeam => GetTeam(TeamType.First);
 
-        public Club(int id, string name, IEnumerable<Player> squad, IEnumerable<Team> teams, string shortName = null, string city = null, string primaryColor = null, string secondaryColor = null)
+        public Club(int id, string name, IEnumerable<Player> squad, IEnumerable<Team> teams, string shortName = null, string city = null, string primaryColor = null, string secondaryColor = null, string tertiaryColor = null, string badgeTemplate = null)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -52,6 +56,8 @@ namespace ProBasketballManager.Domain.Clubs
             City = city;
             PrimaryColor = string.IsNullOrWhiteSpace(primaryColor) ? "#1E293B" : primaryColor;
             SecondaryColor = string.IsNullOrWhiteSpace(secondaryColor) ? "#F8FAFC" : secondaryColor;
+            TertiaryColor = string.IsNullOrWhiteSpace(tertiaryColor) ? "#0A0A0A" : tertiaryColor;
+            BadgeTemplate = badgeTemplate;
 
             _squad = squad.ToList();
             _teams = teams.ToList();
@@ -76,21 +82,21 @@ namespace ProBasketballManager.Domain.Clubs
             return string.Concat(words.Take(3).Select(word => word[0])).ToUpperInvariant();
         }
 
-        public Team GetTeam(TeamType level)
+        public Team GetTeam(TeamType type)
         {
-            var team = _teams.FirstOrDefault(candidate => candidate.Type == level);
+            var team = _teams.FirstOrDefault(candidate => candidate.Type == type);
 
             if (team == null)
             {
-                throw new InvalidOperationException($"{Name} does not field a {level} team.");
+                throw new InvalidOperationException($"{Name} does not field a {type} team.");
             }
 
             return team;
         }
 
-        public bool HasTeam(TeamType level)
+        public bool HasTeam(TeamType type)
         {
-            return _teams.Any(candidate => candidate.Type == level);
+            return _teams.Any(candidate => candidate.Type == type);
         }
 
         public IReadOnlyList<Team> GetTeamsFor(int playerId)

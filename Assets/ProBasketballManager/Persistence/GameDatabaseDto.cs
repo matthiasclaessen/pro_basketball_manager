@@ -22,7 +22,8 @@ namespace ProBasketballManager.Persistence
         public string City;
         public string PrimaryColor;
         public string SecondaryColor;
-        public string LogoFile;
+        public string TertiaryColor;
+        public string BadgeTemplate;
     }
 
     public sealed class DatabaseTeamDto

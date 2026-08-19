@@ -120,6 +120,8 @@ namespace ProBasketballManager.Persistence
                 City = club.City,
                 PrimaryColor = club.PrimaryColor,
                 SecondaryColor = club.SecondaryColor,
+                TertiaryColor = club.TertiaryColor,
+                BadgeTemplate = club.BadgeTemplate,
                 Squad = club.Squad.Select(ToDto).ToList(),
                 Teams = club.Teams.Select(ToDto).ToList()
             };
@@ -192,7 +194,7 @@ namespace ProBasketballManager.Persistence
             {
                 Id = team.Id,
                 Name = team.Name,
-                Level = team.Type.ToString(),
+                Level = team.Level.ToString(),
                 PlayerIds = team.Players.Select(player => player.Id).ToList()
             };
         }
@@ -566,7 +568,7 @@ namespace ProBasketballManager.Persistence
 
             var teams = (dto.Teams ?? new List<TeamDto>()).Select(team => FromDto(team, dto.Id, squadById)).ToList();
 
-            return new Club(dto.Id, dto.Name, squad, teams, dto.ShortName, dto.City, dto.PrimaryColor, dto.SecondaryColor);
+            return new Club(dto.Id, dto.Name, squad, teams, dto.ShortName, dto.City, dto.PrimaryColor, dto.SecondaryColor, dto.TertiaryColor, dto.BadgeTemplate);
         }
 
         private static Team FromDto(TeamDto dto, int clubId, Dictionary<int, Player> squad)

@@ -51,6 +51,8 @@ namespace ProBasketballManager.Persistence
         public string City;
         public string PrimaryColor;
         public string SecondaryColor;
+        public string TertiaryColor;
+        public string BadgeTemplate;
         public List<PlayerDto> Squad = new List<PlayerDto>();
         public List<TeamDto> Teams = new List<TeamDto>();
     }

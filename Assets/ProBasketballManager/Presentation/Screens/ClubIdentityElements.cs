@@ -26,12 +26,21 @@ namespace ProBasketballManager.Presentation.Screens
                 return badge;
             }
 
+            var texture = ClubBadgeRenderer.GetBadge(club);
+
+            if (texture != null)
+            {
+                badge.style.backgroundImage = new StyleBackground(texture);
+
+                return badge;
+            }
+
             badge.style.backgroundColor = ParseColor(club.PrimaryColor, new Color32(30, 41, 59, 255));
 
             var initials = new Label(club.ShortName);
             initials.AddToClassList("club-badge-initials");
             initials.style.color = ParseColor(club.SecondaryColor, new Color32(248, 250, 252, 255));
-            initials.style.fontSize = 10;
+            initials.style.fontSize = Mathf.Max(8, Mathf.RoundToInt(diameter * 0.36f));
 
             badge.Add(initials);
 
