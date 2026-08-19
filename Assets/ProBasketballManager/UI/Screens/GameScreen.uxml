@@ -15,6 +15,7 @@
                 <ui:Button name="nav-league-button" text="League" class="nav-item" />
                 <ui:Button name="nav-save-load-button" text="Save / Load" class="nav-item" />
             </ui:VisualElement>
+            <ui:VisualElement name="team-switcher" class="team-switcher" />
             <ui:VisualElement class="sidebar-footer">
                 <ui:Label text="PROTOTYPE" class="sidebar-footer-label" />
                 <ui:Label text="Version 0.1" class="sidebar-footer-version" />
@@ -28,7 +29,7 @@
                 </ui:VisualElement>
                 <ui:VisualElement class="topbar-season">
                     <ui:Label name="season-name" text="2026 / 27" class="season-value" />
-                    <ui:Label text="DEMO SEASON" class="season-label" />
+                    <ui:Label name="current-date" text="" class="season-label" />
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement class="content">

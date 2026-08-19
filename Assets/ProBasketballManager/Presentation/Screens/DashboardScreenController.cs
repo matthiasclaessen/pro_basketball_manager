@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using System.Globalization;
 using System.Linq;
 using UnityEngine.UIElements;
 
@@ -14,6 +15,7 @@ namespace ProBasketballManager.Presentation.Screens
         private Label _clubNameLabel;
         private Label _leagueNameLabel;
         private Label _seasonNameLabel;
+        private Label _currentDateLabel;
 
         private Label _homeTeamNameLabel;
         private Label _awayTeamNameLabel;
@@ -37,6 +39,7 @@ namespace ProBasketballManager.Presentation.Screens
             _clubNameLabel = documentRoot.Q<Label>("club-name");
             _leagueNameLabel = documentRoot.Q<Label>("league-name");
             _seasonNameLabel = documentRoot.Q<Label>("season-name");
+            _currentDateLabel = documentRoot.Q<Label>("current-date");
 
             _homeTeamNameLabel = documentRoot.Q<Label>("home-team-name");
             _awayTeamNameLabel = documentRoot.Q<Label>("away-team-name");
@@ -93,6 +96,11 @@ namespace ProBasketballManager.Presentation.Screens
             _clubNameLabel.text = userTeam.Name;
             _leagueNameLabel.text = season.League.Name;
             _seasonNameLabel.text = season.Name;
+
+            if (_currentDateLabel != null)
+            {
+                _currentDateLabel.text = Session.CurrentDate.ToString("ddd d MMM yyyy", CultureInfo.InvariantCulture).ToUpperInvariant();
+            }
 
             RenderClubInformation();
             RenderStandings();

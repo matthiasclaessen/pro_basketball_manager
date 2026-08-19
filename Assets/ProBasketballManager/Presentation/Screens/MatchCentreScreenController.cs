@@ -1,8 +1,9 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using ProBasketballManager.Domain.Matches;
+using ProBasketballManager.Presentation.State;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -14,7 +15,7 @@ namespace ProBasketballManager.Presentation.Screens
 
         public event Action ReplayStarted;
 
-        public event Action ReplayFinished;
+        public event Action<ContinueOutcome> ReplayFinished;
 
         public event Action BackRequested;
 
@@ -284,9 +285,11 @@ namespace ProBasketballManager.Presentation.Screens
 
             RenderBoxScore();
 
-            Session.CompleteCurrentRound();
+            Session.CompleteCurrentFixture();
 
-            ReplayFinished?.Invoke();
+            var outcome = Session.Continue();
+
+            ReplayFinished?.Invoke(outcome);
         }
 
         private void ApplyEvent(MatchEvent matchEvent)

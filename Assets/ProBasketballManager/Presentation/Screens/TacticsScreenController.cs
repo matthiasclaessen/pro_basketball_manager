@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using ProBasketballManager.Domain.Players;
@@ -258,7 +258,7 @@ namespace ProBasketballManager.Presentation.Screens
         private void Reset()
         {
             Session.UserTactics = TeamTactics.Default;
-            Session.UserRotation = TeamRotation.CreateDefault(Session.UserTeam);
+            Session.UserRotation = TeamRotation.CreateDefault(Session.UserTeam, Session.Season.Rules);
 
             Render();
 

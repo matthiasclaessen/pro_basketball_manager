@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using ProBasketballManager.Domain.Matches;
 
 namespace ProBasketballManager.Domain.Players
@@ -29,7 +29,7 @@ namespace ProBasketballManager.Domain.Players
             }
 
             var current = player.Attributes;
-            var headroom = player.Potential - Player.GetOverallRating(current);
+            var headroom = player.Potential - PlayerRating.CalculateCurrentAbility(player.Position, current);
 
             return new PlayerAttributes(
                 Move(current.Finishing, PlayerAttributeKind.Finishing, player, headroom, random),
@@ -86,7 +86,7 @@ namespace ProBasketballManager.Domain.Players
 
             var ageFactor = age <= PeakGrowthAge ? 1.0 : 1.0 - ((age - PeakGrowthAge) / (double)(GrowthEndsAtAge - PeakGrowthAge));
 
-            var headroomFactor = Math.Min(1.0, headroom / 3.0);
+            var headroomFactor = Math.Min(1.0, PlayerRating.ToAttributePoints(headroom) / 3.0);
 
             return MaximumGrowthPerSeason * ageFactor * headroomFactor;
         }

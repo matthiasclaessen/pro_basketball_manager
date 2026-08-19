@@ -1,5 +1,6 @@
-using System.Linq;
+﻿using System.Linq;
 using ProBasketballManager.Domain.Players;
+using ProBasketballManager.Domain.Teams;
 using ProBasketballManager.Persistence;
 using ProBasketballManager.Presentation.State;
 using UnityEngine;
@@ -66,6 +67,7 @@ namespace ProBasketballManager.Presentation.Screens
         private Button _playerProfileBackButton;
 
         private VisualElement _navigationBar;
+        private VisualElement _teamSwitcher;
 
         private VisualElement _root;
 
@@ -154,6 +156,7 @@ namespace ProBasketballManager.Presentation.Screens
             _playerProfileBackButton = root.Q<Button>("player-profile-back-button");
 
             _navigationBar = root.Q<VisualElement>("navigation-bar");
+            _teamSwitcher = root.Q<VisualElement>("team-switcher");
         }
 
         private void BindScreens(VisualElement root)
@@ -304,6 +307,8 @@ namespace ProBasketballManager.Presentation.Screens
 
         private void RenderAllScreens()
         {
+            RenderTeamSwitcher();
+
             _dashboardScreen?.Render();
             _saveLoadScreen?.Render();
             _squadScreen?.Render();
@@ -339,13 +344,13 @@ namespace ProBasketballManager.Presentation.Screens
             SetNavigationEnabled(false);
         }
 
-        private void OnReplayFinished()
+        private void OnReplayFinished(ContinueOutcome outcome)
         {
             RenderAllScreens();
 
             SetNavigationEnabled(true);
 
-            if (_session.CanAdvanceSeason)
+            if (outcome != null && outcome.Stop == ContinueStop.SeasonEnded)
             {
                 ShowEndOfSeason();
             }
@@ -494,6 +499,70 @@ namespace ProBasketballManager.Presentation.Screens
             }
 
             _navigationBar.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
+        }
+
+        private void RenderTeamSwitcher()
+        {
+            if (_teamSwitcher == null || _session == null)
+            {
+                return;
+            }
+
+            _teamSwitcher.Clear();
+
+            foreach (var team in _session.UserClub.Teams.OrderBy(entry => entry.Type))
+            {
+                var isManaged = _session.IsManaged(team.Id);
+                var isSelected = team.Id == _session.UserTeam.Id;
+
+                var row = new VisualElement();
+                row.AddToClassList("team-switcher-row");
+
+                var selectButton = new Button { text = team.Name };
+                selectButton.AddToClassList("team-switcher-item");
+
+                if (isSelected)
+                {
+                    selectButton.AddToClassList("team-switcher-item-active");
+                }
+
+                selectButton.SetEnabled(isManaged && !isSelected);
+                selectButton.clicked += () => OnTeamSelected(team);
+
+                var toggleButton = new Button { text = isManaged ? "ON" : "OFF" };
+                toggleButton.AddToClassList("team-switcher-toggle");
+
+                if (isManaged)
+                {
+                    toggleButton.AddToClassList("team-switcher-toggle-on");
+                }
+
+                toggleButton.SetEnabled(!isSelected);
+                toggleButton.clicked += () => OnTeamManagedToggled(team);
+
+                row.Add(selectButton);
+                row.Add(toggleButton);
+
+                _teamSwitcher.Add(row);
+            }
+        }
+
+        private void OnTeamSelected(Team team)
+        {
+            _session.SelectTeam(team);
+
+            RenderTeamSwitcher();
+            RenderAllScreens();
+
+            ShowDashboard();
+        }
+
+        private void OnTeamManagedToggled(Team team)
+        {
+            _session.SetManaged(team.Id, !_session.IsManaged(team.Id));
+
+            RenderTeamSwitcher();
+            RenderAllScreens();
         }
     }
 }

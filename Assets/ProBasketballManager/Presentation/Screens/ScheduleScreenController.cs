@@ -1,3 +1,4 @@
+﻿using System.Globalization;
 using System.Linq;
 using ProBasketballManager.Domain.Competitions;
 using ProBasketballManager.Domain.Teams;
@@ -76,6 +77,8 @@ namespace ProBasketballManager.Presentation.Screens
             var resultText = fixture.IsPlayed ? $"{fixture.Result.HomeScore} - {fixture.Result.AwayScore}" : "vs";
 
             var statusText = fixture.IsPlayed ? "FINAL" : fixture.Id == Session.CurrentFixture?.Id ? "NEXT" : "UPCOMING";
+
+            row.Add(ScreenFormatting.CreateLabel(fixture.Date.ToString("d MMM", CultureInfo.InvariantCulture), "schedule-fixture-date"));
 
             row.Add(ScreenFormatting.CreateLabel(fixture.HomeTeam.Name, "schedule-fixture-home"));
             row.Add(ScreenFormatting.CreateLabel(resultText, "schedule-fixture-result"));

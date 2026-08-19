@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using ProBasketballManager.Domain.Statistics;
@@ -8,6 +8,8 @@ namespace ProBasketballManager.Domain.Competitions
     public sealed class CompletedSeason
     {
         public int Id { get; }
+
+        public int CompetitionId { get; }
 
         public string Name { get; }
 
@@ -19,6 +21,7 @@ namespace ProBasketballManager.Domain.Competitions
 
         public CompletedSeason(
             int id,
+            int competitionId,
             string name,
             IReadOnlyList<LeagueStanding> finalStandings,
             IReadOnlyList<PlayerSeasonStatistics> playerStatistics)
@@ -29,6 +32,7 @@ namespace ProBasketballManager.Domain.Competitions
             }
 
             Id = id;
+            CompetitionId = competitionId;
             Name = name;
             FinalStandings = finalStandings ?? throw new ArgumentNullException(nameof(finalStandings));
             PlayerStatistics = playerStatistics ?? throw new ArgumentNullException(nameof(playerStatistics));

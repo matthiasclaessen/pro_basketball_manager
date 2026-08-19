@@ -14,7 +14,7 @@ namespace ProBasketballManager.Persistence
 {
     public static class SaveGameMapper
     {
-        public const int CurrentSchemaVersion = 6;
+        public const int CurrentSchemaVersion = 9;
 
         public const int MinimumReadableSchemaVersion = 1;
 
@@ -34,12 +34,16 @@ namespace ProBasketballManager.Persistence
                 SavedAtUtc = DateTime.UtcNow.ToString("o"),
                 Description = BuildDescription(snapshot),
                 Clubs = snapshot.Career.Clubs.Select(ToDto).ToList(),
+                Leagues = snapshot.Career.Seasons.Select(running => ToDto(running.League)).ToList(),
+                Seasons = snapshot.Career.Seasons.Select(ToSeasonDto).ToList(),
                 League = ToDto(season.League),
                 Season = ToSeasonDto(season),
                 CompletedSeasons = snapshot.Career.CompletedSeasons.Select(ToDto).ToList(),
                 RetiredPlayers = snapshot.Career.RetiredPlayers.Select(ToDto).ToList(),
                 UserClubId = snapshot.UserTeam.ClubId,
                 UserTeamId = snapshot.UserTeam.Id,
+                ManagedTeamIds = snapshot.ManagedTeamIds ?? new List<int> { snapshot.UserTeam.Id },
+                TeamSetups = BuildTeamSetups(snapshot),
                 UserTactics = ToDto(snapshot.UserTactics),
                 UserRotation = ToDto(snapshot.UserRotation),
                 NextSeed = snapshot.NextSeed,
@@ -67,6 +71,7 @@ namespace ProBasketballManager.Persistence
             return new CompletedSeasonDto
             {
                 Id = season.Id,
+                CompetitionId = season.CompetitionId,
                 Name = season.Name,
                 FinalStandings = season.FinalStandings
                     .Select(standing => new ArchivedStandingDto
@@ -125,6 +130,28 @@ namespace ProBasketballManager.Persistence
                 Calendar = ToDto(league.Calendar),
                 TeamIds = league.Teams.Select(team => team.Id).ToList()
             };
+        }
+
+        private static List<TeamSetupDto> BuildTeamSetups(GameSessionSnapshot snapshot)
+        {
+            var teamIds = new List<int>();
+
+            if (snapshot.Tactics != null)
+            {
+                teamIds.AddRange(snapshot.Tactics.Keys);
+            }
+
+            if (snapshot.Rotations != null)
+            {
+                teamIds.AddRange(snapshot.Rotations.Keys);
+            }
+
+            return teamIds.Distinct().OrderBy(id => id).Select(id => new TeamSetupDto
+            {
+                TeamId = id,
+                Tactics = snapshot.Tactics != null && snapshot.Tactics.TryGetValue(id, out var tactics) ? ToDto(tactics) : null,
+                Rotation = snapshot.Rotations != null && snapshot.Rotations.TryGetValue(id, out var rotation) ? ToDto(rotation) : null
+            }).ToList();
         }
 
         private static CompetitionCalendarDto ToDto(CompetitionCalendar calendar)
@@ -207,6 +234,7 @@ namespace ProBasketballManager.Persistence
             return new SeasonDto
             {
                 Id = season.Id,
+                CompetitionId = season.League.Id,
                 Name = season.Name,
                 Rules = ToDto(season.Rules),
                 Fixtures = season.Fixtures.Select(ToDto).ToList()
@@ -232,6 +260,7 @@ namespace ProBasketballManager.Persistence
 
         private static CompetitionRules FromDto(CompetitionRulesDto dto)
         {
+            // Saves written before rules were data all assumed FIBA.
             if (dto == null)
             {
                 return CompetitionRules.Fiba;
@@ -384,6 +413,8 @@ namespace ProBasketballManager.Persistence
                 throw new SaveGameException("The save file is missing its league or season.");
             }
 
+            UpgradeAbilityScale(dto);
+
             var hasClubs = dto.Clubs != null && dto.Clubs.Count > 0;
 
             if (!hasClubs && (dto.League.Teams == null || dto.League.Teams.Count == 0))
@@ -404,7 +435,11 @@ namespace ProBasketballManager.Persistence
                 .Concat(retiredPlayers)
                 .ToDictionary(player => player.Id);
 
-            var league = FromDto(dto.League, teams, clubs);
+            var leagueDtos = dto.Leagues != null && dto.Leagues.Count > 0 ? dto.Leagues : new List<LeagueDto> { dto.League };
+
+            var leagues = leagueDtos.Select(entry => FromDto(entry, teams, clubs)).ToDictionary(entry => entry.Id);
+
+            var league = leagues.Values.OrderBy(entry => entry.Id).First();
 
             var season = FromDto(dto.Season, league, teams, players);
 
@@ -414,7 +449,11 @@ namespace ProBasketballManager.Persistence
 
             var userTeam = Resolve(teams, dto.UserTeamId, "user team");
 
-            var career = new Career(clubs, league, season, completed, retiredPlayers);
+            var seasonDtos = dto.Seasons != null && dto.Seasons.Count > 0 ? dto.Seasons : new List<SeasonDto> { dto.Season };
+
+            var runningSeasons = seasonDtos.Select(entry => FromDto(entry, ResolveLeagueFor(entry, leagues, league), teams, players)).ToList();
+
+            var career = new Career(clubs, runningSeasons, completed, retiredPlayers);
 
             if (!string.IsNullOrWhiteSpace(dto.CurrentDate))
             {
@@ -429,12 +468,45 @@ namespace ProBasketballManager.Persistence
                 }
             }
 
+            var managedTeamIds = dto.ManagedTeamIds != null && dto.ManagedTeamIds.Count > 0 ? dto.ManagedTeamIds.ToList() : new List<int> { userTeam.Id };
+
+            foreach (var managedTeamId in managedTeamIds)
+            {
+                if (!teams.ContainsKey(managedTeamId))
+                {
+                    throw new SaveGameException($"The save file marks an unknown team as managed (id {managedTeamId}).");
+                }
+            }
+
+            var tactics = new Dictionary<int, TeamTactics>();
+            var rotations = new Dictionary<int, TeamRotation>();
+
+            foreach (var setup in dto.TeamSetups ?? new List<TeamSetupDto>())
+            {
+                var setupTeam = Resolve(teams, setup.TeamId, "team setup");
+
+                var setupRules = career.GetSeasonFor(setupTeam)?.Rules ?? season.Rules;
+
+                if (setup.Tactics != null)
+                {
+                    tactics[setup.TeamId] = FromDto(setup.Tactics);
+                }
+
+                if (setup.Rotation != null)
+                {
+                    rotations[setup.TeamId] = FromDto(setup.Rotation, teams, players, setupRules);
+                }
+            }
+
             return new GameSessionSnapshot
             {
                 Career = career,
                 UserTeam = userTeam,
+                ManagedTeamIds = managedTeamIds,
+                Tactics = tactics,
+                Rotations = rotations,
                 UserTactics = FromDto(dto.UserTactics),
-                UserRotation = FromDto(dto.UserRotation, teams, players, season.Rules),
+                UserRotation = FromDto(dto.UserRotation, teams, players, career.GetSeasonFor(userTeam)?.Rules ?? season.Rules),
                 NextSeed = dto.NextSeed,
                 CurrentFixtureRecorded = dto.CurrentFixtureRecorded
             };
@@ -474,7 +546,7 @@ namespace ProBasketballManager.Persistence
                     entry.Turnovers))
                 .ToList();
 
-            return new CompletedSeason(dto.Id, dto.Name, standings, statistics);
+            return new CompletedSeason(dto.Id, dto.CompetitionId, dto.Name, standings, statistics);
         }
 
         private static Club FromDto(ClubDto dto)
@@ -678,6 +750,57 @@ namespace ProBasketballManager.Persistence
                 dto.AwayScore,
                 offensiveAction,
                 shotZone);
+        }
+
+        private static void UpgradeAbilityScale(SaveGameDto dto)
+        {
+            if (dto.SchemaVersion >= 9)
+            {
+                return;
+            }
+
+            var players = new List<PlayerDto>();
+
+            if (dto.Clubs != null)
+            {
+                players.AddRange(dto.Clubs.Where(club => club.Squad != null).SelectMany(club => club.Squad));
+            }
+
+            if (dto.League != null && dto.League.Teams != null)
+            {
+                players.AddRange(dto.League.Teams.Where(team => team.Players != null).SelectMany(team => team.Players));
+            }
+
+            if (dto.RetiredPlayers != null)
+            {
+                players.AddRange(dto.RetiredPlayers);
+            }
+
+            foreach (var player in players)
+            {
+                player.Potential = ScaleLegacyAbility(player.Potential);
+                player.ScoutedPotential = ScaleLegacyAbility(player.ScoutedPotential);
+            }
+        }
+
+        private static int ScaleLegacyAbility(int legacyValue)
+        {
+            return legacyValue <= 0 ? 0 : PlayerRating.ClampAbility(legacyValue * (int)PlayerRating.AbilityPerAttributePoint);
+        }
+
+        private static League ResolveLeagueFor(SeasonDto dto, Dictionary<int, League> leagues, League fallback)
+        {
+            if (dto.CompetitionId == 0)
+            {
+                return fallback;
+            }
+
+            if (!leagues.TryGetValue(dto.CompetitionId, out var league))
+            {
+                throw new SaveGameException($"Season '{dto.Name}' refers to an unknown competition (id {dto.CompetitionId}).");
+            }
+
+            return league;
         }
 
         private static DateTime ParseFixtureDate(FixtureDto dto, League league)

@@ -93,13 +93,13 @@ namespace ProBasketballManager.Domain.Demo
 
         private static int GetStartingPotential(PlayerPosition position, int offenseModifier, int defenseModifier, int shootingModifier, int rosterIndex, int qualityModifier, bool youngRoster)
         {
-            var current = Player.GetOverallRating(CreateAttributes(position, offenseModifier, defenseModifier, shootingModifier, rosterIndex, qualityModifier));
+            var current = PlayerRating.CalculateCurrentAbility(position, CreateAttributes(position, offenseModifier, defenseModifier, shootingModifier, rosterIndex, qualityModifier));
 
             var age = GetStartingAge(rosterIndex, youngRoster);
 
             var upside = age <= 21 ? 6 : age <= 24 ? 4 : age <= 27 ? 2 : 0;
 
-            return PlayerAttributes.Clamp(current + upside);
+            return PlayerRating.ClampAbility(current + PlayerRating.FromAttributePoints(upside));
         }
 
         private static PlayerAttributes CreateAttributes(PlayerPosition position, int offenseModifier, int defenseModifier, int shootingModifier, int playerIndex, int qualityModifier)

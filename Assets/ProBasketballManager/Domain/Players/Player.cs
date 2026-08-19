@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace ProBasketballManager.Domain.Players
 {
@@ -24,7 +24,11 @@ namespace ProBasketballManager.Domain.Players
 
         public string FullName => $"{FirstName} {LastName}";
 
-        public int RemainingUpside => Math.Max(0, Potential - GetOverallRating(Attributes));
+        public int CurrentAbility => PlayerRating.CalculateCurrentAbility(Position, Attributes);
+
+        public int Overall => PlayerAttributes.Clamp(PlayerRating.ToAttributePoints(CurrentAbility));
+
+        public int RemainingUpside => Math.Max(0, Potential - CurrentAbility);
 
         public Player(int id, string firstName, string lastName, PlayerPosition position, PlayerAttributes attributes, int age = DefaultAge, int potential = 0, int scoutedPotential = 0)
         {
@@ -36,8 +40,8 @@ namespace ProBasketballManager.Domain.Players
 
             Age = age;
 
-            Potential = potential <= 0 ? EstimateCeiling(attributes) : PlayerAttributes.Clamp(potential);
-            ScoutedPotential = scoutedPotential <= 0 ? Potential : PlayerAttributes.Clamp(scoutedPotential);
+            Potential = potential <= 0 ? EstimateCeiling(position, attributes) : PlayerRating.ClampAbility(potential);
+            ScoutedPotential = scoutedPotential <= 0 ? Potential : PlayerRating.ClampAbility(scoutedPotential);
         }
 
         public void ApplyDevelopment(PlayerAttributes developedAttributes)
@@ -50,24 +54,9 @@ namespace ProBasketballManager.Domain.Players
             Age++;
         }
 
-        public static int GetOverallRating(PlayerAttributes attributes)
+        private static int EstimateCeiling(PlayerPosition position, PlayerAttributes attributes)
         {
-            var total =
-                attributes.Finishing + attributes.MidRange + attributes.ThreePoint + attributes.FreeThrow +
-                attributes.Passing + attributes.BallHandling +
-                attributes.PerimeterDefense + attributes.InteriorDefense +
-                attributes.OffensiveRebounding + attributes.DefensiveRebounding +
-                attributes.Speed + attributes.Strength + attributes.Stamina +
-                attributes.BasketballIq;
-
-            return PlayerAttributes.Clamp(total / 14.0);
-        }
-
-        public int Overall => GetOverallRating(Attributes);
-
-        private static int EstimateCeiling(PlayerAttributes attributes)
-        {
-            return GetOverallRating(attributes);
+            return PlayerRating.CalculateCurrentAbility(position, attributes);
         }
     }
 }

@@ -14,6 +14,10 @@ namespace ProBasketballManager.Persistence
 
         public List<ClubDto> Clubs = new List<ClubDto>();
 
+        public List<LeagueDto> Leagues = new List<LeagueDto>();
+
+        public List<SeasonDto> Seasons = new List<SeasonDto>();
+
         public LeagueDto League;
 
         public SeasonDto Season;
@@ -24,6 +28,10 @@ namespace ProBasketballManager.Persistence
 
         public int UserClubId;
         public int UserTeamId;
+
+        public List<int> ManagedTeamIds = new List<int>();
+
+        public List<TeamSetupDto> TeamSetups = new List<TeamSetupDto>();
 
         public TeamTacticsDto UserTactics;
         public TeamRotationDto UserRotation;
@@ -51,6 +59,13 @@ namespace ProBasketballManager.Persistence
         public List<int> TeamIds = new List<int>();
 
         public List<LegacyTeamDto> Teams;
+    }
+
+    public sealed class TeamSetupDto
+    {
+        public int TeamId;
+        public TeamTacticsDto Tactics;
+        public TeamRotationDto Rotation;
     }
 
     public sealed class CompetitionCalendarDto
@@ -114,6 +129,7 @@ namespace ProBasketballManager.Persistence
     public sealed class CompletedSeasonDto
     {
         public int Id;
+        public int CompetitionId;
         public string Name;
         public List<ArchivedStandingDto> FinalStandings = new List<ArchivedStandingDto>();
         public List<ArchivedPlayerSeasonDto> PlayerStatistics = new List<ArchivedPlayerSeasonDto>();
@@ -154,6 +170,7 @@ namespace ProBasketballManager.Persistence
     public sealed class SeasonDto
     {
         public int Id;
+        public int CompetitionId;
         public string Name;
 
         public CompetitionRulesDto Rules;

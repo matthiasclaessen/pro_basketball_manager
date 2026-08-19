@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using ProBasketballManager.Domain.Matches;
 
 namespace ProBasketballManager.Domain.Players
@@ -32,10 +32,10 @@ namespace ProBasketballManager.Domain.Players
                 return false;
             }
 
-            return random.NextDouble() < GetRetirementChance(player.Age, player.Overall);
+            return random.NextDouble() < GetRetirementChance(player.Age, player.CurrentAbility);
         }
 
-        public static double GetRetirementChance(int age, int overall)
+        public static double GetRetirementChance(int age, int currentAbility)
         {
             if (age >= MandatoryRetirementAge)
             {
@@ -51,7 +51,7 @@ namespace ProBasketballManager.Domain.Players
 
             var chance = BaseRetirementChance + (yearsPast * RetirementChanceGrowth);
 
-            chance -= (overall - PlayerAttributes.Average) * QualityReprieve;
+            chance -= (PlayerRating.ToAttributePoints(currentAbility) - PlayerAttributes.Average) * QualityReprieve;
 
             return Math.Max(0.0, Math.Min(1.0, chance));
         }
@@ -94,10 +94,10 @@ namespace ProBasketballManager.Domain.Players
             var baseRating = random.NextInt(MinimumStartingRating, MaximumStartingRating + 1);
             var upside = random.NextInt(MinimumUpside, MaximumUpside + 1);
 
-            var potential = PlayerAttributes.Clamp(baseRating + upside);
+            var potential = PlayerRating.FromAttributePoints(baseRating + upside);
 
             var scoutingError = random.NextInt(-MaximumScoutingError, MaximumScoutingError + 1);
-            var scoutedPotential = PlayerAttributes.Clamp(potential + scoutingError);
+            var scoutedPotential = PlayerRating.ClampAbility(potential + (int)(scoutingError * PlayerRating.AbilityPerAttributePoint));
 
             var attributes = CreateAttributes(baseRating, position, random);
 
