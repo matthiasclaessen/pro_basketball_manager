@@ -194,7 +194,7 @@ namespace ProBasketballManager.Persistence
             {
                 Id = team.Id,
                 Name = team.Name,
-                Level = team.Level.ToString(),
+                Type = team.Type.ToString(),
                 PlayerIds = team.Players.Select(player => player.Id).ToList()
             };
         }
@@ -575,7 +575,7 @@ namespace ProBasketballManager.Persistence
         {
             var players = dto.PlayerIds.Select(id => Resolve(squad, id, $"player on team '{dto.Name}'")).ToList();
 
-            return new Team(dto.Id, dto.Name, players, clubId, ParseEnum<TeamType>(dto.Level, "team level"));
+            return new Team(dto.Id, dto.Name, players, clubId, ParseEnum<TeamType>(dto.Type, "team type"));
         }
 
         private static League FromDto(LeagueDto dto, Dictionary<int, Team> teams, List<Club> clubs)

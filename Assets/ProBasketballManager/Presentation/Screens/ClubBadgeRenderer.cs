@@ -10,10 +10,10 @@ namespace ProBasketballManager.Presentation.Screens
 
         private static readonly string[] FallbackTemplates =
         {
-            "roundel-ball", "roundel-crest", "shield-stars-ball", "shield-sword",
-            "shield-crown-banner", "shield-rose-scroll", "roundel-crown-stripes", "shield-crossed-swords",
-            "shield-ship", "shield-castle-ball", "oval-star-banner", "shield-stripes",
-            "shield-crown-quarters", "roundel-rose"
+            "heater-pale", "heater-fess", "heater-bend", "heater-cross",
+            "heater-saltire", "heater-chevron", "heater-quarterly", "heater-chief-mullets",
+            "heater-barry", "heater-paly", "heater-bendy-shaded", "heater-lozenge",
+            "roundel-annulet", "roundel-gyronny", "oval-pale-mullet"
         };
 
         private static readonly Dictionary<int, Texture2D> Cache = new Dictionary<int, Texture2D>();

@@ -12,14 +12,14 @@ namespace ProBasketballManager.Domain.Demo
             return Create(DemoClubFactory.Create(), TeamType.First, rules);
         }
 
-        public static Season Create(IReadOnlyList<Club> clubs, TeamType level, CompetitionRules rules = null)
+        public static Season Create(IReadOnlyList<Club> clubs, TeamType type, CompetitionRules rules = null)
         {
             var effectiveRules = rules ?? CompetitionRules.Fiba;
 
-            var league = DemoLeagueFactory.CreateFrom(clubs, level);
+            var league = DemoLeagueFactory.CreateFrom(clubs, type);
             var fixtures = RoundRobinScheduleGenerator.Generate(league, effectiveRules);
 
-            return new Season(level == TeamType.First ? 1 : 2, "2026 / 27", league, fixtures, effectiveRules);
+            return new Season(type == TeamType.First ? 1 : 2, "2026 / 27", league, fixtures, effectiveRules);
         }
     }
 }

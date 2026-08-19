@@ -93,7 +93,7 @@ namespace ProBasketballManager.Persistence
     {
         public int Id;
         public string Name;
-        public string Level;
+        public string Type;
         public List<int> PlayerIds = new List<int>();
     }
 
