@@ -16,10 +16,6 @@ namespace ProBasketballManager.Presentation.Screens
 
             badge.style.width = diameter;
             badge.style.height = diameter;
-            badge.style.borderTopLeftRadius = diameter / 2f;
-            badge.style.borderTopRightRadius = diameter / 2f;
-            badge.style.borderBottomLeftRadius = diameter / 2f;
-            badge.style.borderBottomRightRadius = diameter / 2f;
 
             if (club == null)
             {

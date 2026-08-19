@@ -11,7 +11,7 @@
       "PrimaryColor": "#E4032E",
       "SecondaryColor": "#FFD500",
       "TertiaryColor": "#FFFFFF",
-      "BadgeTemplate": "roundel-ball"
+      "BadgeTemplate": "heater-barry"
     },
     {
       "Id": 2,
@@ -21,17 +21,17 @@
       "PrimaryColor": "#E30613",
       "SecondaryColor": "#FFFFFF",
       "TertiaryColor": "#0A0A0A",
-      "BadgeTemplate": "shield-sword"
+      "BadgeTemplate": "heater-bend"
     },
     {
       "Id": 3,
       "Name": "Kangoeroes Mechelen",
       "ShortName": "MEC",
       "City": "Mechelen",
-      "PrimaryColor": "#D2122E",
+      "PrimaryColor": "#0050A0",
       "SecondaryColor": "#FFFFFF",
-      "TertiaryColor": "#0A0A0A",
-      "BadgeTemplate": "roundel-crown-stripes"
+      "TertiaryColor": "#E00010",
+      "BadgeTemplate": "heater-bendy-shaded"
     },
     {
       "Id": 4,
@@ -41,7 +41,7 @@
       "PrimaryColor": "#C8102E",
       "SecondaryColor": "#FFFFFF",
       "TertiaryColor": "#003DA5",
-      "BadgeTemplate": "shield-castle-ball"
+      "BadgeTemplate": "heater-chevron"
     },
     {
       "Id": 5,
@@ -51,17 +51,17 @@
       "PrimaryColor": "#0A0A0A",
       "SecondaryColor": "#F57C00",
       "TertiaryColor": "#FFFFFF",
-      "BadgeTemplate": "shield-crown-quarters"
+      "BadgeTemplate": "heater-chief-mullets"
     },
     {
       "Id": 6,
       "Name": "Spirou Charleroi",
       "ShortName": "CHA",
       "City": "Charleroi",
-      "PrimaryColor": "#0A0A0A",
-      "SecondaryColor": "#FFCE00",
-      "TertiaryColor": "#FFFFFF",
-      "BadgeTemplate": "shield-stripes"
+      "PrimaryColor": "#E00010",
+      "SecondaryColor": "#FFFFFF",
+      "TertiaryColor": "#141414",
+      "BadgeTemplate": "heater-cross"
     },
     {
       "Id": 7,
@@ -71,17 +71,17 @@
       "PrimaryColor": "#0033A0",
       "SecondaryColor": "#FFFFFF",
       "TertiaryColor": "#0A0A0A",
-      "BadgeTemplate": "shield-stars-ball"
+      "BadgeTemplate": "heater-fess"
     },
     {
       "Id": 8,
       "Name": "Kortrijk Spurs",
       "ShortName": "KOR",
       "City": "Kortrijk",
-      "PrimaryColor": "#C8102E",
+      "PrimaryColor": "#E02010",
       "SecondaryColor": "#FFFFFF",
-      "TertiaryColor": "#0A0A0A",
-      "BadgeTemplate": "shield-crossed-swords"
+      "TertiaryColor": "#000000",
+      "BadgeTemplate": "heater-lozenge"
     },
     {
       "Id": 9,
@@ -91,27 +91,27 @@
       "PrimaryColor": "#0053A0",
       "SecondaryColor": "#FFFFFF",
       "TertiaryColor": "#7AC943",
-      "BadgeTemplate": "shield-rose-scroll"
+      "BadgeTemplate": "heater-pale"
     },
     {
       "Id": 10,
       "Name": "Liege Basket",
       "ShortName": "LIE",
       "City": "Liege",
-      "PrimaryColor": "#0A0A0A",
+      "PrimaryColor": "#101030",
       "SecondaryColor": "#FFFFFF",
-      "TertiaryColor": "#E4032E",
-      "BadgeTemplate": "oval-star-banner"
+      "TertiaryColor": "#E08030",
+      "BadgeTemplate": "heater-quarterly"
     },
     {
       "Id": 11,
       "Name": "Brussels Basketball",
       "ShortName": "BRU",
       "City": "Brussels",
-      "PrimaryColor": "#0033A0",
-      "SecondaryColor": "#FFD100",
-      "TertiaryColor": "#FFFFFF",
-      "BadgeTemplate": "shield-ship"
+      "PrimaryColor": "#E01020",
+      "SecondaryColor": "#FFFFFF",
+      "TertiaryColor": "#283030",
+      "BadgeTemplate": "roundel-annulet"
     }
   ],
   "Teams": [
@@ -551,10 +551,10 @@
       "Potential": 178,
       "ScoutedPotential": 173,
       "Attributes": {
-        "Finishing": 17,
+        "Finishing": 19,
         "MidRange": 19,
         "ThreePoint": 20,
-        "FreeThrow": 18,
+        "FreeThrow": 20,
         "Passing": 20,
         "BallHandling": 20,
         "PerimeterDefense": 20,
@@ -562,7 +562,7 @@
         "OffensiveRebounding": 13,
         "DefensiveRebounding": 14,
         "Speed": 20,
-        "Strength": 13,
+        "Strength": 18,
         "Stamina": 17,
         "BasketballIq": 20
       }
