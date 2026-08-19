@@ -47,6 +47,10 @@ namespace ProBasketballManager.Persistence
     {
         public int Id;
         public string Name;
+        public string ShortName;
+        public string City;
+        public string PrimaryColor;
+        public string SecondaryColor;
         public List<PlayerDto> Squad = new List<PlayerDto>();
         public List<TeamDto> Teams = new List<TeamDto>();
     }
@@ -98,6 +102,7 @@ namespace ProBasketballManager.Persistence
         public string LastName;
 
         public string Position;
+        public string Nationality;
 
         public PlayerAttributesDto Attributes;
 

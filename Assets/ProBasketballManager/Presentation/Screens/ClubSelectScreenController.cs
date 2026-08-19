@@ -111,6 +111,10 @@ namespace ProBasketballManager.Presentation.Screens
             var detail = new Label($"{club.Squad.Count} players");
             detail.AddToClassList("club-select-item-detail");
 
+            var badge = ClubIdentityElements.CreateBadge(club, 34);
+            badge.AddToClassList("club-select-item-badge");
+
+            row.Add(badge);
             row.Add(name);
             row.Add(detail);
 

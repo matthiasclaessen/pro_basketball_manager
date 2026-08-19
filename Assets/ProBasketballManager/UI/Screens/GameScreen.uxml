@@ -23,6 +23,7 @@
         </ui:VisualElement>
         <ui:VisualElement class="main">
             <ui:VisualElement class="topbar">
+                <ui:VisualElement name="topbar-badge" class="topbar-badge" />
                 <ui:VisualElement>
                     <ui:Label name="club-name" text="Club" class="topbar-club-name" />
                     <ui:Label name="league-name" text="League" class="topbar-league-name" />

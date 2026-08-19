@@ -1892,7 +1892,6 @@
 
 .club-select-header {
     flex-direction: row;
-    align-items: baseline;
     margin-bottom: 4px;
 }
 
@@ -1955,4 +1954,39 @@
     align-self: flex-start;
     padding: 8px 20px;
     font-size: 13px;
+}
+
+.club-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.club-badge-initials {
+    font-size: 10px;
+}
+
+.player-flag {
+    flex-shrink: 0;
+    margin-right: 8px;
+    border-width: 1px;
+    border-color: rgb(226, 232, 240);
+    background-size: 100% 100%;
+}
+
+.player-flag-missing {
+    background-color: rgb(226, 232, 240);
+}
+
+.squad-row-identity {
+    flex-direction: row;
+    align-items: center;
+}
+
+.club-select-item-badge {
+    margin-right: 12px;
+}
+
+.topbar-badge {
+    margin-right: 10px;
 }

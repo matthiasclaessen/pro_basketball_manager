@@ -12,6 +12,8 @@ namespace ProBasketballManager.Presentation.Screens
         /// <summary>Raised when the manager asks to play the next fixture.</summary>
         public event Action MatchCentreRequested;
 
+        private VisualElement _topbarBadge;
+
         private Label _clubNameLabel;
         private Label _leagueNameLabel;
         private Label _seasonNameLabel;
@@ -36,6 +38,8 @@ namespace ProBasketballManager.Presentation.Screens
 
         protected override void FindControls(VisualElement documentRoot)
         {
+            _topbarBadge = documentRoot.Q<VisualElement>("topbar-badge");
+
             _clubNameLabel = documentRoot.Q<Label>("club-name");
             _leagueNameLabel = documentRoot.Q<Label>("league-name");
             _seasonNameLabel = documentRoot.Q<Label>("season-name");
@@ -92,6 +96,12 @@ namespace ProBasketballManager.Presentation.Screens
 
             var season = Session.Season;
             var userTeam = Session.UserTeam;
+
+            if (_topbarBadge != null)
+            {
+                _topbarBadge.Clear();
+                _topbarBadge.Add(ClubIdentityElements.CreateBadge(Session.UserClub, 28));
+            }
 
             _clubNameLabel.text = userTeam.Name;
             _leagueNameLabel.text = season.League.Name;

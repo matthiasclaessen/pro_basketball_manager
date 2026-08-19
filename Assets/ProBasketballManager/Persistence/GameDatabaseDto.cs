@@ -20,6 +20,9 @@ namespace ProBasketballManager.Persistence
         public string Name;
         public string ShortName;
         public string City;
+        public string PrimaryColor;
+        public string SecondaryColor;
+        public string LogoFile;
     }
 
     public sealed class DatabaseTeamDto
@@ -38,6 +41,7 @@ namespace ProBasketballManager.Persistence
         public string FirstName;
         public string LastName;
         public string Position;
+        public string Nationality;
         public int Age;
         public int Potential;
         public int ScoutedPotential;

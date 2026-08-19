@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace ProBasketballManager.Domain.Players
 {
@@ -13,6 +14,8 @@ namespace ProBasketballManager.Domain.Players
         public string LastName { get; }
 
         public PlayerPosition Position { get; }
+
+        public string Nationality { get; }
 
         public PlayerAttributes Attributes { get; private set; }
 
@@ -30,12 +33,15 @@ namespace ProBasketballManager.Domain.Players
 
         public int RemainingUpside => Math.Max(0, Potential - CurrentAbility);
 
-        public Player(int id, string firstName, string lastName, PlayerPosition position, PlayerAttributes attributes, int age = DefaultAge, int potential = 0, int scoutedPotential = 0)
+        public const string DefaultNationality = "BEL";
+
+        public Player(int id, string firstName, string lastName, PlayerPosition position, PlayerAttributes attributes, int age = DefaultAge, int potential = 0, int scoutedPotential = 0, string nationality = DefaultNationality)
         {
             Id = id;
             FirstName = firstName;
             LastName = lastName;
             Position = position;
+            Nationality = NormaliseNationality(nationality);
             Attributes = attributes ?? throw new ArgumentNullException(nameof(attributes));
 
             Age = age;
@@ -52,6 +58,23 @@ namespace ProBasketballManager.Domain.Players
         public void AdvanceAge()
         {
             Age++;
+        }
+
+        private static string NormaliseNationality(string nationality)
+        {
+            if (string.IsNullOrWhiteSpace(nationality))
+            {
+                return DefaultNationality;
+            }
+
+            var trimmed = nationality.Trim().ToUpperInvariant();
+
+            if (trimmed.Length != 3 || !trimmed.All(char.IsLetter))
+            {
+                throw new ArgumentException($"'{nationality}' is not a three-letter country code.", nameof(nationality));
+            }
+
+            return trimmed;
         }
 
         private static int EstimateCeiling(PlayerPosition position, PlayerAttributes attributes)

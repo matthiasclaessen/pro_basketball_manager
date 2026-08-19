@@ -154,7 +154,7 @@ namespace ProBasketballManager.Persistence
 
                 try
                 {
-                    clubs.Add(new Club(clubDto.Id, clubDto.Name, squad, teams));
+                    clubs.Add(new Club(clubDto.Id, clubDto.Name, squad, teams, clubDto.ShortName, clubDto.City, clubDto.PrimaryColor, clubDto.SecondaryColor));
                 }
                 catch (ArgumentException exception)
                 {
@@ -254,7 +254,7 @@ namespace ProBasketballManager.Persistence
                     dto.Attributes.OffensiveRebounding, dto.Attributes.DefensiveRebounding,
                     dto.Attributes.Speed, dto.Attributes.Strength, dto.Attributes.Stamina, dto.Attributes.BasketballIq);
 
-                return new Player(dto.Id, dto.FirstName, dto.LastName, position, attributes, dto.Age <= 0 ? Player.DefaultAge : dto.Age, dto.Potential, dto.ScoutedPotential);
+                return new Player(dto.Id, dto.FirstName, dto.LastName, position, attributes, dto.Age <= 0 ? Player.DefaultAge : dto.Age, dto.Potential, dto.ScoutedPotential, dto.Nationality);
             }
             catch (ArgumentException exception)
             {

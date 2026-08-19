@@ -15,13 +15,21 @@ namespace ProBasketballManager.Domain.Clubs
 
         public string Name { get; }
 
+        public string ShortName { get; }
+
+        public string City { get; }
+
+        public string PrimaryColor { get; }
+
+        public string SecondaryColor { get; }
+
         public IReadOnlyList<Player> Squad => _squad;
 
         public IReadOnlyList<Team> Teams => _teams;
 
         public Team FirstTeam => GetTeam(TeamType.First);
 
-        public Club(int id, string name, IEnumerable<Player> squad, IEnumerable<Team> teams)
+        public Club(int id, string name, IEnumerable<Player> squad, IEnumerable<Team> teams, string shortName = null, string city = null, string primaryColor = null, string secondaryColor = null)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -40,6 +48,10 @@ namespace ProBasketballManager.Domain.Clubs
 
             Id = id;
             Name = name;
+            ShortName = string.IsNullOrWhiteSpace(shortName) ? BuildInitials(name) : shortName.Trim().ToUpperInvariant();
+            City = city;
+            PrimaryColor = string.IsNullOrWhiteSpace(primaryColor) ? "#1E293B" : primaryColor;
+            SecondaryColor = string.IsNullOrWhiteSpace(secondaryColor) ? "#F8FAFC" : secondaryColor;
 
             _squad = squad.ToList();
             _teams = teams.ToList();
@@ -47,21 +59,38 @@ namespace ProBasketballManager.Domain.Clubs
             Validate();
         }
 
-        public Team GetTeam(TeamType type)
+        public static string BuildInitials(string name)
         {
-            var team = _teams.FirstOrDefault(candidate => candidate.Type == type);
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return "?";
+            }
+
+            var words = name.Split(new[] { ' ', '-' }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (words.Length == 1)
+            {
+                return words[0].Substring(0, Math.Min(3, words[0].Length)).ToUpperInvariant();
+            }
+
+            return string.Concat(words.Take(3).Select(word => word[0])).ToUpperInvariant();
+        }
+
+        public Team GetTeam(TeamType level)
+        {
+            var team = _teams.FirstOrDefault(candidate => candidate.Type == level);
 
             if (team == null)
             {
-                throw new InvalidOperationException($"{Name} does not field a {type} team.");
+                throw new InvalidOperationException($"{Name} does not field a {level} team.");
             }
 
             return team;
         }
 
-        public bool HasTeam(TeamType type)
+        public bool HasTeam(TeamType level)
         {
-            return _teams.Any(candidate => candidate.Type == type);
+            return _teams.Any(candidate => candidate.Type == level);
         }
 
         public IReadOnlyList<Team> GetTeamsFor(int playerId)

@@ -14,7 +14,7 @@ namespace ProBasketballManager.Persistence
 {
     public static class SaveGameMapper
     {
-        public const int CurrentSchemaVersion = 9;
+        public const int CurrentSchemaVersion = 10;
 
         public const int MinimumReadableSchemaVersion = 1;
 
@@ -116,6 +116,10 @@ namespace ProBasketballManager.Persistence
             {
                 Id = club.Id,
                 Name = club.Name,
+                ShortName = club.ShortName,
+                City = club.City,
+                PrimaryColor = club.PrimaryColor,
+                SecondaryColor = club.SecondaryColor,
                 Squad = club.Squad.Select(ToDto).ToList(),
                 Teams = club.Teams.Select(ToDto).ToList()
             };
@@ -201,6 +205,7 @@ namespace ProBasketballManager.Persistence
                 FirstName = player.FirstName,
                 LastName = player.LastName,
                 Position = player.Position.ToString(),
+                Nationality = player.Nationality,
                 Attributes = ToDto(player.Attributes),
                 Age = player.Age,
                 Potential = player.Potential,
@@ -561,7 +566,7 @@ namespace ProBasketballManager.Persistence
 
             var teams = (dto.Teams ?? new List<TeamDto>()).Select(team => FromDto(team, dto.Id, squadById)).ToList();
 
-            return new Club(dto.Id, dto.Name, squad, teams);
+            return new Club(dto.Id, dto.Name, squad, teams, dto.ShortName, dto.City, dto.PrimaryColor, dto.SecondaryColor);
         }
 
         private static Team FromDto(TeamDto dto, int clubId, Dictionary<int, Player> squad)
@@ -604,7 +609,8 @@ namespace ProBasketballManager.Persistence
                 FromDto(dto.Attributes),
                 dto.Age <= 0 ? Player.DefaultAge : dto.Age,
                 dto.Potential,
-                dto.ScoutedPotential);
+                dto.ScoutedPotential,
+                string.IsNullOrWhiteSpace(dto.Nationality) ? Player.DefaultNationality : dto.Nationality);
         }
 
         private static PlayerAttributes FromDto(PlayerAttributesDto dto)

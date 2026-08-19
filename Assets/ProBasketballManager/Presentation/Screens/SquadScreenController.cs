@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using ProBasketballManager.Domain.Players;
 using ProBasketballManager.Domain.Statistics;
@@ -109,23 +109,7 @@ namespace ProBasketballManager.Presentation.Screens
             var row = new VisualElement();
             row.AddToClassList("squad-row");
 
-            var role = ScreenFormatting.GetSquadRole(Session.UserRotation, assignment);
-
-            if (role == ScreenFormatting.StarterRole)
-            {
-                row.AddToClassList("squad-row-starter");
-            }
-            else if (role == ScreenFormatting.ReserveRole)
-            {
-                row.AddToClassList("squad-row-reserve");
-            }
-
-            var roleBadge = ScreenFormatting.CreateLabel(role, "squad-role-column");
-            roleBadge.AddToClassList("squad-role-badge");
-            ScreenFormatting.ApplyRoleClass(roleBadge, role);
-
             row.Add(ScreenFormatting.CreateLabel(statistics.Player.FullName, "squad-player-column"));
-            row.Add(roleBadge);
             row.Add(ScreenFormatting.CreateLabel(ScreenFormatting.GetPositionAbbreviation(statistics.Player.Position), "squad-position-column"));
             row.Add(ScreenFormatting.CreateLabel(statistics.Player.Age.ToString(), "squad-small-column"));
             row.Add(CreatePotentialLabel(statistics.Player));

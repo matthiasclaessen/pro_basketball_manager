@@ -14,22 +14,24 @@ namespace ProBasketballManager.Persistence
             public string Name;
             public string ShortName;
             public string City;
+            public string PrimaryColor;
+            public string SecondaryColor;
             public double Strength;
         }
 
         private static readonly ClubSeed[] Clubs =
         {
-            new ClubSeed { Id = 1, Name = "Oostende", ShortName = "OOS", City = "Oostende", Strength = 2.6 },
-            new ClubSeed { Id = 2, Name = "Antwerp Giants", ShortName = "ANT", City = "Antwerp", Strength = 2.3 },
-            new ClubSeed { Id = 3, Name = "Kangoeroes Mechelen", ShortName = "MEC", City = "Mechelen", Strength = 1.5 },
-            new ClubSeed { Id = 4, Name = "Limburg United", ShortName = "LIM", City = "Hasselt", Strength = 0.8 },
-            new ClubSeed { Id = 5, Name = "Leuven Bears", ShortName = "LEU", City = "Leuven", Strength = 0.3 },
-            new ClubSeed { Id = 6, Name = "Spirou Charleroi", ShortName = "CHA", City = "Charleroi", Strength = 0.0 },
-            new ClubSeed { Id = 7, Name = "Okapi Aalst", ShortName = "AAL", City = "Aalst", Strength = -0.4 },
-            new ClubSeed { Id = 8, Name = "Kortrijk Spurs", ShortName = "KOR", City = "Kortrijk", Strength = -0.8 },
-            new ClubSeed { Id = 9, Name = "Mons-Hainaut", ShortName = "MON", City = "Mons", Strength = -1.2 },
-            new ClubSeed { Id = 10, Name = "Liege Basket", ShortName = "LIE", City = "Liege", Strength = -1.7 },
-            new ClubSeed { Id = 11, Name = "Brussels Basketball", ShortName = "BRU", City = "Brussels", Strength = -2.2 }
+            new ClubSeed { Id = 1, PrimaryColor = "#FFD500", SecondaryColor = "#E30613", Name = "Oostende", ShortName = "OOS", City = "Oostende", Strength = 2.6 },
+            new ClubSeed { Id = 2, PrimaryColor = "#0B5FA5", SecondaryColor = "#FFFFFF", Name = "Antwerp Giants", ShortName = "ANT", City = "Antwerp", Strength = 2.3 },
+            new ClubSeed { Id = 3, PrimaryColor = "#E4022A", SecondaryColor = "#111827", Name = "Kangoeroes Mechelen", ShortName = "MEC", City = "Mechelen", Strength = 1.5 },
+            new ClubSeed { Id = 4, PrimaryColor = "#0F7B4A", SecondaryColor = "#FFFFFF", Name = "Limburg United", ShortName = "LIM", City = "Hasselt", Strength = 0.8 },
+            new ClubSeed { Id = 5, PrimaryColor = "#7B2D8E", SecondaryColor = "#F5B301", Name = "Leuven Bears", ShortName = "LEU", City = "Leuven", Strength = 0.3 },
+            new ClubSeed { Id = 6, PrimaryColor = "#0A0A0A", SecondaryColor = "#FFC300", Name = "Spirou Charleroi", ShortName = "CHA", City = "Charleroi", Strength = 0.0 },
+            new ClubSeed { Id = 7, PrimaryColor = "#C8102E", SecondaryColor = "#FFFFFF", Name = "Okapi Aalst", ShortName = "AAL", City = "Aalst", Strength = -0.4 },
+            new ClubSeed { Id = 8, PrimaryColor = "#1D4ED8", SecondaryColor = "#F97316", Name = "Kortrijk Spurs", ShortName = "KOR", City = "Kortrijk", Strength = -0.8 },
+            new ClubSeed { Id = 9, PrimaryColor = "#B01B2E", SecondaryColor = "#FFFFFF", Name = "Mons-Hainaut", ShortName = "MON", City = "Mons", Strength = -1.2 },
+            new ClubSeed { Id = 10, PrimaryColor = "#E4032E", SecondaryColor = "#111827", Name = "Liege Basket", ShortName = "LIE", City = "Liege", Strength = -1.7 },
+            new ClubSeed { Id = 11, PrimaryColor = "#0E7490", SecondaryColor = "#FDE047", Name = "Brussels Basketball", ShortName = "BRU", City = "Brussels", Strength = -2.2 }
         };
 
         private static readonly double[] RoleModifiers = { 4.2, 2.8, 2.0, 1.4, 0.8, 0.1, -0.5, -1.2, -1.9, -2.6, -3.4, -4.2 };
@@ -72,7 +74,7 @@ namespace ProBasketballManager.Persistence
 
             foreach (var club in Clubs)
             {
-                database.Clubs.Add(new DatabaseClubDto { Id = club.Id, Name = club.Name, ShortName = club.ShortName, City = club.City });
+                database.Clubs.Add(new DatabaseClubDto { Id = club.Id, Name = club.Name, ShortName = club.ShortName, City = club.City, PrimaryColor = club.PrimaryColor, SecondaryColor = club.SecondaryColor });
 
                 var squad = new List<DatabasePlayerDto>();
 
@@ -128,11 +130,38 @@ namespace ProBasketballManager.Persistence
                 FirstName = FirstNames[random.NextInt(0, FirstNames.Length)],
                 LastName = LastNames[random.NextInt(0, LastNames.Length)],
                 Position = position.ToString(),
+                Nationality = PickNationality(random),
                 Age = age,
                 Potential = potential,
                 ScoutedPotential = PlayerRating.ClampAbility(potential + scoutingError),
                 Attributes = ToDto(attributes)
             };
+        }
+
+        private static readonly (string Code, int Weight)[] Nationalities =
+        {
+            ("BEL", 46), ("USA", 16), ("NLD", 8), ("FRA", 7), ("COD", 4),
+            ("ESP", 3), ("SRB", 3), ("LTU", 3), ("DEU", 2), ("ITA", 2),
+            ("SVN", 2), ("GBR", 2), ("SEN", 1), ("TUR", 1)
+        };
+
+        private static string PickNationality(XorShiftRandom random)
+        {
+            var total = Nationalities.Sum(entry => entry.Weight);
+
+            var roll = random.NextInt(0, total);
+
+            foreach (var entry in Nationalities)
+            {
+                roll -= entry.Weight;
+
+                if (roll < 0)
+                {
+                    return entry.Code;
+                }
+            }
+
+            return "BEL";
         }
 
         private static int PickAge(double roleModifier, XorShiftRandom random)

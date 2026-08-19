@@ -92,6 +92,15 @@ namespace ProBasketballManager.Presentation.Screens
                 _mainMenuScreen.LoadRequested += AdoptLoadedGame;
             }
 
+            BindScreen(_clubSelectScreen, nameof(ClubSelectScreenController), _root, null);
+
+            if (_clubSelectScreen != null)
+            {
+                _clubSelectScreen.RegisterCallbacks();
+                _clubSelectScreen.ClubChosen += AdoptNewGame;
+                _clubSelectScreen.Cancelled += ShowMainMenu;
+            }
+
             ShowMainMenu();
         }
 
