@@ -96,6 +96,17 @@
                         </ui:ScrollView>
                     </ui:VisualElement>
                 </ui:VisualElement>
+                <ui:VisualElement name="club-select-screen" class="screen club-select-screen">
+                    <ui:VisualElement class="club-select-header">
+                        <ui:Label text="CHOOSE YOUR CLUB" class="club-select-title" />
+                        <ui:Label name="club-select-database" text="" class="club-select-database" />
+                    </ui:VisualElement>
+                    <ui:Label name="club-select-status" text="" class="club-select-status" />
+                    <ui:ScrollView class="club-select-scroll">
+                        <ui:VisualElement name="club-select-list" class="club-select-list" />
+                    </ui:ScrollView>
+                    <ui:Button name="club-select-back-button" text="Back" class="club-select-back" />
+                </ui:VisualElement>
                 <ui:VisualElement name="save-load-screen" class="screen screen-hidden">
                     <ui:VisualElement class="screen-header">
                         <ui:Label text="Save / Load" class="page-title" />

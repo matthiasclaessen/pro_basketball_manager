@@ -16,6 +16,10 @@ namespace ProBasketballManager.Presentation.Screens
         private MainMenuScreenController _mainMenuScreen;
 
         [SerializeField]
+        [Tooltip("New game: pick a club from the loaded database.")]
+        private ClubSelectScreenController _clubSelectScreen;
+
+        [SerializeField]
         [Tooltip("Save to a slot, or load an existing save mid-game.")]
         private SaveLoadScreenController _saveLoadScreen;
 
@@ -93,7 +97,23 @@ namespace ProBasketballManager.Presentation.Screens
 
         private void StartNewGame()
         {
-            AdoptSession(GameSession.CreateDemo());
+            ShowClubSelect();
+        }
+
+        private void ShowClubSelect()
+        {
+            HideEveryScreenElement();
+            HideAllScreens();
+
+            SetNavigationVisible(false);
+
+            _clubSelectScreen?.Show();
+            _clubSelectScreen?.Render();
+        }
+
+        private void AdoptNewGame(GameDatabase database, int teamId)
+        {
+            AdoptSession(GameSession.CreateNew(database, teamId));
         }
 
         private void AdoptLoadedGame(GameSessionSnapshot snapshot)
@@ -466,6 +486,7 @@ namespace ProBasketballManager.Presentation.Screens
             _closeSeasonScreen?.Hide();
             _saveLoadScreen?.Hide();
             _mainMenuScreen?.Hide();
+            _clubSelectScreen?.Hide();
         }
 
         private void SetActiveNavigation(Button activeButton)
