@@ -130,18 +130,10 @@ GameObject:
   - component: {fileID: 22130508}
   - component: {fileID: 22130507}
   - component: {fileID: 22130506}
-  - component: {fileID: 22130509}
-  - component: {fileID: 22130512}
   - component: {fileID: 22130511}
-  - component: {fileID: 22130510}
-  - component: {fileID: 22130515}
   - component: {fileID: 22130514}
-  - component: {fileID: 22130513}
   - component: {fileID: 22130517}
-  - component: {fileID: 22130516}
-  - component: {fileID: 22130518}
-  - component: {fileID: 22130519}
-  - component: {fileID: 22130520}
+  - component: {fileID: 22130521}
   m_Layer: 5
   m_Name: GameUI
   m_TagString: Untagged
@@ -162,17 +154,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProBasketballManager.Presentation.Screens.GameScreenController
   _mainMenuScreen: {fileID: 22130517}
-  _clubSelectScreen: {fileID: 22130520}
-  _saveLoadScreen: {fileID: 22130516}
+  _loadGameScreen: {fileID: 22130521}
   _dashboardScreen: {fileID: 22130514}
   _squadScreen: {fileID: 22130511}
-  _playerProfileScreen: {fileID: 22130510}
-  _tacticsScreen: {fileID: 22130515}
-  _scheduleScreen: {fileID: 22130512}
-  _leagueScreen: {fileID: 22130509}
-  _matchCentreScreen: {fileID: 22130513}
-  _endOfSeasonScreen: {fileID: 22130518}
-  _closeSeasonScreen: {fileID: 22130519}
 --- !u!114 &22130507
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -211,30 +195,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &22130509
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 22130505}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 97ab7f4d29b3ce84497804cafa2afaa1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProBasketballManager.Presentation.Screens.LeagueScreenController
---- !u!114 &22130510
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 22130505}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b0be390e340e6fc468a4f071f06a9286, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProBasketballManager.Presentation.Screens.PlayerProfileScreenController
 --- !u!114 &22130511
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -247,30 +207,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0e33beb7c8f5e34dae1990a2436bdfd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProBasketballManager.Presentation.Screens.SquadScreenController
---- !u!114 &22130512
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 22130505}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e9fde64b88147164c8563fa7eee09219, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProBasketballManager.Presentation.Screens.ScheduleScreenController
---- !u!114 &22130513
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 22130505}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ecf9c44c43ead24448db12f275342755, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProBasketballManager.Presentation.Screens.MatchCentreScreenController
 --- !u!114 &22130514
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -283,30 +219,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 438ae69cdb599fc47a8ce5d62fce4d72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProBasketballManager.Presentation.Screens.DashboardScreenController
---- !u!114 &22130515
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 22130505}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cc8b58f948baaa2488c3e307127f1c32, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProBasketballManager.Presentation.Screens.TacticsScreenController
---- !u!114 &22130516
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 22130505}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6676ac4e001addb4ca2e28693d94d29a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: ProBasketballManager.Presentation::ProBasketballManager.Presentation.Screens.SaveLoadScreenController
 --- !u!114 &22130517
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -319,7 +231,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 574fb320d176b3f4daec415ad0dbc2e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: ProBasketballManager.Presentation::ProBasketballManager.Presentation.Screens.MainMenuScreenController
---- !u!114 &22130518
+--- !u!114 &22130521
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -328,33 +240,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 22130505}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ad544d362dfed5143ae3a03a80f64899, type: 3}
+  m_Script: {fileID: 11500000, guid: f101193e323176348a8fe6fc23803cf8, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: ProBasketballManager.Presentation::ProBasketballManager.Presentation.Screens.EndOfSeasonScreenController
---- !u!114 &22130519
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 22130505}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dee5bbc29887aeb49bd4a0e512915e76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: ProBasketballManager.Presentation::ProBasketballManager.Presentation.Screens.CloseSeasonScreenController
---- !u!114 &22130520
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 22130505}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9dd39b1bbce2da544a0a9f22988344cb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: ProBasketballManager.Presentation::ProBasketballManager.Presentation.Screens.ClubSelectScreenController
+  m_EditorClassIdentifier: ProBasketballManager.Presentation::ProBasketballManager.Presentation.Screens.LoadGameScreenController
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0

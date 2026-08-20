@@ -2,7 +2,7 @@
     <Style src="project://database/Assets/ProBasketballManager/UI/Styles/Base.uss" />
     <Style src="project://database/Assets/ProBasketballManager/UI/Styles/Shell.uss" />
     <Style src="project://database/Assets/ProBasketballManager/UI/Styles/Components.uss" />
-    <!-- <Style src="project://database/Assets/ProBasketballManager/UI/Styles/Welcome.uss" /> -->
+    <Style src="project://database/Assets/ProBasketballManager/UI/Styles/MainMenuScreen.uss" />
     <!-- <Style src="project://database/Assets/ProBasketballManager/UI/Styles/LoadGame.uss" /> -->
     <!-- <Style src="project://database/Assets/ProBasketballManager/UI/Styles/Screens/Squad.uss" /> -->
     <ui:Template name="DashboardScreen" src="project://database/Assets/ProBasketballManager/UI/Screens/DashboardScreen.uxml" />
