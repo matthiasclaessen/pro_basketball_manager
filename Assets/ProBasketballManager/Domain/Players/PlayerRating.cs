@@ -12,6 +12,8 @@ namespace ProBasketballManager.Domain.Players
 
         public const double AbilityPerAttributePoint = 10.0;
 
+        public const double CurveExponent = 1.70;
+
         public static int CalculateCurrentAbility(PlayerPosition position, PlayerAttributes attributes)
         {
             if (attributes == null)
@@ -19,15 +21,9 @@ namespace ProBasketballManager.Domain.Players
                 throw new ArgumentNullException(nameof(attributes));
             }
 
-            var total =
-                attributes.Finishing + attributes.MidRange + attributes.ThreePoint + attributes.FreeThrow +
-                attributes.Passing + attributes.BallHandling +
-                attributes.PerimeterDefense + attributes.InteriorDefense +
-                attributes.OffensiveRebounding + attributes.DefensiveRebounding +
-                attributes.Speed + attributes.Strength + attributes.Stamina +
-                attributes.BasketballIq;
+            var weightedAverage = PositionWeights.GetWeightedAverage(position, attributes);
 
-            return ClampAbility(total / 14.0 * AbilityPerAttributePoint);
+            return ClampAbility(MaximumAbility * Math.Pow(weightedAverage / PlayerAttributes.Maximum, CurveExponent));
         }
 
         public static int ClampAbility(int value)
@@ -42,12 +38,16 @@ namespace ProBasketballManager.Domain.Players
 
         public static int FromAttributePoints(double attributePoints)
         {
-            return ClampAbility(attributePoints * AbilityPerAttributePoint);
+            var clamped = Math.Clamp(attributePoints, 0.0, PlayerAttributes.Maximum);
+
+            return ClampAbility(MaximumAbility * Math.Pow(clamped / PlayerAttributes.Maximum, CurveExponent));
         }
 
         public static double ToAttributePoints(int ability)
         {
-            return ability / AbilityPerAttributePoint;
+            var clamped = Math.Clamp(ability, MinimumAbility, MaximumAbility);
+
+            return PlayerAttributes.Maximum * Math.Pow((double)clamped / MaximumAbility, 1.0 / CurveExponent);
         }
     }
 }

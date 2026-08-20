@@ -21,6 +21,9 @@ namespace ProBasketballManager.Domain.Players
 
         public const double SeasonVariation = 0.55;
 
+        public const double MinimumWeightFocus = 0.45;
+        public const double MaximumWeightFocus = 1.55;
+
         public static PlayerAttributes Develop(Player player, IRandomSource random)
         {
             if (player == null)
@@ -52,11 +55,40 @@ namespace ProBasketballManager.Domain.Players
         {
             var category = AttributeCategories.GetCategory(attribute);
 
-            var change = GetGrowth(player.Age, headroom, category) - GetDecline(player.Age, category);
+            var change = GetGrowth(player.Age, headroom, category) * GetWeightFocus(attribute, player.Position) - GetDecline(player.Age, category);
 
             change += (random.NextDouble() - 0.5) * SeasonVariation;
 
             return PlayerAttributes.Clamp(value + RoundStochastically(change, random));
+        }
+
+        public static double GetWeightFocus(PlayerAttributeKind attribute, PlayerPosition position)
+        {
+            var weights = PositionWeights.For(position);
+
+            var index = (int)attribute;
+
+            if (index < 0 || index >= PositionWeights.AttributeCount)
+            {
+                throw new ArgumentOutOfRangeException(nameof(attribute), attribute, "This attribute has no position weight.");
+            }
+
+            var maximum = 0.0;
+            var total = 0.0;
+
+            for (var i = 0; i < PositionWeights.AttributeCount; i++)
+            {
+                total += weights[i];
+
+                if (weights[i] > maximum)
+                {
+                    maximum = weights[i];
+                }
+            }
+
+            var relative = (weights[index] - (total / PositionWeights.AttributeCount)) / maximum;
+
+            return Math.Clamp(1.0 + relative * (MaximumWeightFocus - MinimumWeightFocus), MinimumWeightFocus, MaximumWeightFocus);
         }
 
         public static int RoundStochastically(double change, IRandomSource random)

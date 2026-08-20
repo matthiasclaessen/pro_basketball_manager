@@ -36,6 +36,11 @@ namespace ProBasketballManager.Persistence
             new ClubSeed { Id = 11, TertiaryColor = "#283030", BadgeTemplate = "roundel-annulet", PrimaryColor = "#E01020", SecondaryColor = "#FFFFFF", Name = "Brussels Basketball", ShortName = "BRU", City = "Brussels", Strength = -2.2 }
         };
 
+        public const double LeagueBaseline = 10.8;
+        public const double ClubStrengthScale = 0.50;
+        public const double RoleScale = 0.45;
+        public const double NoiseSpread = 1.8;
+
         private static readonly double[] RoleModifiers = { 4.2, 2.8, 2.0, 1.4, 0.8, 0.1, -0.5, -1.2, -1.9, -2.6, -3.4, -4.2 };
 
         private static readonly PlayerPosition[] RosterPositions =
@@ -44,6 +49,22 @@ namespace ProBasketballManager.Persistence
             PlayerPosition.PointGuard, PlayerPosition.ShootingGuard, PlayerPosition.SmallForward, PlayerPosition.PowerForward, PlayerPosition.Center,
             PlayerPosition.ShootingGuard, PlayerPosition.Center
         };
+
+        private static PlayerPosition[] ShufflePositions(XorShiftRandom random)
+        {
+            var positions = (PlayerPosition[])RosterPositions.Clone();
+
+            for (var i = positions.Length - 1; i > 0; i--)
+            {
+                var j = random.NextInt(0, i + 1);
+
+                var swap = positions[i];
+                positions[i] = positions[j];
+                positions[j] = swap;
+            }
+
+            return positions;
+        }
 
         private static readonly string[] FirstNames =
         {
@@ -80,9 +101,11 @@ namespace ProBasketballManager.Persistence
 
                 var squad = new List<DatabasePlayerDto>();
 
-                for (var slot = 0; slot < RosterPositions.Length; slot++)
+                var positions = ShufflePositions(random);
+
+                for (var slot = 0; slot < positions.Length; slot++)
                 {
-                    squad.Add(CreatePlayer(playerId++, club, RosterPositions[slot], RoleModifiers[slot], random));
+                    squad.Add(CreatePlayer(playerId++, club, positions[slot], RoleModifiers[slot], random));
                 }
 
                 database.Players.AddRange(squad);
@@ -113,7 +136,7 @@ namespace ProBasketballManager.Persistence
 
         private static DatabasePlayerDto CreatePlayer(int id, ClubSeed club, PlayerPosition position, double roleModifier, XorShiftRandom random)
         {
-            var baseline = 10.5 + club.Strength + roleModifier + ((random.NextDouble() - 0.5) * 2.2);
+            var baseline = LeagueBaseline + (club.Strength * ClubStrengthScale) + (roleModifier * RoleScale) + ((random.NextDouble() - 0.5) * NoiseSpread);
 
             var age = PickAge(roleModifier, random);
 
@@ -197,17 +220,17 @@ namespace ProBasketballManager.Persistence
             var centre = position == PlayerPosition.Center;
 
             return new PlayerAttributes(
-                finishing: Roll(big ? 2.5 : 0.0),
-                midRange: Roll(centre ? -3.0 : 0.5),
-                threePoint: Roll(guard ? 2.5 : centre ? -5.5 : -1.0),
+                finishing: Roll(big ? 2.5 : position == PlayerPosition.SmallForward ? 2.0 : 0.0),
+                midRange: Roll(centre ? -3.0 : position == PlayerPosition.SmallForward ? 2.0 : 0.5),
+                threePoint: Roll(guard ? 2.5 : centre ? -5.5 : position == PlayerPosition.SmallForward ? 1.5 : -1.0),
                 freeThrow: Roll(guard ? 1.5 : -1.5),
                 passing: Roll(position == PlayerPosition.PointGuard ? 4.0 : guard ? 1.0 : big ? -2.5 : -0.5),
                 ballHandling: Roll(position == PlayerPosition.PointGuard ? 4.5 : guard ? 1.5 : centre ? -4.5 : -2.0),
-                perimeterDefense: Roll(guard ? 2.0 : centre ? -3.5 : 0.0),
+                perimeterDefense: Roll(guard ? 2.0 : centre ? -3.5 : position == PlayerPosition.SmallForward ? 2.5 : 0.0),
                 interiorDefense: Roll(centre ? 5.0 : big ? 3.0 : guard ? -4.0 : -0.5),
                 offensiveRebounding: Roll(centre ? 4.0 : big ? 2.5 : guard ? -4.5 : -1.0),
                 defensiveRebounding: Roll(centre ? 4.5 : big ? 3.0 : guard ? -3.5 : 0.0),
-                speed: Roll(guard ? 3.0 : centre ? -3.5 : 0.5),
+                speed: Roll(guard ? 3.0 : centre ? -3.5 : position == PlayerPosition.SmallForward ? 1.5 : 0.5),
                 strength: Roll(centre ? 4.5 : big ? 3.0 : guard ? -3.0 : 0.0),
                 stamina: Roll(0.5),
                 basketballIq: Roll(position == PlayerPosition.PointGuard ? 2.5 : 0.0));

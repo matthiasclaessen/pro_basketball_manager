@@ -246,11 +246,11 @@ namespace ProBasketballManager.Domain.Competitions
                         continue;
                     }
 
-                    var before = player.Overall;
+                    var before = player.CurrentAbility;
 
                     player.ApplyDevelopment(DevelopmentModel.Develop(player, random));
 
-                    var after = player.Overall;
+                    var after = player.CurrentAbility;
 
                     if (after > before)
                     {

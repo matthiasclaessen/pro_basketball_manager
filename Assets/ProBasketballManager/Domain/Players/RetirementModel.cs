@@ -62,7 +62,7 @@ namespace ProBasketballManager.Domain.Players
         public const int MinimumEntryAge = 18;
         public const int MaximumEntryAge = 22;
 
-        public const double PotentialTargetFactor = 1.08;
+        public const double PotentialTargetFactor = 1.04;
         public const double PotentialSpread = 34.0;
         public const double MinimumEntryGap = 20.0;
         public const double MaximumEntryGap = 45.0;
