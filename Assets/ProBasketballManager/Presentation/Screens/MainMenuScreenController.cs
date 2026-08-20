@@ -1,6 +1,4 @@
-using System;
-using ProBasketballManager.Persistence;
-using UnityEngine;
+﻿using System;
 using UnityEngine.UIElements;
 
 namespace ProBasketballManager.Presentation.Screens
@@ -11,17 +9,21 @@ namespace ProBasketballManager.Presentation.Screens
 
         public event Action NewGameRequested;
 
-        public event Action<GameSessionSnapshot> LoadRequested;
+        public event Action LoadGameRequested;
+
+        public event Action ExitRequested;
 
         private Button _newGameButton;
+        private Button _loadGameButton;
+        private Button _exitGameButton;
         private Label _statusLabel;
-        private VisualElement _slotList;
 
         protected override void FindControls(VisualElement documentRoot)
         {
-            _newGameButton = documentRoot.Q<Button>("new-game-button");
-            _statusLabel = documentRoot.Q<Label>("main-menu-status");
-            _slotList = documentRoot.Q<VisualElement>("main-menu-save-list");
+            _newGameButton = Require<Button>(documentRoot, "new-game-button");
+            _loadGameButton = Require<Button>(documentRoot, "load-game-button");
+            _exitGameButton = Require<Button>(documentRoot, "exit-game-button");
+            _statusLabel = Require<Label>(documentRoot, "main-menu-status");
         }
 
         public void RegisterCallbacks()
@@ -31,8 +33,14 @@ namespace ProBasketballManager.Presentation.Screens
                 return;
             }
 
-            _newGameButton.clicked -= RaiseNewGameRequested;
-            _newGameButton.clicked += RaiseNewGameRequested;
+            _newGameButton.clicked -= RaiseNewGame;
+            _newGameButton.clicked += RaiseNewGame;
+
+            _loadGameButton.clicked -= RaiseLoadGame;
+            _loadGameButton.clicked += RaiseLoadGame;
+
+            _exitGameButton.clicked -= RaiseExit;
+            _exitGameButton.clicked += RaiseExit;
         }
 
         public void UnregisterCallbacks()
@@ -42,12 +50,34 @@ namespace ProBasketballManager.Presentation.Screens
                 return;
             }
 
-            _newGameButton.clicked -= RaiseNewGameRequested;
+            _newGameButton.clicked -= RaiseNewGame;
+            _loadGameButton.clicked -= RaiseLoadGame;
+            _exitGameButton.clicked -= RaiseExit;
         }
 
-        private void RaiseNewGameRequested()
+        public void ShowMessage(string message)
+        {
+            if (!IsBound)
+            {
+                return;
+            }
+
+            _statusLabel.text = message ?? string.Empty;
+        }
+
+        private void RaiseNewGame()
         {
             NewGameRequested?.Invoke();
+        }
+
+        private void RaiseLoadGame()
+        {
+            LoadGameRequested?.Invoke();
+        }
+
+        private void RaiseExit()
+        {
+            ExitRequested?.Invoke();
         }
 
         public override void Render()
@@ -58,51 +88,6 @@ namespace ProBasketballManager.Presentation.Screens
             }
 
             _statusLabel.text = string.Empty;
-
-            try
-            {
-                SaveSlotListRenderer.Render(_slotList, SaveGameRepository.ListSaves(), RequestLoad, DeleteSlot);
-            }
-            catch (Exception exception)
-            {
-                _statusLabel.text = $"Could not read the saves folder: {exception.Message}";
-
-                Debug.LogException(exception);
-            }
-        }
-
-        private void RequestLoad(SaveSlotInfo slot)
-        {
-            try
-            {
-                LoadRequested?.Invoke(SaveGameRepository.LoadFromPath(slot.FilePath));
-            }
-            catch (SaveGameException exception)
-            {
-                _statusLabel.text = exception.Message;
-            }
-            catch (Exception exception)
-            {
-                _statusLabel.text = $"Load failed: {exception.Message}";
-
-                Debug.LogException(exception);
-            }
-        }
-
-        private void DeleteSlot(SaveSlotInfo slot)
-        {
-            try
-            {
-                SaveGameRepository.Delete(slot.SlotName);
-
-                Render();
-            }
-            catch (Exception exception)
-            {
-                _statusLabel.text = $"Delete failed: {exception.Message}";
-
-                Debug.LogException(exception);
-            }
         }
     }
 }

@@ -1,4 +1,4 @@
-using ProBasketballManager.Presentation.State;
+﻿using ProBasketballManager.Presentation.State;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -14,6 +14,8 @@ namespace ProBasketballManager.Presentation.Screens
 
         public bool IsBound { get; private set; }
 
+        private bool _missingControls;
+
         public void Bind(GameSession session, VisualElement documentRoot)
         {
             Session = session;
@@ -21,21 +23,37 @@ namespace ProBasketballManager.Presentation.Screens
 
             if (ScreenRoot == null)
             {
-                Debug.LogError(
-                    $"{GetType().Name} could not find an element named '{ScreenElementName}' in the UI document. " +
-                    "Check that the name matches the UXML.");
+                Debug.LogError($"{GetType().Name} could not find an element named '{ScreenElementName}' in the UI document. " + "Check that the name matches the UXML.");
 
                 IsBound = false;
 
                 return;
             }
 
+            _missingControls = false;
+
             FindControls(documentRoot);
 
-            IsBound = true;
+            IsBound = !_missingControls;
         }
 
         protected abstract void FindControls(VisualElement documentRoot);
+
+        protected T Require<T>(VisualElement documentRoot, string elementName) where T : VisualElement
+        {
+            var element = documentRoot.Q<T>(elementName);
+
+            if (element == null)
+            {
+                Debug.LogError(
+                    $"{GetType().Name} could not find a {typeof(T).Name} named '{elementName}'. " +
+                    $"The '{ScreenElementName}' element exists, so either the name is wrong or the UXML template holding it failed to load.");
+
+                _missingControls = true;
+            }
+
+            return element;
+        }
 
         public abstract void Render();
 

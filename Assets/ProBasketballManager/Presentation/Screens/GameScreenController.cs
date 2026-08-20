@@ -16,12 +16,8 @@ namespace ProBasketballManager.Presentation.Screens
         private MainMenuScreenController _mainMenuScreen;
 
         [SerializeField]
-        [Tooltip("New game: pick a club from the loaded database.")]
-        private ClubSelectScreenController _clubSelectScreen;
-
-        [SerializeField]
-        [Tooltip("Save to a slot, or load an existing save mid-game.")]
-        private SaveLoadScreenController _saveLoadScreen;
+        [Tooltip("Load game: pick a save file from the welcome screen.")]
+        private LoadGameScreenController _loadGameScreen;
 
         [SerializeField]
         [Tooltip("Home screen: club summary, next fixture and mini league table.")]
@@ -30,34 +26,6 @@ namespace ProBasketballManager.Presentation.Screens
         [SerializeField]
         [Tooltip("Squad list with season averages.")]
         private SquadScreenController _squadScreen;
-
-        [SerializeField]
-        [Tooltip("Individual player profile, opened from the squad list.")]
-        private PlayerProfileScreenController _playerProfileScreen;
-
-        [SerializeField]
-        [Tooltip("Tactics sliders and the rotation plan.")]
-        private TacticsScreenController _tacticsScreen;
-
-        [SerializeField]
-        [Tooltip("Full season schedule.")]
-        private ScheduleScreenController _scheduleScreen;
-
-        [SerializeField]
-        [Tooltip("League standings table.")]
-        private LeagueScreenController _leagueScreen;
-
-        [SerializeField]
-        [Tooltip("Live match replay, play by play and box score.")]
-        private MatchCentreScreenController _matchCentreScreen;
-
-        [SerializeField]
-        [Tooltip("Season summary shown once the last fixture is played.")]
-        private EndOfSeasonScreenController _endOfSeasonScreen;
-
-        [SerializeField]
-        [Tooltip("Retirements and development, shown after starting a new season.")]
-        private CloseSeasonScreenController _closeSeasonScreen;
 
         private GameSession _session;
 
@@ -89,16 +57,19 @@ namespace ProBasketballManager.Presentation.Screens
             {
                 _mainMenuScreen.RegisterCallbacks();
                 _mainMenuScreen.NewGameRequested += StartNewGame;
-                _mainMenuScreen.LoadRequested += AdoptLoadedGame;
+                _mainMenuScreen.LoadGameRequested += ShowLoadGame;
+                _mainMenuScreen.ExitRequested += ExitGame;
             }
 
-            BindScreen(_clubSelectScreen, nameof(ClubSelectScreenController), _root, null);
 
-            if (_clubSelectScreen != null)
+
+            BindScreen(_loadGameScreen, nameof(LoadGameScreenController), _root, null);
+
+            if (_loadGameScreen != null)
             {
-                _clubSelectScreen.RegisterCallbacks();
-                _clubSelectScreen.ClubChosen += AdoptNewGame;
-                _clubSelectScreen.Cancelled += ShowMainMenu;
+                _loadGameScreen.RegisterCallbacks();
+                _loadGameScreen.LoadRequested += AdoptLoadedGame;
+                _loadGameScreen.Cancelled += ShowMainMenu;
             }
 
             ShowMainMenu();
@@ -109,15 +80,32 @@ namespace ProBasketballManager.Presentation.Screens
             ShowClubSelect();
         }
 
-        private void ShowClubSelect()
+        private void ShowLoadGame()
         {
             HideEveryScreenElement();
             HideAllScreens();
 
             SetNavigationVisible(false);
 
-            _clubSelectScreen?.Show();
-            _clubSelectScreen?.Render();
+            _loadGameScreen?.Show();
+            _loadGameScreen?.Render();
+        }
+
+        private void ExitGame()
+        {
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
+        }
+
+        private void ShowClubSelect()
+        {
+            HideEveryScreenElement();
+            HideAllScreens();
+
+            SetNavigationVisible(false);
         }
 
         private void AdoptNewGame(GameDatabase database, int teamId)
@@ -137,7 +125,7 @@ namespace ProBasketballManager.Presentation.Screens
 
         private void AdoptSession(GameSession session)
         {
-            _matchCentreScreen?.StopReplay();
+            ClubBadgeRenderer.ClearCache();
 
             _session = session;
 
@@ -161,13 +149,19 @@ namespace ProBasketballManager.Presentation.Screens
 
         private void OnDisable()
         {
-            _matchCentreScreen?.StopReplay();
-
             if (_mainMenuScreen != null)
             {
                 _mainMenuScreen.UnregisterCallbacks();
                 _mainMenuScreen.NewGameRequested -= StartNewGame;
-                _mainMenuScreen.LoadRequested -= AdoptLoadedGame;
+                _mainMenuScreen.LoadGameRequested -= ShowLoadGame;
+                _mainMenuScreen.ExitRequested -= ExitGame;
+            }
+
+            if (_loadGameScreen != null)
+            {
+                _loadGameScreen.UnregisterCallbacks();
+                _loadGameScreen.LoadRequested -= AdoptLoadedGame;
+                _loadGameScreen.Cancelled -= ShowMainMenu;
             }
 
             UnregisterCallbacks();
@@ -190,16 +184,8 @@ namespace ProBasketballManager.Presentation.Screens
 
         private void BindScreens(VisualElement root)
         {
-            BindScreen(_saveLoadScreen, nameof(SaveLoadScreenController), root);
             BindScreen(_dashboardScreen, nameof(DashboardScreenController), root);
             BindScreen(_squadScreen, nameof(SquadScreenController), root);
-            BindScreen(_playerProfileScreen, nameof(PlayerProfileScreenController), root);
-            BindScreen(_tacticsScreen, nameof(TacticsScreenController), root);
-            BindScreen(_scheduleScreen, nameof(ScheduleScreenController), root);
-            BindScreen(_leagueScreen, nameof(LeagueScreenController), root);
-            BindScreen(_matchCentreScreen, nameof(MatchCentreScreenController), root);
-            BindScreen(_endOfSeasonScreen, nameof(EndOfSeasonScreenController), root);
-            BindScreen(_closeSeasonScreen, nameof(CloseSeasonScreenController), root);
         }
 
         private void BindScreen(ScreenController screen, string screenName, VisualElement root)
@@ -225,54 +211,12 @@ namespace ProBasketballManager.Presentation.Screens
 
             _navDashboardButton.clicked += ShowDashboard;
             _navSquadButton.clicked += ShowSquad;
-            _navTacticsButton.clicked += ShowTactics;
-            _navScheduleButton.clicked += ShowSchedule;
-            _navLeagueButton.clicked += ShowLeague;
-            _navSaveLoadButton.clicked += ShowSaveLoad;
 
-            _playerProfileBackButton.clicked += ShowSquad;
-
-            if (_saveLoadScreen != null)
-            {
-                _saveLoadScreen.RegisterCallbacks();
-                _saveLoadScreen.LoadRequested += AdoptLoadedGame;
-            }
-
+          
             if (_dashboardScreen != null)
             {
                 _dashboardScreen.RegisterCallbacks();
                 _dashboardScreen.MatchCentreRequested += StartMatchCentre;
-            }
-
-            if (_squadScreen != null)
-            {
-                _squadScreen.PlayerSelected += ShowPlayerProfile;
-            }
-
-            if (_tacticsScreen != null)
-            {
-                _tacticsScreen.RegisterCallbacks();
-                _tacticsScreen.RotationChanged += OnRotationChanged;
-            }
-
-            if (_endOfSeasonScreen != null)
-            {
-                _endOfSeasonScreen.RegisterCallbacks();
-                _endOfSeasonScreen.NextSeasonRequested += StartNextSeason;
-            }
-
-            if (_closeSeasonScreen != null)
-            {
-                _closeSeasonScreen.RegisterCallbacks();
-                _closeSeasonScreen.ContinueRequested += ShowDashboard;
-            }
-
-            if (_matchCentreScreen != null)
-            {
-                _matchCentreScreen.RegisterCallbacks();
-                _matchCentreScreen.ReplayStarted += OnReplayStarted;
-                _matchCentreScreen.ReplayFinished += OnReplayFinished;
-                _matchCentreScreen.BackRequested += ShowDashboard;
             }
         }
 
@@ -282,55 +226,15 @@ namespace ProBasketballManager.Presentation.Screens
             {
                 _navDashboardButton.clicked -= ShowDashboard;
                 _navSquadButton.clicked -= ShowSquad;
-                _navTacticsButton.clicked -= ShowTactics;
-                _navScheduleButton.clicked -= ShowSchedule;
-                _navLeagueButton.clicked -= ShowLeague;
-                _navSaveLoadButton.clicked -= ShowSaveLoad;
 
                 _playerProfileBackButton.clicked -= ShowSquad;
             }
 
-            if (_saveLoadScreen != null)
-            {
-                _saveLoadScreen.UnregisterCallbacks();
-                _saveLoadScreen.LoadRequested -= AdoptLoadedGame;
-            }
 
             if (_dashboardScreen != null)
             {
                 _dashboardScreen.UnregisterCallbacks();
                 _dashboardScreen.MatchCentreRequested -= StartMatchCentre;
-            }
-
-            if (_squadScreen != null)
-            {
-                _squadScreen.PlayerSelected -= ShowPlayerProfile;
-            }
-
-            if (_tacticsScreen != null)
-            {
-                _tacticsScreen.UnregisterCallbacks();
-                _tacticsScreen.RotationChanged -= OnRotationChanged;
-            }
-
-            if (_endOfSeasonScreen != null)
-            {
-                _endOfSeasonScreen.UnregisterCallbacks();
-                _endOfSeasonScreen.NextSeasonRequested -= StartNextSeason;
-            }
-
-            if (_closeSeasonScreen != null)
-            {
-                _closeSeasonScreen.UnregisterCallbacks();
-                _closeSeasonScreen.ContinueRequested -= ShowDashboard;
-            }
-
-            if (_matchCentreScreen != null)
-            {
-                _matchCentreScreen.UnregisterCallbacks();
-                _matchCentreScreen.ReplayStarted -= OnReplayStarted;
-                _matchCentreScreen.ReplayFinished -= OnReplayFinished;
-                _matchCentreScreen.BackRequested -= ShowDashboard;
             }
         }
 
@@ -339,31 +243,18 @@ namespace ProBasketballManager.Presentation.Screens
             RenderTeamSwitcher();
 
             _dashboardScreen?.Render();
-            _saveLoadScreen?.Render();
             _squadScreen?.Render();
-            _tacticsScreen?.Render();
-            _scheduleScreen?.Render();
-            _leagueScreen?.Render();
-            _endOfSeasonScreen?.Render();
-            _closeSeasonScreen?.Render();
         }
 
         private void OnRotationChanged()
         {
             _squadScreen?.Render();
-            _playerProfileScreen?.Render();
         }
 
         private void StartMatchCentre()
         {
-            if (_matchCentreScreen == null)
-            {
-                return;
-            }
 
             HideAllScreens();
-
-            _matchCentreScreen.PrepareMatch();
 
             SetActiveNavigation(null);
         }
@@ -388,25 +279,9 @@ namespace ProBasketballManager.Presentation.Screens
         private void ShowEndOfSeason()
         {
             HideAllScreens();
-            _endOfSeasonScreen?.Show();
             SetActiveNavigation(null);
         }
 
-        private void StartNextSeason()
-        {
-            _session.AdvanceToNextSeason();
-
-            RenderAllScreens();
-
-            ShowCloseSeason();
-        }
-
-        private void ShowCloseSeason()
-        {
-            HideAllScreens();
-            _closeSeasonScreen?.Show();
-            SetActiveNavigation(null);
-        }
 
         private void ShowDashboard()
         {
@@ -422,27 +297,6 @@ namespace ProBasketballManager.Presentation.Screens
             HideAllScreens();
             _squadScreen?.Show();
             SetActiveNavigation(_navSquadButton);
-        }
-
-        private void ShowPlayerProfile(Player player)
-        {
-            HideAllScreens();
-            _playerProfileScreen?.ShowForPlayer(player);
-            SetActiveNavigation(_navSquadButton);
-        }
-
-        private void ShowTactics()
-        {
-            HideAllScreens();
-            _tacticsScreen?.Show();
-            SetActiveNavigation(_navTacticsButton);
-        }
-
-        private void ShowSchedule()
-        {
-            HideAllScreens();
-            _scheduleScreen?.Show();
-            SetActiveNavigation(_navScheduleButton);
         }
 
         private void HideEveryScreenElement()
@@ -468,34 +322,12 @@ namespace ProBasketballManager.Presentation.Screens
             _mainMenuScreen?.Show();
         }
 
-        private void ShowSaveLoad()
-        {
-            HideAllScreens();
-            _saveLoadScreen?.Show();
-            SetActiveNavigation(_navSaveLoadButton);
-        }
-
-        private void ShowLeague()
-        {
-            HideAllScreens();
-            _leagueScreen?.Show();
-            SetActiveNavigation(_navLeagueButton);
-        }
-
         private void HideAllScreens()
         {
             _dashboardScreen?.Hide();
             _squadScreen?.Hide();
-            _playerProfileScreen?.Hide();
-            _tacticsScreen?.Hide();
-            _scheduleScreen?.Hide();
-            _leagueScreen?.Hide();
-            _matchCentreScreen?.Hide();
-            _endOfSeasonScreen?.Hide();
-            _closeSeasonScreen?.Hide();
-            _saveLoadScreen?.Hide();
             _mainMenuScreen?.Hide();
-            _clubSelectScreen?.Hide();
+            _loadGameScreen?.Hide();
         }
 
         private void SetActiveNavigation(Button activeButton)

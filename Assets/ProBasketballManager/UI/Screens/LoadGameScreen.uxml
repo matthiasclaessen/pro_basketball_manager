@@ -1,0 +1,20 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="load-game-root" class="welcome-screen">
+        <ui:VisualElement class="background-glow background-glow-left" />
+        <ui:VisualElement class="background-glow background-glow-right" />
+        <ui:VisualElement class="load-game-content">
+            <ui:VisualElement class="load-game-header">
+                <ui:VisualElement class="load-game-heading">
+                    <ui:Label text="LOAD GAME" class="load-game-title" />
+                    <ui:Label text="Continue a saved career." class="load-game-subtitle" />
+                </ui:VisualElement>
+                <ui:Button name="load-game-back-button" text="Back" class="load-game-back" />
+            </ui:VisualElement>
+            <ui:Label name="load-game-status" text="" class="load-game-status" />
+            <ui:ScrollView class="load-game-scroll">
+                <ui:VisualElement name="load-game-slot-list" class="load-game-slot-list" />
+            </ui:ScrollView>
+            <ui:Label name="load-game-path" text="" class="load-game-path" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

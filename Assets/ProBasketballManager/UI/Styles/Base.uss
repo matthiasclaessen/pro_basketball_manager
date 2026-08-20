@@ -1,0 +1,125 @@
+.brand {
+    margin-bottom: 42px;
+}
+
+.brand-kicker {
+    color: #f97316;
+    font-size: 12px;
+    -unity-font-style: bold;
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+}
+
+.brand-title {
+    color: #ffffff;
+    font-size: 20px;
+    -unity-font-style: bold;
+}
+
+.page-title {
+    color: #111827;
+    font-size: 28px;
+    -unity-font-style: bold;
+}
+
+.page-subtitle {
+    color: #6b7280;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.primary-button {
+    width: 220px;
+    height: 46px;
+    align-self: center;
+    color: #ffffff;
+    background-color: #f97316;
+    font-size: 13px;
+    -unity-font-style: bold;
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    border-top-left-radius: 7px;
+    border-top-right-radius: 7px;
+    border-bottom-left-radius: 7px;
+    border-bottom-right-radius: 7px;
+}
+
+.primary-button:hover {
+    background-color: #ea580c;
+}
+
+.primary-button:active {
+    background-color: #c2410c;
+}
+
+.panel-title {
+    color: #111827;
+    font-size: 16px;
+    -unity-font-style: bold;
+    margin-bottom: 18px;
+}
+
+.screen {
+    flex-grow: 1;
+}
+
+.screen-hidden {
+    display: none;
+}
+
+.secondary-button {
+    height: 38px;
+    color: #374151;
+    background-color: #ffffff;
+    font-size: 12px;
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-top-color: #d1d5db;
+    border-right-color: #d1d5db;
+    border-bottom-color: #d1d5db;
+    border-left-color: #d1d5db;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    padding-left: 14px;
+    padding-right: 14px;
+}
+
+.secondary-button:hover {
+    background-color: #f9fafb;
+}
+
+.instant-result-button {
+    height: 34px;
+    color: #c2410c;
+    background-color: #fff7ed;
+    font-size: 11px;
+    -unity-font-style: bold;
+    padding-left: 14px;
+    padding-right: 14px;
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-top-color: #fed7aa;
+    border-right-color: #fed7aa;
+    border-bottom-color: #fed7aa;
+    border-left-color: #fed7aa;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+.section-label {
+    color: #9ca3af;
+    font-size: 10px;
+    -unity-font-style: bold;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+}

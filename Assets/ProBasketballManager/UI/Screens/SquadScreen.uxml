@@ -1,0 +1,48 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement class="squad-screen-header">
+        <ui:VisualElement>
+            <ui:Label text="Squad" class="page-title" />
+            <ui:Label name="squad-subtitle" text="Antwerp Admirals · 2026 / 27" class="page-subtitle" />
+        </ui:VisualElement>
+        <ui:Label name="squad-games-badge" text="0 GAMES PLAYED" class="squad-games-badge" />
+    </ui:VisualElement>
+    <ui:VisualElement class="squad-summary-row">
+        <ui:VisualElement class="card squad-summary-card">
+            <ui:Label text="ROSTER" class="card-eyebrow" />
+            <ui:Label name="squad-roster-value" text="12" class="squad-summary-value" />
+            <ui:Label text="Players" class="squad-summary-label" />
+        </ui:VisualElement>
+        <ui:VisualElement class="card squad-summary-card squad-summary-card-middle">
+            <ui:Label text="RECORD" class="card-eyebrow" />
+            <ui:Label name="squad-record-value" text="0 - 0" class="squad-summary-value" />
+            <ui:Label text="Wins - Losses" class="squad-summary-label" />
+        </ui:VisualElement>
+        <ui:VisualElement class="card squad-summary-card">
+            <ui:Label text="LEADING SCORER" class="card-eyebrow" />
+            <ui:Label name="squad-leading-scorer-value" text="No games yet" class="squad-summary-value squad-leading-scorer-value" />
+            <ui:Label name="squad-leading-scorer-detail" text="— PPG" class="squad-summary-label" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement class="card squad-table-card">
+        <ui:VisualElement class="squad-table-header">
+            <ui:Label text="Player" class="squad-player-column" />
+            <ui:Label text="Pos" class="squad-position-column" />
+            <ui:Label text="Age" class="squad-small-column" />
+            <ui:Label text="Ability" class="squad-stars-column" />
+            <ui:Label text="Potential" class="squad-stars-column" />
+            <ui:Label text="GP" class="squad-small-column" />
+            <ui:Label text="GS" class="squad-small-column" />
+            <ui:Label text="MIN" class="squad-stat-column" />
+            <ui:Label text="PTS" class="squad-stat-column" />
+            <ui:Label text="REB" class="squad-stat-column" />
+            <ui:Label text="AST" class="squad-stat-column" />
+            <ui:Label text="STL" class="squad-stat-column" />
+            <ui:Label text="FG%" class="squad-percent-column" />
+            <ui:Label text="3P%" class="squad-percent-column" />
+            <ui:Label text="FT%" class="squad-percent-column" />
+        </ui:VisualElement>
+        <ui:ScrollView class="squad-table-scroll">
+            <ui:VisualElement name="squad-list" class="squad-list" />
+        </ui:ScrollView>
+    </ui:VisualElement>
+</ui:UXML>

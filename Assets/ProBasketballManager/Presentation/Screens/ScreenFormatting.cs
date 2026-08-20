@@ -1,4 +1,4 @@
-using ProBasketballManager.Domain.Players;
+﻿using ProBasketballManager.Domain.Players;
 using ProBasketballManager.Domain.Teams;
 using UnityEngine.UIElements;
 
@@ -9,10 +9,6 @@ namespace ProBasketballManager.Presentation.Screens
         public const string NoValue = "\u2014";
 
         public const string Separator = "\u00b7";
-
-        public const string StarterRole = "STARTER";
-        public const string RotationRole = "ROTATION";
-        public const string ReserveRole = "RESERVE";
 
         public static string GetPositionAbbreviation(PlayerPosition position)
         {
@@ -25,16 +21,6 @@ namespace ProBasketballManager.Presentation.Screens
                 PlayerPosition.Center => "C",
                 _ => "-"
             };
-        }
-
-        public static string GetSquadRole(TeamRotation rotation, PlayerRotationAssignment assignment)
-        {
-            if (rotation.IsStarter(assignment.Player.Id))
-            {
-                return StarterRole;
-            }
-
-            return assignment.TargetMinutes > 0 ? RotationRole : ReserveRole;
         }
 
         public static string FormatPerGame(int gamesPlayed, double value)
@@ -53,26 +39,6 @@ namespace ProBasketballManager.Presentation.Screens
             label.AddToClassList(className);
 
             return label;
-        }
-
-        public static void ApplyRoleClass(VisualElement element, string role)
-        {
-            element.RemoveFromClassList("squad-role-starter");
-            element.RemoveFromClassList("squad-role-rotation");
-            element.RemoveFromClassList("squad-role-reserve");
-
-            if (role == StarterRole)
-            {
-                element.AddToClassList("squad-role-starter");
-            }
-            else if (role == RotationRole)
-            {
-                element.AddToClassList("squad-role-rotation");
-            }
-            else
-            {
-                element.AddToClassList("squad-role-reserve");
-            }
         }
     }
 }

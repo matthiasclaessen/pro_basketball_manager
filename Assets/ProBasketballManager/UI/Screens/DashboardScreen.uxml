@@ -1,0 +1,61 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Label text="Dashboard" class="page-title" />
+    <ui:Label text="Your club overview and next fixture." class="page-subtitle" />
+    <ui:VisualElement class="card match-card">
+        <ui:VisualElement class="card-header">
+            <ui:VisualElement>
+                <ui:Label text="NEXT MATCH" class="card-eyebrow" />
+                <ui:Label text="Belgian Demo League" class="card-title" />
+            </ui:VisualElement>
+            <ui:Label name="match-status" text="UPCOMING" class="status-badge" />
+        </ui:VisualElement>
+        <ui:VisualElement class="scoreboard">
+            <ui:VisualElement class="team-block">
+                <ui:Label name="home-team-name" text="Home Team" class="team-name" />
+                <ui:Label text="HOME" class="team-side-label" />
+            </ui:VisualElement>
+            <ui:VisualElement class="score-block">
+                <ui:VisualElement class="score-row">
+                    <ui:Label name="home-score" text="—" class="score" />
+                    <ui:Label text=":" class="score-separator" />
+                    <ui:Label name="away-score" text="—" class="score" />
+                </ui:VisualElement>
+                <ui:Label name="fixture-info" text="Round 1 · 20:00" class="fixture-info" />
+            </ui:VisualElement>
+            <ui:VisualElement class="team-block">
+                <ui:Label name="away-team-name" text="Away Team" class="team-name" />
+                <ui:Label text="AWAY" class="team-side-label" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="period-scores" class="period-scores" />
+        <ui:Button name="simulate-match-button" text="Open Match Centre" class="primary-button" />
+    </ui:VisualElement>
+    <ui:VisualElement class="bottom-grid">
+        <ui:VisualElement class="card league-card">
+            <ui:Label text="LEAGUE" class="card-eyebrow" />
+            <ui:Label text="Belgian Demo League" class="panel-title" />
+            <ui:VisualElement class="league-table-header">
+                <ui:Label text="#" class="league-position" />
+                <ui:Label text="Team" class="league-team-name" />
+                <ui:Label text="Record" class="league-record" />
+            </ui:VisualElement>
+            <ui:VisualElement name="league-list" class="league-list" />
+        </ui:VisualElement>
+        <ui:VisualElement class="card club-card">
+            <ui:Label text="YOUR CLUB" class="card-eyebrow" />
+            <ui:Label name="club-panel-name" text="Club" class="panel-title" />
+            <ui:VisualElement class="metric-row">
+                <ui:Label text="Roster" class="metric-label" />
+                <ui:Label name="roster-count" text="-" class="metric-value" />
+            </ui:VisualElement>
+            <ui:VisualElement class="metric-row">
+                <ui:Label text="Avg. 3PT" class="metric-label" />
+                <ui:Label name="three-point-rating" text="-" class="metric-value" />
+            </ui:VisualElement>
+            <ui:VisualElement class="metric-row">
+                <ui:Label text="Avg. defense" class="metric-label" />
+                <ui:Label name="defense-rating" text="-" class="metric-value" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
