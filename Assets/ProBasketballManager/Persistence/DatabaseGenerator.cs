@@ -40,6 +40,7 @@ namespace ProBasketballManager.Persistence
         public const double ClubStrengthScale = 0.50;
         public const double RoleScale = 0.45;
         public const double NoiseSpread = 1.8;
+        public const double TalentScarcity = 2.2;
 
         private static readonly double[] RoleModifiers = { 4.2, 2.8, 2.0, 1.4, 0.8, 0.1, -0.5, -1.2, -1.9, -2.6, -3.4, -4.2 };
 
@@ -144,9 +145,11 @@ namespace ProBasketballManager.Persistence
 
             var currentAbility = PlayerRating.CalculateCurrentAbility(position, attributes);
 
-            var upside = age <= 20 ? 45 : age <= 23 ? 30 : age <= 26 ? 16 : age <= 29 ? 6 : 0;
+            var ceiling = age <= 20 ? 62.0 : age <= 23 ? 44.0 : age <= 26 ? 26.0 : age <= 29 ? 12.0 : 4.0;
 
-            var potential = PlayerRating.ClampAbility(currentAbility + upside + (int)((random.NextDouble() - 0.4) * 22));
+            var talent = Math.Pow(random.NextDouble(), TalentScarcity);
+
+            var potential = PlayerRating.ClampAbility(currentAbility + ceiling * talent + ((random.NextDouble() - 0.5) * 8.0));
 
             var scoutingError = (int)((random.NextDouble() - 0.5) * 26);
 

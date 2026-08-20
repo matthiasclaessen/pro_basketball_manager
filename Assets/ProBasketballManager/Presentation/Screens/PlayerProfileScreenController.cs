@@ -13,8 +13,9 @@ namespace ProBasketballManager.Presentation.Screens
         private Label _metaLabel;
         private Label _roleLabel;
         private Label _seasonLabel;
-        private Label _overallLabel;
-        private Label _potentialLabel;
+
+        private VisualElement _overallContainer;
+        private VisualElement _potentialContainer;
 
         private Label _gamesPlayedLabel;
         private Label _gamesStartedLabel;
@@ -43,8 +44,9 @@ namespace ProBasketballManager.Presentation.Screens
             _metaLabel = documentRoot.Q<Label>("player-profile-meta");
             _roleLabel = documentRoot.Q<Label>("player-profile-role");
             _seasonLabel = documentRoot.Q<Label>("player-profile-season");
-            _overallLabel = documentRoot.Q<Label>("player-profile-overall");
-            _potentialLabel = documentRoot.Q<Label>("player-profile-potential");
+
+            _overallContainer = documentRoot.Q<VisualElement>("squad-stars-column");
+            _potentialContainer = documentRoot.Q<VisualElement>("squad-stars-column");
 
             _gamesPlayedLabel = documentRoot.Q<Label>("player-profile-gp");
             _gamesStartedLabel = documentRoot.Q<Label>("player-profile-gs");
@@ -108,17 +110,11 @@ namespace ProBasketballManager.Presentation.Screens
 
         private void RenderDevelopment(Player player)
         {
-            if (_overallLabel != null)
-            {
-                _overallLabel.text = player.CurrentAbility.ToString();
-            }
+            _overallContainer.Clear();
+            _overallContainer.Add(StarRatingElements.Create(Session.GetAbilityStars(player), 16));
 
-            if (_potentialLabel == null)
-            {
-                return;
-            }
-
-            _potentialLabel.text = player.ScoutedPotential <= player.CurrentAbility ? "Fully developed" : $"{player.ScoutedPotential} (scouted)";
+            _potentialContainer.Clear();
+            _potentialContainer.Add(StarRatingElements.Create(Session.GetPotentialStars(player), 16));
         }
 
         private void RenderStatistics(PlayerSeasonStatistics statistics)

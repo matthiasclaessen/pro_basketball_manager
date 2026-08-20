@@ -65,25 +65,6 @@ namespace ProBasketballManager.Presentation.Screens
             }
         }
 
-        private static Label CreatePotentialLabel(Player player)
-        {
-            if (player.ScoutedPotential <= player.CurrentAbility)
-            {
-                var settled = ScreenFormatting.CreateLabel(ScreenFormatting.NoValue, "squad-small-column");
-                settled.AddToClassList("squad-potential-settled");
-
-                return settled;
-            }
-
-            var label = ScreenFormatting.CreateLabel(player.ScoutedPotential.ToString(), "squad-small-column");
-
-            var upside = player.ScoutedPotential - player.CurrentAbility;
-
-            label.AddToClassList(upside >= 4 ? "squad-potential-high" : "squad-potential-modest");
-
-            return label;
-        }
-
         private void RenderLeadingScorer(System.Collections.Generic.IEnumerable<PlayerSeasonStatistics> statistics)
         {
             var leadingScorer = statistics
@@ -110,14 +91,16 @@ namespace ProBasketballManager.Presentation.Screens
             row.AddToClassList("squad-row");
 
             var nameCell = new VisualElement();
+            nameCell.AddToClassList("squad-player-column");
             nameCell.AddToClassList("squad-row-identity");
             nameCell.Add(ClubIdentityElements.CreateFlag(statistics.Player.Nationality, 18));
-            nameCell.Add(ScreenFormatting.CreateLabel(statistics.Player.FullName, "squad-player-column"));
+            nameCell.Add(ScreenFormatting.CreateLabel(statistics.Player.FullName, "squad-player-name"));
 
             row.Add(nameCell);
             row.Add(ScreenFormatting.CreateLabel(ScreenFormatting.GetPositionAbbreviation(statistics.Player.Position), "squad-position-column"));
             row.Add(ScreenFormatting.CreateLabel(statistics.Player.Age.ToString(), "squad-small-column"));
-            row.Add(CreatePotentialLabel(statistics.Player));
+            row.Add(WrapStars(Session.GetAbilityStars(statistics.Player)));
+            row.Add(WrapStars(Session.GetPotentialStars(statistics.Player)));
             row.Add(ScreenFormatting.CreateLabel(statistics.GamesPlayed.ToString(), "squad-small-column"));
             row.Add(ScreenFormatting.CreateLabel(statistics.GamesStarted.ToString(), "squad-small-column"));
             row.Add(ScreenFormatting.CreateLabel(ScreenFormatting.FormatPerGame(statistics.GamesPlayed, statistics.MinutesPerGame), "squad-stat-column"));
@@ -134,6 +117,15 @@ namespace ProBasketballManager.Presentation.Screens
             row.RegisterCallback<ClickEvent>(_ => PlayerSelected?.Invoke(player));
 
             return row;
+        }
+
+        private static VisualElement WrapStars(double stars)
+        {
+            var cell = new VisualElement();
+            cell.AddToClassList("squad-stars-column");
+            cell.Add(StarRatingElements.Create(stars, 12));
+
+            return cell;
         }
     }
 }

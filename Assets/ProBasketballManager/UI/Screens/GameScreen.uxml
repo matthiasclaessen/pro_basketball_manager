@@ -219,10 +219,10 @@
                     <ui:VisualElement class="card squad-table-card">
                         <ui:VisualElement class="squad-table-header">
                             <ui:Label text="Player" class="squad-player-column" />
-                            <ui:Label text="Role" class="squad-role-column" />
                             <ui:Label text="Pos" class="squad-position-column" />
                             <ui:Label text="Age" class="squad-small-column" />
-                            <ui:Label text="Pot" class="squad-small-column" />
+                            <ui:Label text="Ability" class="squad-stars-column" />
+                            <ui:Label text="Potential" class="squad-stars-column" />
                             <ui:Label text="GP" class="squad-small-column" />
                             <ui:Label text="GS" class="squad-small-column" />
                             <ui:Label text="MIN" class="squad-stat-column" />

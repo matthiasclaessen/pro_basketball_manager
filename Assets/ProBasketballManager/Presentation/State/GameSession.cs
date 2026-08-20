@@ -34,6 +34,10 @@ namespace ProBasketballManager.Presentation.State
 
         public IReadOnlyList<Team> ManagedTeams => UserClub.Teams.Where(team => _managedTeamIds.Contains(team.Id)).ToList();
 
+        private IReadOnlyList<int> _starReference;
+
+        public IReadOnlyList<int> StarReference => _starReference ?? (_starReference = BuildStarReference());
+
         public Fixture CurrentFixture { get; private set; }
 
         public Team HomeTeam => CurrentFixture?.HomeTeam;
@@ -73,6 +77,33 @@ namespace ProBasketballManager.Presentation.State
             _managedTeamIds.Add(userTeam.Id);
 
             RefreshCurrentFixture();
+        }
+
+        private IReadOnlyList<int> BuildStarReference()
+        {
+            var competition = Career.GetSeasonFor(UserTeam)?.League ?? Career.PrimaryLeague;
+
+            return StarRating.BuildReference(competition.Teams.SelectMany(team => team.Players));
+        }
+
+        public double GetAbilityStars(Player player)
+        {
+            if (player == null)
+            {
+                throw new ArgumentNullException(nameof(player));
+            }
+
+            return StarRating.Calculate(player.CurrentAbility, StarReference);
+        }
+
+        public double GetPotentialStars(Player player)
+        {
+            if (player == null)
+            {
+                throw new ArgumentNullException(nameof(player));
+            }
+
+            return StarRating.Calculate(player.ScoutedPotential, StarReference);
         }
 
         public TeamTactics GetTactics(Team team)
@@ -171,6 +202,8 @@ namespace ProBasketballManager.Presentation.State
             }
 
             UserTeam = team;
+
+            _starReference = null;
 
             RefreshCurrentFixture();
         }
@@ -299,6 +332,8 @@ namespace ProBasketballManager.Presentation.State
             var archived = Career.AdvanceToNextSeason();
 
             _rotations.Clear();
+
+            _starReference = null;
 
             CurrentMatchResult = null;
             CurrentFixtureRecorded = false;
