@@ -67,7 +67,7 @@ namespace ProBasketballManager.Presentation.Screens
 
         private static Label CreatePotentialLabel(Player player)
         {
-            if (player.ScoutedPotential <= player.Overall)
+            if (player.ScoutedPotential <= player.CurrentAbility)
             {
                 var settled = ScreenFormatting.CreateLabel(ScreenFormatting.NoValue, "squad-small-column");
                 settled.AddToClassList("squad-potential-settled");
@@ -77,7 +77,7 @@ namespace ProBasketballManager.Presentation.Screens
 
             var label = ScreenFormatting.CreateLabel(player.ScoutedPotential.ToString(), "squad-small-column");
 
-            var upside = player.ScoutedPotential - player.Overall;
+            var upside = player.ScoutedPotential - player.CurrentAbility;
 
             label.AddToClassList(upside >= 4 ? "squad-potential-high" : "squad-potential-modest");
 
@@ -109,7 +109,12 @@ namespace ProBasketballManager.Presentation.Screens
             var row = new VisualElement();
             row.AddToClassList("squad-row");
 
-            row.Add(ScreenFormatting.CreateLabel(statistics.Player.FullName, "squad-player-column"));
+            var nameCell = new VisualElement();
+            nameCell.AddToClassList("squad-row-identity");
+            nameCell.Add(ClubIdentityElements.CreateFlag(statistics.Player.Nationality, 18));
+            nameCell.Add(ScreenFormatting.CreateLabel(statistics.Player.FullName, "squad-player-column"));
+
+            row.Add(nameCell);
             row.Add(ScreenFormatting.CreateLabel(ScreenFormatting.GetPositionAbbreviation(statistics.Player.Position), "squad-position-column"));
             row.Add(ScreenFormatting.CreateLabel(statistics.Player.Age.ToString(), "squad-small-column"));
             row.Add(CreatePotentialLabel(statistics.Player));

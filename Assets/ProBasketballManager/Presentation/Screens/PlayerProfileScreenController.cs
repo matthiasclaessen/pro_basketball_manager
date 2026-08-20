@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using ProBasketballManager.Domain.Players;
 using ProBasketballManager.Domain.Statistics;
 using UnityEngine.UIElements;
@@ -110,7 +110,7 @@ namespace ProBasketballManager.Presentation.Screens
         {
             if (_overallLabel != null)
             {
-                _overallLabel.text = player.Overall.ToString();
+                _overallLabel.text = player.CurrentAbility.ToString();
             }
 
             if (_potentialLabel == null)
@@ -118,7 +118,7 @@ namespace ProBasketballManager.Presentation.Screens
                 return;
             }
 
-            _potentialLabel.text = player.ScoutedPotential <= player.Overall ? "Fully developed" : $"{player.ScoutedPotential} (scouted)";
+            _potentialLabel.text = player.ScoutedPotential <= player.CurrentAbility ? "Fully developed" : $"{player.ScoutedPotential} (scouted)";
         }
 
         private void RenderStatistics(PlayerSeasonStatistics statistics)

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using ProBasketballManager.Domain.Competitions;
@@ -147,12 +147,12 @@ namespace ProBasketballManager.Presentation.Screens
 
                 var replacement = record.Replacement;
 
-                var upside = replacement.ScoutedPotential > replacement.Overall ? $", scouted ceiling {replacement.ScoutedPotential}" : string.Empty;
+                var upside = replacement.ScoutedPotential > replacement.CurrentAbility ? $", scouted ceiling {replacement.ScoutedPotential}" : string.Empty;
 
                 details.Add(ScreenFormatting.CreateLabel(
                     $"Replaced by {replacement.FullName}, {replacement.Age}, " +
                     $"{ScreenFormatting.GetPositionAbbreviation(replacement.Position)}, " +
-                    $"rated {replacement.Overall}{upside}",
+                    $"rated {replacement.CurrentAbility}{upside}",
                     "close-season-detail"));
 
                 row.Add(details);
