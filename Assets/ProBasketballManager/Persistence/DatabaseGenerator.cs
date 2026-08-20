@@ -145,11 +145,11 @@ namespace ProBasketballManager.Persistence
 
             var currentAbility = PlayerRating.CalculateCurrentAbility(position, attributes);
 
-            var ceiling = age <= 20 ? 62.0 : age <= 23 ? 44.0 : age <= 26 ? 26.0 : age <= 29 ? 12.0 : 4.0;
+            var ceiling = age <= 20 ? 62.0 : age <= 23 ? 46.0 : age <= 26 ? 30.0 : age <= 29 ? 16.0 : 6.0;
 
             var talent = Math.Pow(random.NextDouble(), TalentScarcity);
 
-            var potential = PlayerRating.ClampAbility(currentAbility + ceiling * talent + ((random.NextDouble() - 0.5) * 8.0));
+            var potential = PlayerRating.ClampAbility(currentAbility + (ceiling * talent) + ((random.NextDouble() - 0.5) * 8.0));
 
             var scoutingError = (int)((random.NextDouble() - 0.5) * 26);
 

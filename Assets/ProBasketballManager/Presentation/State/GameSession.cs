@@ -34,9 +34,12 @@ namespace ProBasketballManager.Presentation.State
 
         public IReadOnlyList<Team> ManagedTeams => UserClub.Teams.Where(team => _managedTeamIds.Contains(team.Id)).ToList();
 
-        private IReadOnlyList<int> _starReference;
+        private IReadOnlyList<int> _abilityReference;
+        private IReadOnlyList<int> _potentialReference;
 
-        public IReadOnlyList<int> StarReference => _starReference ?? (_starReference = BuildStarReference());
+        public IReadOnlyList<int> AbilityReference => _abilityReference ?? (_abilityReference = BuildReference(false));
+
+        public IReadOnlyList<int> PotentialReference => _potentialReference ?? (_potentialReference = BuildReference(true));
 
         public Fixture CurrentFixture { get; private set; }
 
@@ -79,11 +82,13 @@ namespace ProBasketballManager.Presentation.State
             RefreshCurrentFixture();
         }
 
-        private IReadOnlyList<int> BuildStarReference()
+        private IReadOnlyList<int> BuildReference(bool byPotential)
         {
             var competition = Career.GetSeasonFor(UserTeam)?.League ?? Career.PrimaryLeague;
 
-            return StarRating.BuildReference(competition.Teams.SelectMany(team => team.Players));
+            var players = competition.Teams.SelectMany(team => team.Players);
+
+            return players.Select(player => byPotential ? player.ScoutedPotential : player.CurrentAbility).OrderByDescending(value => value).ToList();
         }
 
         public double GetAbilityStars(Player player)
@@ -93,7 +98,7 @@ namespace ProBasketballManager.Presentation.State
                 throw new ArgumentNullException(nameof(player));
             }
 
-            return StarRating.Calculate(player.CurrentAbility, StarReference);
+            return StarRating.Calculate(player.CurrentAbility, AbilityReference);
         }
 
         public double GetPotentialStars(Player player)
@@ -103,7 +108,7 @@ namespace ProBasketballManager.Presentation.State
                 throw new ArgumentNullException(nameof(player));
             }
 
-            return StarRating.Calculate(player.ScoutedPotential, StarReference);
+            return StarRating.Calculate(player.ScoutedPotential, PotentialReference);
         }
 
         public TeamTactics GetTactics(Team team)
@@ -203,7 +208,8 @@ namespace ProBasketballManager.Presentation.State
 
             UserTeam = team;
 
-            _starReference = null;
+            _abilityReference = null;
+            _potentialReference = null;
 
             RefreshCurrentFixture();
         }
@@ -333,7 +339,8 @@ namespace ProBasketballManager.Presentation.State
 
             _rotations.Clear();
 
-            _starReference = null;
+            _abilityReference = null;
+            _potentialReference = null;
 
             CurrentMatchResult = null;
             CurrentFixtureRecorded = false;
