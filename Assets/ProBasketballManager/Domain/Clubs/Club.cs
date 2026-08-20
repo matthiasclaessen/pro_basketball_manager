@@ -27,13 +27,15 @@ namespace ProBasketballManager.Domain.Clubs
 
         public string BadgeTemplate { get; }
 
+        public int Reputation { get; private set; }
+
         public IReadOnlyList<Player> Squad => _squad;
 
         public IReadOnlyList<Team> Teams => _teams;
 
         public Team FirstTeam => GetTeam(TeamType.First);
 
-        public Club(int id, string name, IEnumerable<Player> squad, IEnumerable<Team> teams, string shortName = null, string city = null, string primaryColor = null, string secondaryColor = null, string tertiaryColor = null, string badgeTemplate = null)
+        public Club(int id, string name, IEnumerable<Player> squad, IEnumerable<Team> teams, string shortName = null, string city = null, string primaryColor = null, string secondaryColor = null, string tertiaryColor = null, string badgeTemplate = null, int reputation = 0)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -62,7 +64,14 @@ namespace ProBasketballManager.Domain.Clubs
             _squad = squad.ToList();
             _teams = teams.ToList();
 
+            Reputation = reputation > 0 ? PlayerRating.ClampAbility(reputation) : PlayerRating.ClampAbility(_squad.Average(player => player.CurrentAbility));
+
             Validate();
+        }
+
+        public double GetRecruitmentTarget(double reputationWeight)
+        {
+            return Reputation * reputationWeight + _squad.Average(player => player.CurrentAbility) * (1.0 - reputationWeight);
         }
 
         public static string BuildInitials(string name)

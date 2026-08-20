@@ -15,6 +15,8 @@ namespace ProBasketballManager.Domain.Competitions
         private readonly List<Player> _retiredPlayers = new List<Player>();
         private readonly List<Club> _clubs;
 
+        public const double RecruitmentReputationWeight = 0.90;
+
         public IReadOnlyList<Club> Clubs => _clubs;
 
         private readonly List<Season> _seasons = new List<Season>();
@@ -39,7 +41,8 @@ namespace ProBasketballManager.Domain.Competitions
 
         public bool CanAdvance => AllSeasonsComplete;
 
-        public Career(IEnumerable<Club> clubs, League league, Season currentSeason, IEnumerable<CompletedSeason> completedSeasons = null, IEnumerable<Player> retiredPlayers = null) : this(clubs, new[] { currentSeason ?? throw new ArgumentNullException(nameof(currentSeason)) }, completedSeasons, retiredPlayers)
+        public Career(IEnumerable<Club> clubs, League league, Season currentSeason, IEnumerable<CompletedSeason> completedSeasons = null, IEnumerable<Player> retiredPlayers = null)
+            : this(clubs, new[] { currentSeason ?? throw new ArgumentNullException(nameof(currentSeason)) }, completedSeasons, retiredPlayers)
         {
             if (currentSeason.League != league)
             {
@@ -222,6 +225,8 @@ namespace ProBasketballManager.Domain.Competitions
 
             foreach (var club in _clubs)
             {
+                var targetAbility = club.GetRecruitmentTarget(RecruitmentReputationWeight);
+
                 foreach (var player in club.Squad.ToList())
                 {
                     var team = club.GetPrimaryTeamFor(player.Id);
@@ -230,7 +235,7 @@ namespace ProBasketballManager.Domain.Competitions
 
                     if (RetirementModel.ShouldRetire(player, random))
                     {
-                        var replacement = ProspectGenerator.Create(nextPlayerId++, player.Position, random);
+                        var replacement = ProspectGenerator.Create(nextPlayerId++, player.Position, random, targetAbility);
 
                         club.ReplacePlayer(player, replacement);
 

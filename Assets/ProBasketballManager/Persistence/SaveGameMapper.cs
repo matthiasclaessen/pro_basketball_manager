@@ -14,7 +14,7 @@ namespace ProBasketballManager.Persistence
 {
     public static class SaveGameMapper
     {
-        public const int CurrentSchemaVersion = 10;
+        public const int CurrentSchemaVersion = 11;
 
         public const int MinimumReadableSchemaVersion = 1;
 
@@ -122,6 +122,7 @@ namespace ProBasketballManager.Persistence
                 SecondaryColor = club.SecondaryColor,
                 TertiaryColor = club.TertiaryColor,
                 BadgeTemplate = club.BadgeTemplate,
+                Reputation = club.Reputation,
                 Squad = club.Squad.Select(ToDto).ToList(),
                 Teams = club.Teams.Select(ToDto).ToList()
             };
@@ -568,7 +569,7 @@ namespace ProBasketballManager.Persistence
 
             var teams = (dto.Teams ?? new List<TeamDto>()).Select(team => FromDto(team, dto.Id, squadById)).ToList();
 
-            return new Club(dto.Id, dto.Name, squad, teams, dto.ShortName, dto.City, dto.PrimaryColor, dto.SecondaryColor, dto.TertiaryColor, dto.BadgeTemplate);
+            return new Club(dto.Id, dto.Name, squad, teams, dto.ShortName, dto.City, dto.PrimaryColor, dto.SecondaryColor, dto.TertiaryColor, dto.BadgeTemplate, dto.Reputation);
         }
 
         private static Team FromDto(TeamDto dto, int clubId, Dictionary<int, Player> squad)

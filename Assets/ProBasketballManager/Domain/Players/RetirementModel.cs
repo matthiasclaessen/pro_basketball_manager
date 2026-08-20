@@ -62,11 +62,10 @@ namespace ProBasketballManager.Domain.Players
         public const int MinimumEntryAge = 18;
         public const int MaximumEntryAge = 22;
 
-        public const int MinimumStartingRating = 7;
-        public const int MaximumStartingRating = 13;
-
-        public const int MinimumUpside = 3;
-        public const int MaximumUpside = 8;
+        public const double PotentialTargetFactor = 1.08;
+        public const double PotentialSpread = 34.0;
+        public const double MinimumEntryGap = 20.0;
+        public const double MaximumEntryGap = 45.0;
 
         public const int MaximumScoutingError = 3;
 
@@ -84,17 +83,23 @@ namespace ProBasketballManager.Domain.Players
             "Hermans", "Dubois", "Lambert", "Michiels", "Segers", "Coppens", "Pauwels"
         };
 
-        public static Player Create(int id, PlayerPosition position, IRandomSource random)
+        public static Player Create(int id, PlayerPosition position, IRandomSource random, double targetAbility)
         {
+            if (targetAbility <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(targetAbility), "A prospect must be generated against a positive target ability.");
+            }
+
             var firstName = FirstNames[random.NextInt(0, FirstNames.Length)];
             var lastName = LastNames[random.NextInt(0, LastNames.Length)];
 
             var age = random.NextInt(MinimumEntryAge, MaximumEntryAge + 1);
 
-            var baseRating = random.NextInt(MinimumStartingRating, MaximumStartingRating + 1);
-            var upside = random.NextInt(MinimumUpside, MaximumUpside + 1);
+            var potential = PlayerRating.ClampAbility(targetAbility * PotentialTargetFactor + (random.NextDouble() - 0.5) * PotentialSpread);
 
-            var potential = PlayerRating.FromAttributePoints(baseRating + upside);
+            var entryGap = MinimumEntryGap + random.NextDouble() * (MaximumEntryGap - MinimumEntryGap);
+
+            var baseRating = PlayerRating.ToAttributePoints(PlayerRating.ClampAbility(potential - entryGap));
 
             var scoutingError = random.NextInt(-MaximumScoutingError, MaximumScoutingError + 1);
             var scoutedPotential = PlayerRating.ClampAbility(potential + (int)(scoutingError * PlayerRating.AbilityPerAttributePoint));
@@ -104,7 +109,7 @@ namespace ProBasketballManager.Domain.Players
             return new Player(id, firstName, lastName, position, attributes, age, potential, scoutedPotential);
         }
 
-        private static PlayerAttributes CreateAttributes(int baseRating, PlayerPosition position, IRandomSource random)
+        private static PlayerAttributes CreateAttributes(double baseRating, PlayerPosition position, IRandomSource random)
         {
             int Roll(int bias)
             {

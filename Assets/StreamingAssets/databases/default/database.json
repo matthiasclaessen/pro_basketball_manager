@@ -11,7 +11,8 @@
       "PrimaryColor": "#E4032E",
       "SecondaryColor": "#FFD500",
       "TertiaryColor": "#FFFFFF",
-      "BadgeTemplate": "heater-barry"
+      "BadgeTemplate": "heater-barry",
+      "Reputation": 128
     },
     {
       "Id": 2,
@@ -21,7 +22,8 @@
       "PrimaryColor": "#E30613",
       "SecondaryColor": "#FFFFFF",
       "TertiaryColor": "#0A0A0A",
-      "BadgeTemplate": "heater-bend"
+      "BadgeTemplate": "heater-bend",
+      "Reputation": 123
     },
     {
       "Id": 3,
@@ -31,7 +33,8 @@
       "PrimaryColor": "#0050A0",
       "SecondaryColor": "#FFFFFF",
       "TertiaryColor": "#E00010",
-      "BadgeTemplate": "heater-bendy-shaded"
+      "BadgeTemplate": "heater-bendy-shaded",
+      "Reputation": 119
     },
     {
       "Id": 4,
@@ -41,7 +44,8 @@
       "PrimaryColor": "#C8102E",
       "SecondaryColor": "#FFFFFF",
       "TertiaryColor": "#003DA5",
-      "BadgeTemplate": "heater-chevron"
+      "BadgeTemplate": "heater-chevron",
+      "Reputation": 111
     },
     {
       "Id": 5,
@@ -51,7 +55,8 @@
       "PrimaryColor": "#0A0A0A",
       "SecondaryColor": "#F57C00",
       "TertiaryColor": "#FFFFFF",
-      "BadgeTemplate": "heater-chief-mullets"
+      "BadgeTemplate": "heater-chief-mullets",
+      "Reputation": 106
     },
     {
       "Id": 6,
@@ -61,7 +66,8 @@
       "PrimaryColor": "#E00010",
       "SecondaryColor": "#FFFFFF",
       "TertiaryColor": "#141414",
-      "BadgeTemplate": "heater-cross"
+      "BadgeTemplate": "heater-cross",
+      "Reputation": 102
     },
     {
       "Id": 7,
@@ -71,7 +77,8 @@
       "PrimaryColor": "#0033A0",
       "SecondaryColor": "#FFFFFF",
       "TertiaryColor": "#0A0A0A",
-      "BadgeTemplate": "heater-fess"
+      "BadgeTemplate": "heater-fess",
+      "Reputation": 97
     },
     {
       "Id": 8,
@@ -81,7 +88,8 @@
       "PrimaryColor": "#E02010",
       "SecondaryColor": "#FFFFFF",
       "TertiaryColor": "#000000",
-      "BadgeTemplate": "heater-lozenge"
+      "BadgeTemplate": "heater-lozenge",
+      "Reputation": 94
     },
     {
       "Id": 9,
@@ -91,7 +99,8 @@
       "PrimaryColor": "#0053A0",
       "SecondaryColor": "#FFFFFF",
       "TertiaryColor": "#7AC943",
-      "BadgeTemplate": "heater-pale"
+      "BadgeTemplate": "heater-pale",
+      "Reputation": 95
     },
     {
       "Id": 10,
@@ -101,7 +110,8 @@
       "PrimaryColor": "#101030",
       "SecondaryColor": "#FFFFFF",
       "TertiaryColor": "#E08030",
-      "BadgeTemplate": "heater-quarterly"
+      "BadgeTemplate": "heater-quarterly",
+      "Reputation": 87
     },
     {
       "Id": 11,
@@ -111,7 +121,8 @@
       "PrimaryColor": "#E01020",
       "SecondaryColor": "#FFFFFF",
       "TertiaryColor": "#283030",
-      "BadgeTemplate": "roundel-annulet"
+      "BadgeTemplate": "roundel-annulet",
+      "Reputation": 83
     }
   ],
   "Teams": [
@@ -551,10 +562,10 @@
       "Potential": 178,
       "ScoutedPotential": 173,
       "Attributes": {
-        "Finishing": 19,
+        "Finishing": 17,
         "MidRange": 19,
         "ThreePoint": 20,
-        "FreeThrow": 20,
+        "FreeThrow": 18,
         "Passing": 20,
         "BallHandling": 20,
         "PerimeterDefense": 20,
@@ -562,7 +573,7 @@
         "OffensiveRebounding": 13,
         "DefensiveRebounding": 14,
         "Speed": 20,
-        "Strength": 18,
+        "Strength": 13,
         "Stamina": 17,
         "BasketballIq": 20
       }

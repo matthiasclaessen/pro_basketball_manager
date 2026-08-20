@@ -87,6 +87,8 @@ namespace ProBasketballManager.Persistence
 
                 database.Players.AddRange(squad);
 
+                database.Clubs[database.Clubs.Count - 1].Reputation = (int)Math.Round(squad.Average(player => PlayerRating.CalculateCurrentAbility((PlayerPosition)Enum.Parse(typeof(PlayerPosition), player.Position), FromDto(player.Attributes))));
+
                 database.Teams.Add(new DatabaseTeamDto
                 {
                     Id = club.Id,
@@ -209,6 +211,11 @@ namespace ProBasketballManager.Persistence
                 strength: Roll(centre ? 4.5 : big ? 3.0 : guard ? -3.0 : 0.0),
                 stamina: Roll(0.5),
                 basketballIq: Roll(position == PlayerPosition.PointGuard ? 2.5 : 0.0));
+        }
+
+        private static PlayerAttributes FromDto(DatabaseAttributesDto a)
+        {
+            return new PlayerAttributes(a.Finishing, a.MidRange, a.ThreePoint, a.FreeThrow, a.Passing, a.BallHandling, a.PerimeterDefense, a.InteriorDefense, a.OffensiveRebounding, a.DefensiveRebounding, a.Speed, a.Strength, a.Stamina, a.BasketballIq);
         }
 
         private static DatabaseAttributesDto ToDto(PlayerAttributes attributes)

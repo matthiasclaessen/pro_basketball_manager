@@ -53,6 +53,7 @@ namespace ProBasketballManager.Persistence
         public string SecondaryColor;
         public string TertiaryColor;
         public string BadgeTemplate;
+        public int Reputation;
         public List<PlayerDto> Squad = new List<PlayerDto>();
         public List<TeamDto> Teams = new List<TeamDto>();
     }

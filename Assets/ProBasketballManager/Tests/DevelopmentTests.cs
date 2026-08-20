@@ -157,7 +157,7 @@ namespace ProBasketballManager.Domain.Tests
 
             for (var trial = 0; trial < 200; trial++)
             {
-                var prospect = ProspectGenerator.Create(trial, PlayerPosition.SmallForward, random);
+                var prospect = ProspectGenerator.Create(trial, PlayerPosition.SmallForward, random, PlayerRating.AverageAbility);
 
                 Assert.That(prospect.Age, Is.InRange(ProspectGenerator.MinimumEntryAge, ProspectGenerator.MaximumEntryAge));
 
@@ -177,7 +177,7 @@ namespace ProBasketballManager.Domain.Tests
 
             for (var trial = 0; trial < 200; trial++)
             {
-                var prospect = ProspectGenerator.Create(trial, PlayerPosition.PointGuard, random);
+                var prospect = ProspectGenerator.Create(trial, PlayerPosition.SmallForward, random, PlayerRating.AverageAbility);
 
                 var error = Math.Abs(prospect.ScoutedPotential - prospect.Potential);
 
@@ -203,10 +203,10 @@ namespace ProBasketballManager.Domain.Tests
 
             for (var trial = 0; trial < 150; trial++)
             {
-                centreRebounding += ProspectGenerator.Create(trial, PlayerPosition.Center, random)
+                centreRebounding += ProspectGenerator.Create(trial, PlayerPosition.SmallForward, random, PlayerRating.AverageAbility)
                     .Attributes.DefensiveRebounding;
 
-                guardRebounding += ProspectGenerator.Create(trial, PlayerPosition.PointGuard, random)
+                guardRebounding += ProspectGenerator.Create(trial, PlayerPosition.SmallForward, random, PlayerRating.AverageAbility)
                     .Attributes.DefensiveRebounding;
             }
 

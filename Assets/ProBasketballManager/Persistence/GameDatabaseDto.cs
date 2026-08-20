@@ -24,6 +24,7 @@ namespace ProBasketballManager.Persistence
         public string SecondaryColor;
         public string TertiaryColor;
         public string BadgeTemplate;
+        public int Reputation;
     }
 
     public sealed class DatabaseTeamDto

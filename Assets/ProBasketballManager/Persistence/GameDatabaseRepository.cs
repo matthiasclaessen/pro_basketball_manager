@@ -154,7 +154,7 @@ namespace ProBasketballManager.Persistence
 
                 try
                 {
-                    clubs.Add(new Club(clubDto.Id, clubDto.Name, squad, teams, clubDto.ShortName, clubDto.City, clubDto.PrimaryColor, clubDto.SecondaryColor, clubDto.TertiaryColor, clubDto.BadgeTemplate));
+                    clubs.Add(new Club(clubDto.Id, clubDto.Name, squad, teams, clubDto.ShortName, clubDto.City, clubDto.PrimaryColor, clubDto.SecondaryColor, clubDto.TertiaryColor, clubDto.BadgeTemplate, clubDto.Reputation));
                 }
                 catch (ArgumentException exception)
                 {

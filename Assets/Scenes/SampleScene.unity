@@ -141,6 +141,7 @@ GameObject:
   - component: {fileID: 22130516}
   - component: {fileID: 22130518}
   - component: {fileID: 22130519}
+  - component: {fileID: 22130520}
   m_Layer: 5
   m_Name: GameUI
   m_TagString: Untagged
@@ -161,6 +162,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProBasketballManager.Presentation.Screens.GameScreenController
   _mainMenuScreen: {fileID: 22130517}
+  _clubSelectScreen: {fileID: 22130520}
   _saveLoadScreen: {fileID: 22130516}
   _dashboardScreen: {fileID: 22130514}
   _squadScreen: {fileID: 22130511}
@@ -341,6 +343,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dee5bbc29887aeb49bd4a0e512915e76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: ProBasketballManager.Presentation::ProBasketballManager.Presentation.Screens.CloseSeasonScreenController
+--- !u!114 &22130520
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 22130505}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9dd39b1bbce2da544a0a9f22988344cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProBasketballManager.Presentation::ProBasketballManager.Presentation.Screens.ClubSelectScreenController
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
