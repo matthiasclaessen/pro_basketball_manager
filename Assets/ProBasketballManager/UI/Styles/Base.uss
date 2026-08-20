@@ -65,6 +65,10 @@
     flex-grow: 1;
 }
 
+.screen > TemplateContainer {
+    flex-grow: 1;
+}
+
 .screen-hidden {
     display: none;
 }

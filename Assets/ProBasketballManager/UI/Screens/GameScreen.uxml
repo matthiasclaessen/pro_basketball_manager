@@ -50,7 +50,7 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="main-menu-screen" class="screen screen-hidden welcome-host">
+        <ui:VisualElement name="main-menu-screen" class="screen welcome-host">
             <ui:Instance template="WelcomeScreen" />
         </ui:VisualElement>
         <ui:VisualElement name="load-game-screen" class="screen screen-hidden welcome-host">

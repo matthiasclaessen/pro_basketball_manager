@@ -16,6 +16,10 @@
     overflow: hidden;
 }
 
+.welcome-screen .brand-title {
+    color: #111827;
+}
+
 .background-glow {
     position: absolute;
     width: 760px;
@@ -256,16 +260,24 @@
     justify-content: center;
     margin-right: 20px;
     background-color: #fff7ed;
+    background-size: 26px 26px;
+    background-position: center;
     border-top-left-radius: 31px;
     border-top-right-radius: 31px;
     border-bottom-left-radius: 31px;
     border-bottom-right-radius: 31px;
 }
 
-.menu-button-icon-label {
-    color: #f97316;
-    font-size: 14px;
-    -unity-font-style: bold;
+.menu-button-icon-new-game {
+    background-image: url("../Icons/basketball.svg");
+}
+
+.menu-button-icon-load-game {
+    background-image: url("../Icons/folder-open.svg");
+}
+
+.menu-button-icon-exit-game {
+    background-image: url("../Icons/log-out.svg");
 }
 
 .menu-button-content {

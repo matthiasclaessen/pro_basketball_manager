@@ -226,8 +226,6 @@ namespace ProBasketballManager.Presentation.Screens
             {
                 _navDashboardButton.clicked -= ShowDashboard;
                 _navSquadButton.clicked -= ShowSquad;
-
-                _playerProfileBackButton.clicked -= ShowSquad;
             }
 
 

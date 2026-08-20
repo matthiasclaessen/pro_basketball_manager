@@ -1,66 +1,60 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements">
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
     <ui:VisualElement name="welcome-root" class="welcome-screen">
-        <ui:VisualElement class="background-glow background-glow-left" />
-        <ui:VisualElement class="background-glow background-glow-right" />
+        <ui:VisualElement class="background-glow background-glow-left"/>
+        <ui:VisualElement class="background-glow background-glow-right"/>
         <ui:VisualElement class="basketball-watermark">
-            <ui:VisualElement class="basketball-line basketball-line-horizontal" />
-            <ui:VisualElement class="basketball-line basketball-line-vertical" />
-            <ui:VisualElement class="basketball-curve basketball-curve-left" />
-            <ui:VisualElement class="basketball-curve basketball-curve-right" />
+            <ui:VisualElement class="basketball-line basketball-line-horizontal"/>
+            <ui:VisualElement class="basketball-line basketball-line-vertical"/>
+            <ui:VisualElement class="basketball-curve basketball-curve-left"/>
+            <ui:VisualElement class="basketball-curve basketball-curve-right"/>
         </ui:VisualElement>
         <ui:VisualElement class="welcome-content">
             <ui:VisualElement class="welcome-brand">
                 <ui:VisualElement class="brand-mark">
                     <ui:VisualElement class="brand-ball">
-                        <ui:Label text="PB" class="brand-ball-label" />
+                        <ui:Label text="PB" class="brand-ball-label"/>
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement class="brand-text">
-                    <ui:Label text="PRO" class="brand-kicker" />
-                    <ui:Label text="BASKETBALL" class="brand-title" />
-                    <ui:Label text="MANAGER" class="brand-title" />
+                    <ui:Label text="PRO" class="brand-kicker"/>
+                    <ui:Label text="BASKETBALL" class="brand-title"/>
+                    <ui:Label text="MANAGER" class="brand-title"/>
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement class="brand-divider" />
-            <ui:Label text="BUILD YOUR TEAM. WIN CHAMPIONSHIPS. LEAVE YOUR LEGACY." class="welcome-tagline" />
+            <ui:VisualElement class="brand-divider"/>
+            <ui:Label text="BUILD YOUR TEAM. WIN CHAMPIONSHIPS. LEAVE YOUR LEGACY." class="welcome-tagline"/>
             <ui:VisualElement class="menu">
                 <ui:Button name="new-game-button" class="menu-button">
-                    <ui:VisualElement class="menu-button-icon">
-                        <ui:Label text="01" class="menu-button-icon-label" />
-                    </ui:VisualElement>
+                    <ui:VisualElement class="menu-button-icon menu-button-icon-new-game" style="background-image: url(&quot;project://database/Assets/ProBasketballManager/UI/Icons/basketball.svg?fileID=7388822144124034973&amp;guid=8623d0080fcc0274d8e2712ba462b577&amp;type=3#basketball&quot;);"/>
                     <ui:VisualElement class="menu-button-content">
-                        <ui:Label text="NEW GAME" class="menu-button-title" />
-                        <ui:Label text="Start a new career and build your dynasty." class="menu-button-description" />
+                        <ui:Label text="NEW GAME" class="menu-button-title"/>
+                        <ui:Label text="Start a new career and build your dynasty." class="menu-button-description"/>
                     </ui:VisualElement>
-                    <ui:Label text="›" class="menu-button-arrow" />
+                    <ui:Label text="›" class="menu-button-arrow"/>
                 </ui:Button>
                 <ui:Button name="load-game-button" class="menu-button">
-                    <ui:VisualElement class="menu-button-icon">
-                        <ui:Label text="02" class="menu-button-icon-label" />
-                    </ui:VisualElement>
+                    <ui:VisualElement class="menu-button-icon menu-button-icon-load-game" style="background-image: url(&quot;project://database/Assets/ProBasketballManager/UI/Icons/folder-open.svg?fileID=7388822144124034973&amp;guid=cab1c85d22c593441ab8eda95b2e599e&amp;type=3#folder-open&quot;);"/>
                     <ui:VisualElement class="menu-button-content">
-                        <ui:Label text="LOAD GAME" class="menu-button-title" />
-                        <ui:Label text="Continue your existing career." class="menu-button-description" />
+                        <ui:Label text="LOAD GAME" class="menu-button-title"/>
+                        <ui:Label text="Continue your existing career." class="menu-button-description"/>
                     </ui:VisualElement>
-                    <ui:Label text="›" class="menu-button-arrow" />
+                    <ui:Label text="›" class="menu-button-arrow"/>
                 </ui:Button>
                 <ui:Button name="exit-game-button" class="menu-button">
-                    <ui:VisualElement class="menu-button-icon">
-                        <ui:Label text="03" class="menu-button-icon-label" />
-                    </ui:VisualElement>
+                    <ui:VisualElement class="menu-button-icon menu-button-icon-exit-game" style="background-image: url(&quot;project://database/Assets/ProBasketballManager/UI/Icons/log-out.svg?fileID=7388822144124034973&amp;guid=221bf657bbab1424abfad3d7b703366a&amp;type=3#log-out&quot;);"/>
                     <ui:VisualElement class="menu-button-content">
-                        <ui:Label text="EXIT GAME" class="menu-button-title" />
-                        <ui:Label text="Exit Pro Basketball Manager." class="menu-button-description" />
+                        <ui:Label text="EXIT GAME" class="menu-button-title"/>
+                        <ui:Label text="Exit Pro Basketball Manager." class="menu-button-description"/>
                     </ui:VisualElement>
-                    <ui:Label text="›" class="menu-button-arrow" />
+                    <ui:Label text="›" class="menu-button-arrow"/>
                 </ui:Button>
             </ui:VisualElement>
-            <ui:Label name="main-menu-status" text="" class="welcome-status" />
+            <ui:Label name="main-menu-status" text="" class="welcome-status"/>
         </ui:VisualElement>
         <ui:VisualElement class="version-info">
-            <ui:Label text="PROTOTYPE" class="version-label" />
-            <ui:Label text="Version 0.1" class="version-value" />
+            <ui:Label text="PROTOTYPE" class="version-label"/>
+            <ui:Label text="Version 0.1" class="version-value"/>
         </ui:VisualElement>
-        <ui:Label text="© 2026 Pro Basketball Manager" class="copyright" />
+        <ui:Label text="© 2026 Pro Basketball Manager" class="copyright"/>
     </ui:VisualElement>
 </ui:UXML>
