@@ -1,24 +1,11 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
     <ui:VisualElement name="welcome-root" class="welcome-screen">
-        <ui:VisualElement class="background-glow background-glow-left"/>
-        <ui:VisualElement class="background-glow background-glow-right"/>
-        <ui:VisualElement class="basketball-watermark">
-            <ui:VisualElement class="basketball-line basketball-line-horizontal"/>
-            <ui:VisualElement class="basketball-line basketball-line-vertical"/>
-            <ui:VisualElement class="basketball-curve basketball-curve-left"/>
-            <ui:VisualElement class="basketball-curve basketball-curve-right"/>
-        </ui:VisualElement>
         <ui:VisualElement class="welcome-content">
             <ui:VisualElement class="welcome-brand">
-                <ui:VisualElement class="brand-mark">
-                    <ui:VisualElement class="brand-ball">
-                        <ui:Label text="PB" class="brand-ball-label"/>
-                    </ui:VisualElement>
-                </ui:VisualElement>
                 <ui:VisualElement class="brand-text">
-                    <ui:Label text="PRO" class="brand-kicker"/>
-                    <ui:Label text="BASKETBALL" class="brand-title"/>
-                    <ui:Label text="MANAGER" class="brand-title"/>
+                    <ui:Label text="PRO" class="brand-kicker font-extrabold"/>
+                    <ui:Label text="BASKETBALL" class="brand-title font-extrabold"/>
+                    <ui:Label text="MANAGER" class="brand-title font-extrabold"/>
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement class="brand-divider"/>

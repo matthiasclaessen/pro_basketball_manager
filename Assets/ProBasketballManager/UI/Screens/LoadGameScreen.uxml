@@ -1,20 +1,74 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
-    <ui:VisualElement name="load-game-root" class="welcome-screen">
-        <ui:VisualElement class="background-glow background-glow-left" />
-        <ui:VisualElement class="background-glow background-glow-right" />
-        <ui:VisualElement class="load-game-content">
-            <ui:VisualElement class="load-game-header">
-                <ui:VisualElement class="load-game-heading">
-                    <ui:Label text="LOAD GAME" class="load-game-title" />
-                    <ui:Label text="Continue a saved career." class="load-game-subtitle" />
+    <ui:VisualElement name="load-game-root" class="load-game-screen">
+        <ui:VisualElement class="top-bar">
+            <ui:VisualElement class="load-game-brand">
+                <ui:VisualElement class="brand-logo">
+                    <ui:Label text="PB" class="brand-logo-text" />
                 </ui:VisualElement>
-                <ui:Button name="load-game-back-button" text="Back" class="load-game-back" />
+                <ui:VisualElement class="brand-title-container">
+                    <ui:VisualElement class="brand-title-row">
+                        <ui:Label text="PRO" class="brand-title-accent" />
+                        <ui:Label text=" BASKETBALL" class="brand-title" />
+                    </ui:VisualElement>
+                    <ui:Label text="MANAGER" class="brand-title" />
+                </ui:VisualElement>
             </ui:VisualElement>
-            <ui:Label name="load-game-status" text="" class="load-game-status" />
-            <ui:ScrollView class="load-game-scroll">
-                <ui:VisualElement name="load-game-slot-list" class="load-game-slot-list" />
-            </ui:ScrollView>
-            <ui:Label name="load-game-path" text="" class="load-game-path" />
+            <ui:Button name="load-game-back-button" text="‹   Back to Main Menu" class="back-button" />
+        </ui:VisualElement>
+        <ui:VisualElement class="page-heading">
+            <ui:Label text="LOAD GAME" class="page-title" />
+            <ui:Label text="Select a saved career to continue." class="page-subtitle" />
+            <ui:VisualElement class="title-divider" />
+        </ui:VisualElement>
+        <ui:Label name="load-game-status" text="" class="load-game-status" />
+        <ui:VisualElement class="load-layout">
+            <ui:VisualElement class="save-browser">
+                <ui:ScrollView class="save-scroll">
+                    <ui:VisualElement name="save-list" class="save-list" />
+                </ui:ScrollView>
+            </ui:VisualElement>
+            <ui:VisualElement class="selected-column">
+                <ui:VisualElement class="selected-save-card">
+                    <ui:Label text="SELECTED SAVE" class="selected-save-badge" />
+                    <ui:VisualElement name="selected-save-logo" class="selected-save-logo">
+                        <ui:Label name="selected-save-logo-label" text="" class="selected-save-logo-placeholder" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="selected-save-divider" />
+                    <ui:VisualElement class="selected-info-row">
+                        <ui:VisualElement class="detail-icon">
+                            <ui:Label text="S" class="detail-icon-text" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="detail-content">
+                            <ui:Label text="Save" class="detail-label" />
+                            <ui:Label name="selected-name-label" text="" class="detail-value" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="detail-divider" />
+                    <ui:VisualElement class="selected-info-row">
+                        <ui:VisualElement class="detail-icon">
+                            <ui:Label text="D" class="detail-icon-text" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="detail-content">
+                            <ui:Label text="Last Played" class="detail-label" />
+                            <ui:Label name="selected-last-played-label" text="" class="detail-value" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="detail-divider" />
+                    <ui:VisualElement class="selected-info-row">
+                        <ui:VisualElement class="detail-icon">
+                            <ui:Label text="Y" class="detail-icon-text" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="detail-content">
+                            <ui:Label text="Season" class="detail-label" />
+                            <ui:Label name="selected-season-label" text="" class="detail-value" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="selected-actions">
+                    <ui:Button name="delete-save-button" text="Delete Save" class="delete-button" />
+                    <ui:Button name="load-save-button" text="Load Save  →" class="load-button" />
+                </ui:VisualElement>
+            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

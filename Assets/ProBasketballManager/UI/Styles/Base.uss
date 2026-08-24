@@ -1,30 +1,38 @@
-.brand {
-    margin-bottom: 42px;
+:root {
+    -unity-font-definition: url("project://database/Assets/ProBasketballManager/Resources/Fonts%20&%20Materials/Inter_18pt-Regular%20SDF.asset");
+    --pbm-navy: #122547;
+    --pbm-navy-deep: #0E2040;
+    --pbm-navy-hover: #1B3260;
+    --pbm-navy-tint: #EDF1F7;
+    --pbm-orange: #F78222;
+    --pbm-orange-bright: #FE8512;
+    --pbm-orange-hover: #E06E12;
+    --pbm-orange-tint: #FFF4E8;
+    --pbm-orange-border: #FBC28A;
+    --pbm-surface: #FFFFFF;
+    --pbm-border: #E2E8F0;
+    --pbm-text: #0F172A;
+    --pbm-text-muted: #64748B;
 }
 
-.brand-kicker {
-    color: #f97316;
-    font-size: 12px;
-    -unity-font-style: bold;
-    letter-spacing: 2px;
-    margin-bottom: 4px;
+.font-extrabold {
+    -unity-font-definition: url("project://database/Assets/ProBasketballManager/Resources/Fonts%20&%20Materials/Inter_18pt-ExtraBold SDF.asset");
+    -unity-font-style: normal;
 }
 
-.brand-title {
-    color: #ffffff;
-    font-size: 20px;
-    -unity-font-style: bold;
+.font-black {
+    -unity-font-definition: url("project://database/Assets/ProBasketballManager/Resources/Fonts%20&%20Materials/Inter_18pt-Black SDF.asset");
+    -unity-font-style: normal;
 }
 
 .page-title {
-    color: #111827;
     font-size: 28px;
-    -unity-font-style: bold;
+    color: #111827;
 }
 
 .page-subtitle {
-    color: #6b7280;
     font-size: 14px;
+    color: #6b7280;
     margin-top: 5px;
 }
 
