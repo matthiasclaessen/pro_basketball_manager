@@ -3,10 +3,12 @@
     <Style src="project://database/Assets/ProBasketballManager/UI/Styles/Shell.uss" />
     <Style src="project://database/Assets/ProBasketballManager/UI/Styles/Components.uss" />
     <Style src="project://database/Assets/ProBasketballManager/UI/Styles/MainMenuScreen.uss" />
+    <Style src="project://database/Assets/ProBasketballManager/UI/Styles/NewGameScreen.uss" />
     <Style src="project://database/Assets/ProBasketballManager/UI/Styles/LoadGameScreen.uss" />
     <!-- <Style src="project://database/Assets/ProBasketballManager/UI/Styles/Screens/Squad.uss" /> -->
     <ui:Template name="DashboardScreen" src="project://database/Assets/ProBasketballManager/UI/Screens/DashboardScreen.uxml" />
     <ui:Template name="WelcomeScreen" src="project://database/Assets/ProBasketballManager/UI/Screens/MainMenuScreen.uxml" />
+    <ui:Template name="NewGameScreen" src="project://database/Assets/ProBasketballManager/UI/Screens/NewGameScreen.uxml" />
     <ui:Template name="LoadGameScreen" src="project://database/Assets/ProBasketballManager/UI/Screens/LoadGameScreen.uxml" />
     <ui:Template name="SquadScreen" src="project://database/Assets/ProBasketballManager/UI/Screens/SquadScreen.uxml" />
     <ui:VisualElement name="root" class="app">
@@ -52,6 +54,9 @@
         </ui:VisualElement>
         <ui:VisualElement name="main-menu-screen" class="screen welcome-host">
             <ui:Instance template="WelcomeScreen" />
+        </ui:VisualElement>
+        <ui:VisualElement name="new-game-screen" class="screen screen-hidden welcome-host">
+            <ui:Instance template="NewGameScreen" />
         </ui:VisualElement>
         <ui:VisualElement name="load-game-screen" class="screen screen-hidden welcome-host">
             <ui:Instance template="LoadGameScreen" />

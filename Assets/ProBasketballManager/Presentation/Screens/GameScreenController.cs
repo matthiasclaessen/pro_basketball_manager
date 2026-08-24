@@ -16,6 +16,10 @@ namespace ProBasketballManager.Presentation.Screens
         private MainMenuScreenController _mainMenuScreen;
 
         [SerializeField]
+        [Tooltip("New game: pick a starting season and a club.")]
+        private NewGameScreenController _newGameScreen;
+
+        [SerializeField]
         [Tooltip("Load game: pick a save file from the welcome screen.")]
         private LoadGameScreenController _loadGameScreen;
 
@@ -61,7 +65,14 @@ namespace ProBasketballManager.Presentation.Screens
                 _mainMenuScreen.ExitRequested += ExitGame;
             }
 
+            BindScreen(_newGameScreen, nameof(NewGameScreenController), _root, null);
 
+            if (_newGameScreen != null)
+            {
+                _newGameScreen.RegisterCallbacks();
+                _newGameScreen.StartRequested += AdoptNewGame;
+                _newGameScreen.Cancelled += ShowMainMenu;
+            }
 
             BindScreen(_loadGameScreen, nameof(LoadGameScreenController), _root, null);
 
@@ -106,6 +117,8 @@ namespace ProBasketballManager.Presentation.Screens
             HideAllScreens();
 
             SetNavigationVisible(false);
+
+            _newGameScreen?.Show();
         }
 
         private void AdoptNewGame(GameDatabase database, int teamId)
@@ -155,6 +168,11 @@ namespace ProBasketballManager.Presentation.Screens
                 _mainMenuScreen.NewGameRequested -= StartNewGame;
                 _mainMenuScreen.LoadGameRequested -= ShowLoadGame;
                 _mainMenuScreen.ExitRequested -= ExitGame;
+            }
+
+            if (_newGameScreen != null)
+            {
+                _newGameScreen.UnregisterCallbacks();
             }
 
             if (_loadGameScreen != null)
@@ -212,7 +230,7 @@ namespace ProBasketballManager.Presentation.Screens
             _navDashboardButton.clicked += ShowDashboard;
             _navSquadButton.clicked += ShowSquad;
 
-          
+
             if (_dashboardScreen != null)
             {
                 _dashboardScreen.RegisterCallbacks();
@@ -325,6 +343,7 @@ namespace ProBasketballManager.Presentation.Screens
             _dashboardScreen?.Hide();
             _squadScreen?.Hide();
             _mainMenuScreen?.Hide();
+            _newGameScreen?.Hide();
             _loadGameScreen?.Hide();
         }
 

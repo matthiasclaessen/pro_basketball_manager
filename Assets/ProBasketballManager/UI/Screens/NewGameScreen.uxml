@@ -1,0 +1,78 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="new-game-root" class="new-game-screen">
+        <ui:VisualElement class="top-bar">
+            <ui:VisualElement class="load-game-brand">
+                <ui:VisualElement name="new-game-shield" class="brand-shield">
+                    <ui:Label text="PB" class="brand-shield-label" />
+                </ui:VisualElement>
+                <ui:VisualElement class="brand-title-container">
+                    <ui:VisualElement class="brand-title-row">
+                        <ui:Label text="PRO" class="brand-title-accent" />
+                        <ui:Label text=" BASKETBALL" class="brand-title" />
+                    </ui:VisualElement>
+                    <ui:Label text="MANAGER" class="brand-title" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:Button name="new-game-back-button" text="‹   Back to Main Menu" class="back-button" />
+        </ui:VisualElement>
+        <ui:VisualElement class="page-heading">
+            <ui:Label text="NEW GAME" class="page-title" />
+            <ui:Label text="Start your managerial career" class="page-subtitle" />
+            <ui:VisualElement class="title-divider" />
+        </ui:VisualElement>
+        <ui:Label name="new-game-status" text="" class="new-game-status" />
+        <ui:VisualElement class="setup-layout">
+            <ui:VisualElement class="setup-panel">
+                <ui:VisualElement class="setup-section">
+                    <ui:Label text="START DATE" class="section-title" />
+                    <ui:VisualElement class="season-row">
+                        <ui:Label text="Starting Season" class="field-label" />
+                        <ui:Label name="new-game-season-value" text="" class="season-readonly" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="section-divider" />
+                <ui:VisualElement class="setup-section setup-section-grow">
+                    <ui:Label text="CHOOSE CLUB" class="section-title" />
+                    <ui:VisualElement class="club-toolbar">
+                        <ui:DropdownField name="new-game-league-dropdown" class="league-dropdown" />
+                        <ui:TextField name="new-game-search-field" class="club-search" value="" />
+                    </ui:VisualElement>
+                    <ui:ScrollView class="club-scroll">
+                        <ui:VisualElement name="new-game-club-list" class="club-list" />
+                    </ui:ScrollView>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="summary-column">
+                <ui:VisualElement class="summary-card">
+                    <ui:Label text="GAME SETUP SUMMARY" class="summary-title" />
+                    <ui:VisualElement class="summary-row">
+                        <ui:Label text="Starting Season" class="summary-label" />
+                        <ui:Label name="summary-season" text="" class="summary-value" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="summary-divider" />
+                    <ui:VisualElement class="summary-row">
+                        <ui:Label text="League" class="summary-label" />
+                        <ui:Label name="summary-league" text="" class="summary-value" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="summary-divider" />
+                    <ui:VisualElement class="summary-row">
+                        <ui:Label text="Club" class="summary-label" />
+                        <ui:Label name="summary-club" text="" class="summary-value" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="summary-divider" />
+                    <ui:VisualElement class="summary-row">
+                        <ui:Label text="Squad Size" class="summary-label" />
+                        <ui:Label name="summary-squad" text="" class="summary-value" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="summary-note">
+                        <ui:Label text="ABOUT YOUR CAREER" class="summary-note-title" />
+                        <ui:Label text="Take control of a club and lead them to glory. Manage your team, develop players and compete for championships across multiple seasons." class="summary-note-body" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="setup-actions">
+                    <ui:Button name="start-career-button" text="Start Career  →" class="start-button" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
